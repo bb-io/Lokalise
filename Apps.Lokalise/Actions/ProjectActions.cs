@@ -13,8 +13,8 @@ public class ProjectActions : BaseActions
 
     [Action]
     public ProjectsResponse? ListAllProjects(string url,
-                                            [ActionParameter] ProjectListParameters projectListParameters,
-                                            AuthenticationCredentialsProvider authenticationCredentialsProvider)
+                                            AuthenticationCredentialsProvider authenticationCredentialsProvider,
+                                            [ActionParameter] ProjectListParameters projectListParameters)
     {
         var requestUrl = url + ProjectsUrl;
 
@@ -27,9 +27,34 @@ public class ProjectActions : BaseActions
     }
 
     [Action]
+    public ProjectsCollectionResponse? ProjectForDates(string url,
+                                        AuthenticationCredentialsProvider authenticationCredentialsProvider,
+                                        [ActionParameter] ProjectFilterByDateRequest projectListParameters)
+    {
+        var requestUrl = url + ProjectsUrl;
+
+        var result = _httpRequestProvider.Get(
+            requestUrl,
+            null,
+            authenticationCredentialsProvider);
+
+        var projects = SnakeCaseConverter.Deserialize<ProjectsResponse>(result.Content);
+
+        projects.Projects = projects.Projects.Where(proj =>
+        {
+            var dateTime = DateTime.Parse(string.Join(" ", proj.CreatedAt.Split(" ").Take(2)));
+            return dateTime >= projectListParameters.From && dateTime <= projectListParameters.To;
+        }).ToList();
+
+        return new ProjectsCollectionResponse {
+            Projects = projects
+        };
+    }
+
+    [Action]
     public ProjectResponse? CreateProject(string url,
-                                        [ActionParameter] ProjectCreateRequest? projectListParameters,
-                                        AuthenticationCredentialsProvider authenticationCredentialsProvider)
+                                        AuthenticationCredentialsProvider authenticationCredentialsProvider,
+                                        [ActionParameter] ProjectCreateRequest? projectListParameters)
     {
         var requestUrl = url + ProjectsUrl;
         var result = _httpRequestProvider.Post(
@@ -44,8 +69,8 @@ public class ProjectActions : BaseActions
 
     [Action]
     public ProjectResponse? RetrieveProject(string url,
-                                    [ActionParameter] string projectId,
-                                    AuthenticationCredentialsProvider authenticationCredentialsProvider)
+                                    AuthenticationCredentialsProvider authenticationCredentialsProvider,
+                                    [ActionParameter] string projectId)
     {
         var requestUrl = url + ProjectsUrl + $"/{projectId}";
         var result = _httpRequestProvider.Get(requestUrl, null, authenticationCredentialsProvider);
@@ -54,9 +79,9 @@ public class ProjectActions : BaseActions
 
     [Action]
     public ProjectResponse? UpdateProject(string url,
+                                  AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                   [ActionParameter] string projectId,
-                                  [ActionParameter] ProjectUpdateRequest projectListParameters,
-                                  AuthenticationCredentialsProvider authenticationCredentialsProvider)
+                                  [ActionParameter] ProjectUpdateRequest projectListParameters)
     {
         var requestUrl = url + ProjectsUrl + $"/{projectId}";
         var result = _httpRequestProvider.Put(
@@ -71,8 +96,8 @@ public class ProjectActions : BaseActions
 
     [Action]
     public ProjectDeleteResponse? DeleteProject(string url,
-                                [ActionParameter] string projectId,
-                                AuthenticationCredentialsProvider authenticationCredentialsProvider)
+                                AuthenticationCredentialsProvider authenticationCredentialsProvider,
+                                [ActionParameter] string projectId)
     {
         var requestUrl = url + ProjectsUrl + $"/{projectId}";
         var result = _httpRequestProvider.Delete(requestUrl, _requestWithBodyHeaders, authenticationCredentialsProvider);
@@ -81,8 +106,8 @@ public class ProjectActions : BaseActions
 
     [Action]
     public EmptyResponse? EmptyProject(string url,
-                              [ActionParameter] string projectId,
-                              AuthenticationCredentialsProvider authenticationCredentialsProvider)
+                              AuthenticationCredentialsProvider authenticationCredentialsProvider,
+                              [ActionParameter] string projectId)
     {
         var requestUrl = url + ProjectsUrl + $"/{projectId}/empty";
         var result = _httpRequestProvider.Put(
