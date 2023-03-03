@@ -5,6 +5,8 @@ using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Authentication;
 
 namespace Apps.Lokalise.Actions;
+
+[ActionList]
 public class TaskActions : BaseActions
 {
     private const string TasksUrl = "tasks";
