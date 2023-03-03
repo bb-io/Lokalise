@@ -14,9 +14,9 @@ public class TaskActions : BaseActions
 
     [Action]
     public TasksResponse? ListAllTasks(string url,
+                                            AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                             [ActionParameter] string projectId,
-                                            [ActionParameter] TaskListParameters taskListParameters,
-                                            AuthenticationCredentialsProvider authenticationCredentialsProvider)
+                                            [ActionParameter] TaskListParameters taskListParameters)
     {
         var requestUrl = $"{url}/{ProjectsUrl}/{projectId}/{TasksUrl}";
 
@@ -30,9 +30,9 @@ public class TaskActions : BaseActions
 
     [Action]
     public TaskResponse? CreateTask(string url,
+                                        AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                         [ActionParameter] string projectId,
-                                        [ActionParameter] TaskCreateRequest? taskCreateRequest,
-                                        AuthenticationCredentialsProvider authenticationCredentialsProvider)
+                                        [ActionParameter] TaskCreateRequest? taskCreateRequest)
     {
         var requestUrl = $"{url}/{ProjectsUrl}/{projectId}/{TasksUrl}";
         var result = _httpRequestProvider.Post(
@@ -46,22 +46,23 @@ public class TaskActions : BaseActions
     }
 
     [Action]
-    public TaskRetriveResponse? RetrieveTask(string url,
+    public TaskResponse? RetrieveTask(string url,
+                                    AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                     [ActionParameter] string projectId,
-                                    [ActionParameter] string taskId,
-                                    AuthenticationCredentialsProvider authenticationCredentialsProvider)
+                                    [ActionParameter] string taskId)
     {
         var requestUrl = $"{url}/{ProjectsUrl}/{projectId}/{TasksUrl}/{taskId}";
         var result = _httpRequestProvider.Get(requestUrl, null, authenticationCredentialsProvider);
-        return SnakeCaseConverter.Deserialize<TaskRetriveResponse>(result.Content);
+        var res = SnakeCaseConverter.Deserialize<TaskRetriveResponse>(result.Content);
+        return res.Task;
     }
 
     [Action]
     public TaskRetriveResponse? UpdateTask(string url,
+                                    AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                   [ActionParameter] string projectId,
                                   [ActionParameter] string taskId,
-                                  [ActionParameter] TaskUpdateRequest taskUpdateRequest,
-                                  AuthenticationCredentialsProvider authenticationCredentialsProvider)
+                                  [ActionParameter] TaskUpdateRequest taskUpdateRequest)
     {
         var requestUrl = $"{url}/{ProjectsUrl}/{projectId}/{TasksUrl}/{taskId}";
         var result = _httpRequestProvider.Put(
@@ -76,9 +77,9 @@ public class TaskActions : BaseActions
 
     [Action]
     public TaskDeleteResponse? DeleteTask(string url,
+                                    AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                 [ActionParameter] string projectId,
-                                [ActionParameter] string taskId,
-                                AuthenticationCredentialsProvider authenticationCredentialsProvider)
+                                [ActionParameter] string taskId)
     {
         var requestUrl = $"{url}/{ProjectsUrl}/{projectId}/{TasksUrl}/{taskId}";
         var result = _httpRequestProvider.Delete(requestUrl, null, authenticationCredentialsProvider);

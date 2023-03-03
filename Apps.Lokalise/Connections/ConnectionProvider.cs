@@ -6,14 +6,14 @@ public class ConnectionProvider : IConnectionProvider
 {
     public AuthenticationCredentialsProvider Create(IDictionary<string, string> connectionValues)
     {
-        var credential = connectionValues.First(x => x.Key == "apiKey");
+        var credential = connectionValues.First(x => x.Key == "X-Api-Token");
         return new AuthenticationCredentialsProvider(
             AuthenticationCredentialsRequestLocation.Header,
-            "X-Api-Token", 
+            credential.Key, 
             credential.Value);
     }
 
     public string ConnectionName => "Blackbird";
 
-    public IEnumerable<string> ConnectionProperties => new[] { "url", "apiKey" };
+    public IEnumerable<string> ConnectionProperties => new[] { "url", "X-Api-Token" };
 }
