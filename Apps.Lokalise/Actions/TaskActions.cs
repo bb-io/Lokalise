@@ -58,6 +58,18 @@ public class TaskActions : BaseActions
     }
 
     [Action]
+    public WordsCounts? RetrieveTaskWordsCount(string url,
+                                AuthenticationCredentialsProvider authenticationCredentialsProvider,
+                                [ActionParameter] string projectId,
+                                [ActionParameter] string taskId)
+    {
+        var requestUrl = $"{url}/{ProjectsUrl}/{projectId}/{TasksUrl}/{taskId}";
+        var result = _httpRequestProvider.Get(requestUrl, null, authenticationCredentialsProvider);
+        var res = SnakeCaseConverter.Deserialize<WordsCountResponse>(result.Content);
+        return res.Task;
+    }
+
+    [Action]
     public TaskRetriveResponse? UpdateTask(string url,
                                     AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                   [ActionParameter] string projectId,
