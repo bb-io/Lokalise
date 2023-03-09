@@ -1,0 +1,12 @@
+﻿{
+  "definition": [
+    {
+      "name": "token",
+      "description": "API token for authorization"
+    }
+  ],
+  "communicationWrapperType": "HttpWrapper",
+  "authenticationType": null,
+  "authenticationDefition": null,
+  "authenticationResponseMapping": null
+}

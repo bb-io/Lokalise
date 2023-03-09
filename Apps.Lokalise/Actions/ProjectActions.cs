@@ -9,17 +9,14 @@ namespace Apps.Lokalise.Actions;
 [ActionList]
 public class ProjectActions : BaseActions
 {
-    private const string ProjectsUrl = "/projects";
+    private readonly string ProjectsUrl = "https://api.lokalise.com/api2/projects";
 
     [Action]
-    public ProjectsResponse? ListAllProjects(string url,
-                                            AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public ProjectsResponse? ListAllProjects(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                             [ActionParameter] ProjectListParameters projectListParameters)
     {
-        var requestUrl = url + ProjectsUrl;
-
         var result = _httpRequestProvider.Get(
-            requestUrl,
+            ProjectsUrl,
             SnakeCaseConverter.ModelToSnakeCaseKeyPair(projectListParameters),
             authenticationCredentialsProvider);
 
@@ -27,14 +24,11 @@ public class ProjectActions : BaseActions
     }
 
     [Action]
-    public ProjectsCollectionResponse? ProjectForDates(string url,
-                                        AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public ProjectsCollectionResponse? ProjectForDates(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                         [ActionParameter] ProjectFilterByDateRequest projectListParameters)
     {
-        var requestUrl = url + ProjectsUrl;
-
         var result = _httpRequestProvider.Get(
-            requestUrl,
+            ProjectsUrl,
             null,
             authenticationCredentialsProvider);
 
@@ -52,13 +46,11 @@ public class ProjectActions : BaseActions
     }
 
     [Action]
-    public ProjectResponse? CreateProject(string url,
-                                        AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public ProjectResponse? CreateProject(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                         [ActionParameter] ProjectCreateRequest? projectListParameters)
     {
-        var requestUrl = url + ProjectsUrl;
         var result = _httpRequestProvider.Post(
-            requestUrl,
+            ProjectsUrl,
             null,
             _requestWithBodyHeaders,
             SnakeCaseConverter.Serialize(projectListParameters),
@@ -68,22 +60,20 @@ public class ProjectActions : BaseActions
     }
 
     [Action]
-    public ProjectResponse? RetrieveProject(string url,
-                                    AuthenticationCredentialsProvider authenticationCredentialsProvider,
-                                    [ActionParameter] string projectId)
+    public ProjectResponse? RetrieveProject(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+                                    [ActionParameter]string projectId)
     {
-        var requestUrl = url + ProjectsUrl + $"/{projectId}";
+        var requestUrl = ProjectsUrl + $"/{projectId}";
         var result = _httpRequestProvider.Get(requestUrl, null, authenticationCredentialsProvider);
         return SnakeCaseConverter.Deserialize<ProjectResponse>(result.Content);
     }
 
     [Action]
-    public ProjectResponse? UpdateProject(string url,
-                                  AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public ProjectResponse? UpdateProject(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                   [ActionParameter] string projectId,
                                   [ActionParameter] ProjectUpdateRequest projectListParameters)
     {
-        var requestUrl = url + ProjectsUrl + $"/{projectId}";
+        var requestUrl = ProjectsUrl + $"/{projectId}";
         var result = _httpRequestProvider.Put(
             requestUrl,
             null,
@@ -95,21 +85,19 @@ public class ProjectActions : BaseActions
     }
 
     [Action]
-    public ProjectDeleteResponse? DeleteProject(string url,
-                                AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public ProjectDeleteResponse? DeleteProject(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                 [ActionParameter] string projectId)
     {
-        var requestUrl = url + ProjectsUrl + $"/{projectId}";
+        var requestUrl = ProjectsUrl + $"/{projectId}";
         var result = _httpRequestProvider.Delete(requestUrl, _requestWithBodyHeaders, authenticationCredentialsProvider);
         return SnakeCaseConverter.Deserialize<ProjectDeleteResponse>(result.Content);
     }
 
     [Action]
-    public EmptyResponse? EmptyProject(string url,
-                              AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public EmptyResponse? EmptyProject(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
                               [ActionParameter] string projectId)
     {
-        var requestUrl = url + ProjectsUrl + $"/{projectId}/empty";
+        var requestUrl = ProjectsUrl + $"/{projectId}/empty";
         var result = _httpRequestProvider.Put(
             requestUrl,
             null,
