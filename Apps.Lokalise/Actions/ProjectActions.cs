@@ -12,7 +12,7 @@ public class ProjectActions : BaseActions
     private readonly string ProjectsUrl = "https://api.lokalise.com/api2/projects";
 
     [Action]
-    public ProjectsResponse? ListAllProjects(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public ProjectsResponse? ListAllProjects(AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                             [ActionParameter] ProjectListParameters projectListParameters)
     {
         var result = _httpRequestProvider.Get(
@@ -24,7 +24,7 @@ public class ProjectActions : BaseActions
     }
 
     [Action]
-    public ProjectsCollectionResponse? ProjectForDates(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public ProjectsCollectionResponse? ProjectForDates(AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                         [ActionParameter] ProjectFilterByDateRequest projectListParameters)
     {
         var result = _httpRequestProvider.Get(
@@ -46,7 +46,7 @@ public class ProjectActions : BaseActions
     }
 
     [Action]
-    public ProjectResponse? CreateProject(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public ProjectResponse? CreateProject(AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                         [ActionParameter] ProjectCreateRequest? projectListParameters)
     {
         var result = _httpRequestProvider.Post(
@@ -60,7 +60,7 @@ public class ProjectActions : BaseActions
     }
 
     [Action]
-    public ProjectResponse? RetrieveProject(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public ProjectResponse? RetrieveProject(AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                     [ActionParameter]string projectId)
     {
         var requestUrl = ProjectsUrl + $"/{projectId}";
@@ -69,7 +69,7 @@ public class ProjectActions : BaseActions
     }
 
     [Action]
-    public ProjectResponse? UpdateProject(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public ProjectResponse? UpdateProject(AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                   [ActionParameter] string projectId,
                                   [ActionParameter] ProjectUpdateRequest projectListParameters)
     {
@@ -85,7 +85,7 @@ public class ProjectActions : BaseActions
     }
 
     [Action]
-    public ProjectDeleteResponse? DeleteProject(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public ProjectDeleteResponse? DeleteProject(AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                 [ActionParameter] string projectId)
     {
         var requestUrl = ProjectsUrl + $"/{projectId}";
@@ -94,7 +94,7 @@ public class ProjectActions : BaseActions
     }
 
     [Action]
-    public EmptyResponse? EmptyProject(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public EmptyResponse? EmptyProject(AuthenticationCredentialsProvider authenticationCredentialsProvider,
                               [ActionParameter] string projectId)
     {
         var requestUrl = ProjectsUrl + $"/{projectId}/empty";

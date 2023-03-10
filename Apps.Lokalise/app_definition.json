@@ -1,7 +1,7 @@
 ﻿{
   "definition": [
     {
-      "name": "token",
+      "name": "X-Api-Key",
       "description": "API token for authorization"
     }
   ],

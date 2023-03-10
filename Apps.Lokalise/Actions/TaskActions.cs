@@ -9,15 +9,15 @@ namespace Apps.Lokalise.Actions;
 [ActionList]
 public class TaskActions : BaseActions
 {
-    private const string TasksUrl = "https://api.lokalise.com/api2/tasks";
+    private const string TasksUrlPart = "tasks";
     private const string ProjectsUrl = "https://api.lokalise.com/api2/projects";
 
     [Action]
-    public TasksResponse? ListAllTasks(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public TasksResponse? ListAllTasks(AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                             [ActionParameter] string projectId,
                                             [ActionParameter] TaskListParameters taskListParameters)
     {
-        var requestUrl = $"{ProjectsUrl}/{projectId}/{TasksUrl}";
+        var requestUrl = $"{ProjectsUrl}/{projectId}/{TasksUrlPart}";
 
         var result = _httpRequestProvider.Get(
             requestUrl,
@@ -28,11 +28,11 @@ public class TaskActions : BaseActions
     }
 
     [Action]
-    public TaskResponse? CreateTask(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public TaskResponse? CreateTask(AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                         [ActionParameter] string projectId,
                                         [ActionParameter] TaskCreateRequest? taskCreateRequest)
     {
-        var requestUrl = $"{ProjectsUrl}/{projectId}/{TasksUrl}";
+        var requestUrl = $"{ProjectsUrl}/{projectId}/{TasksUrlPart}";
         var result = _httpRequestProvider.Post(
             requestUrl,
             null,
@@ -44,34 +44,34 @@ public class TaskActions : BaseActions
     }
 
     [Action]
-    public TaskResponse? RetrieveTask(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public TaskResponse? RetrieveTask(AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                     [ActionParameter] string projectId,
                                     [ActionParameter] string taskId)
     {
-        var requestUrl = $"{ProjectsUrl}/{projectId}/{TasksUrl}/{taskId}";
+        var requestUrl = $"{ProjectsUrl}/{projectId}/{TasksUrlPart}/{taskId}";
         var result = _httpRequestProvider.Get(requestUrl, null, authenticationCredentialsProvider);
         var res = SnakeCaseConverter.Deserialize<TaskRetriveResponse>(result.Content);
         return res.Task;
     }
 
     [Action]
-    public WordsCounts? RetrieveTaskWordsCount(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public WordsCounts? RetrieveTaskWordsCount(AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                 [ActionParameter] string projectId,
                                 [ActionParameter] string taskId)
     {
-        var requestUrl = $"{ProjectsUrl}/{projectId}/{TasksUrl}/{taskId}";
+        var requestUrl = $"{ProjectsUrl}/{projectId}/{TasksUrlPart}/{taskId}";
         var result = _httpRequestProvider.Get(requestUrl, null, authenticationCredentialsProvider);
         var res = SnakeCaseConverter.Deserialize<WordsCountResponse>(result.Content);
         return res.Task;
     }
 
     [Action]
-    public TaskRetriveResponse? UpdateTask(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public TaskRetriveResponse? UpdateTask(AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                   [ActionParameter] string projectId,
                                   [ActionParameter] string taskId,
                                   [ActionParameter] TaskUpdateRequest taskUpdateRequest)
     {
-        var requestUrl = $"{ProjectsUrl}/{projectId}/{TasksUrl}/{taskId}";
+        var requestUrl = $"{ProjectsUrl}/{projectId}/{TasksUrlPart}/{taskId}";
         var result = _httpRequestProvider.Put(
             requestUrl,
             null,
@@ -83,11 +83,11 @@ public class TaskActions : BaseActions
     }
 
     [Action]
-    public TaskDeleteResponse? DeleteTask(string token, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+    public TaskDeleteResponse? DeleteTask(AuthenticationCredentialsProvider authenticationCredentialsProvider,
                                 [ActionParameter] string projectId,
                                 [ActionParameter] string taskId)
     {
-        var requestUrl = $"{ProjectsUrl}/{projectId}/{TasksUrl}/{taskId}";
+        var requestUrl = $"{ProjectsUrl}/{projectId}/{TasksUrlPart}/{taskId}";
         var result = _httpRequestProvider.Delete(requestUrl, null, authenticationCredentialsProvider);
         return SnakeCaseConverter.Deserialize<TaskDeleteResponse>(result.Content);
     }
