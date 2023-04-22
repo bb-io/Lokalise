@@ -7,7 +7,7 @@ public class Language
     public List<int> Keys { get; set; }
     public string Status { get; set; }
     public int Progress { get; set; }
-    public InitialTmLeverage InitialTmLeverage { get; set; }
+    //public InitialTmLeverage InitialTmLeverage { get; set; }
     public int KeysCount { get; set; }
     public int WordsCount { get; set; }
     public string CompletedAt { get; set; }

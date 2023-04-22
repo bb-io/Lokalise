@@ -13,6 +13,6 @@ public class ProjectResponse
     public int TeamId { get; set; }
     public int BaseLanguageId { get; set; }
     public string BaseLanguageIso { get; set; }
-    public Settings Settings { get; set; }
-    public Statistics Statistics { get; set; }
+    //public Settings Settings { get; set; }
+    //public Statistics Statistics { get; set; }
 }
