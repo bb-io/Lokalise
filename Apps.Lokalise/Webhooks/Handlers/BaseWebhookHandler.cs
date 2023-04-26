@@ -25,7 +25,7 @@ namespace Apps.Localise.Webhooks.Handlers
         public async Task SubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider, Dictionary<string, string> values)
         {
             var client = new LokaliseClient();
-            var request = new LokaliseRequest($"/projects/9313135464493320194009.67731881/webhooks", Method.Post, authenticationCredentialsProvider); //{values["projectIdForWebhooks"]}
+            var request = new LokaliseRequest($"/projects/{values["projectIdForWebhooks"]}/webhooks", Method.Post, authenticationCredentialsProvider); //{values["projectIdForWebhooks"]}
             request.AddJsonBody(new
             {
                 url = values["payloadUrl"],
