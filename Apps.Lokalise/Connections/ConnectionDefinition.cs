@@ -20,7 +20,17 @@ namespace Apps.Lokalise.Connections
                 ConnectionUsage = ConnectionUsage.Actions,
                 ConnectionProperties = new List<ConnectionProperty>()
                 {
-                    new ConnectionProperty("apiToken")
+                    new ConnectionProperty("apiToken"),
+                }
+            },
+            new ConnectionPropertyGroup
+            {
+                Name = "Project Id for webhooks",
+                AuthenticationType = ConnectionAuthenticationType.Undefined,
+                ConnectionUsage = ConnectionUsage.Webhooks,
+                ConnectionProperties = new List<ConnectionProperty>()
+                {
+                    new ConnectionProperty("projectIdForWebhooks")
                 }
             }
         };
