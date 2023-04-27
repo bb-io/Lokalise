@@ -1,14 +1,8 @@
 ﻿using Apps.Lokalise;
+using Apps.Lokalise.Dtos;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Webhooks;
 using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Apps.Localise.Webhooks.Handlers
 {
@@ -25,24 +19,28 @@ namespace Apps.Localise.Webhooks.Handlers
         public async Task SubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider, Dictionary<string, string> values)
         {
             var client = new LokaliseClient();
-            var request = new LokaliseRequest($"/projects/{values["projectIdForWebhooks"]}/webhooks", Method.Post, authenticationCredentialsProvider); //{values["projectIdForWebhooks"]}
+            var request = new LokaliseRequest($"/projects/{values["projectIdForWebhooks"]}/webhooks", Method.Post, authenticationCredentialsProvider);
             request.AddJsonBody(new
             {
                 url = values["payloadUrl"],
                 events = new[] { SubscriptionEvent }
             });
-            await client.ExecuteAsync(request);
+            Task.Run(async () =>
+            {
+                await Task.Delay(2000);
+                client.Execute(request);
+            });
         }
 
         public async Task UnsubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider, Dictionary<string, string> values)
         {
-            //var client = new ZendeskClient(authenticationCredentialsProvider);
-            //var getRequest = new ZendeskRequest($"/api/v2/webhooks?filter[name_contains]={SubscriptionEvent}", Method.Get, authenticationCredentialsProvider);
-            //var webhooks = await client.GetAsync<WebhooksListResponse>(getRequest);
-            //var webhookId = webhooks.Webhooks.First().Id;
+            var client = new LokaliseClient();
+            var getRequest = new LokaliseRequest($"/projects/{values["projectIdForWebhooks"]}/webhooks?limit=5000", Method.Post, authenticationCredentialsProvider);
+            var webhooks = await client.GetAsync<WebhooksResponseWrapper>(getRequest);
+            var webhook = webhooks.Webhooks.FirstOrDefault(w => w.Url == values["payloadUrl"]);
 
-            //var deleteRequest = new ZendeskRequest($"/api/v2/webhooks/{webhookId}", Method.Delete, authenticationCredentialsProvider);
-            //await client.ExecuteAsync(deleteRequest);
+            var deleteRequest = new LokaliseRequest($"/projects/{values["projectIdForWebhooks"]}/webhooks/{webhook.WebhookId}", Method.Delete, authenticationCredentialsProvider);
+            await client.ExecuteAsync(deleteRequest);
         }
     }
 }
