@@ -13,7 +13,7 @@ namespace Apps.Localise.Webhooks
     {
         const string LokalisePingRequestBody = "[\"ping\"]";
 
-        [Webhook("On project imported", typeof(ProjectImportedHandler))]
+        [Webhook("On project imported", typeof(ProjectImportedHandler), Description = "Triggered when an object is imported")]
         public async Task<WebhookResponse<ProjectImportedPayload>> ProjectImportedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -33,7 +33,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project exported", typeof(ProjectExportedHandler))]
+        [Webhook("On project exported", typeof(ProjectExportedHandler), Description = "Triggered when a project is exported")]
         public async Task<WebhookResponse<ProjectExportedPayload>> ProjectExportedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -53,7 +53,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project deleted", typeof(ProjectDeletedHandler))]
+        [Webhook("On project deleted", typeof(ProjectDeletedHandler), Description = "Triggered when a project is deleted")]
         public async Task<WebhookResponse<BasePayload>> ProjectDeletedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -73,7 +73,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project snapshot", typeof(ProjectSnapshotHandler))]
+        [Webhook("On project snapshot", typeof(ProjectSnapshotHandler), Description = "Triggered when a snapshot of a project is made")]
         public async Task<WebhookResponse<BasePayload>> ProjectSnapshotHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -93,7 +93,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project branch added", typeof(ProjectBranchAddedHandler))]
+        [Webhook("On project branch added", typeof(ProjectBranchAddedHandler), Description = "Triggered when a new branch is added to a project")]
         public async Task<WebhookResponse<ProjectBranchAddedPayload>> ProjectBranchAddedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -113,7 +113,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project branch deleted", typeof(ProjectBranchDeletedHandler))]
+        [Webhook("On project branch deleted", typeof(ProjectBranchDeletedHandler), Description = "Triggered when a branch is deleted from a project")]
         public async Task<WebhookResponse<ProjectBranchDeletedPayload>> ProjectBranchDeletedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -133,7 +133,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project branch merged", typeof(ProjectBranchMergedHandler))]
+        [Webhook("On project branch merged", typeof(ProjectBranchMergedHandler), Description = "Triggered when a branch merge happens")]
         public async Task<WebhookResponse<ProjectBranchMergedPayload>> ProjectBranchMergedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -153,7 +153,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project languages added", typeof(ProjectLanguagesAddedHandler))]
+        [Webhook("On project languages added", typeof(ProjectLanguagesAddedHandler), Description = "Triggered when a new language is added to a project")]
         public async Task<WebhookResponse<ProjectLanguagesAddedPayload>> ProjectLanguagesAddedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -173,7 +173,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project language removed", typeof(ProjectLanguageRemovedHandler))]
+        [Webhook("On project language removed", typeof(ProjectLanguageRemovedHandler), Description = "Triggered when a language is removed from a project")]
         public async Task<WebhookResponse<ProjectLanguageRemovedPayload>> ProjectLanguageRemovedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -193,7 +193,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project language settings changed", typeof(ProjectLanguageSettings_changedHandler))]
+        [Webhook("On project language settings changed", typeof(ProjectLanguageSettings_changedHandler), Description = "Triggered when project language settings change")]
         public async Task<WebhookResponse<ProjectLanguageSettings_changedPayload>> ProjectLanguageSettings_changedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -213,7 +213,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project key added", typeof(ProjectKeyAddedHandler))]
+        [Webhook("On project key added", typeof(ProjectKeyAddedHandler), Description = "Triggered when a new key is added to a project")]
         public async Task<WebhookResponse<ProjectKeyAddedPayload>> ProjectKeyAddedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -233,7 +233,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project keys added", typeof(ProjectKeysAddedHandler))]
+        [Webhook("On project keys added", typeof(ProjectKeysAddedHandler), Description = "Triggered when multiple keys are added to a project")]
         public async Task<WebhookResponse<ProjectKeysAddedPayload>> ProjectKeysAddedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -253,7 +253,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project key modified", typeof(ProjectKeyModifiedHandler))]
+        [Webhook("On project key modified", typeof(ProjectKeyModifiedHandler), Description = "Triggered when keys are modified")]
         public async Task<WebhookResponse<ProjectKeyModifiedPayload>> ProjectKeyModifiedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -273,7 +273,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project keys deleted", typeof(ProjectKeysDeletedHandler))]
+        [Webhook("On project keys deleted", typeof(ProjectKeysDeletedHandler), Description = "Triggered when keys are removed from a project")]
         public async Task<WebhookResponse<ProjectKeysDeletedPayload>> ProjectKeysDeletedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -293,7 +293,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project key comment added", typeof(ProjectKeyCommentAddedHandler))]
+        [Webhook("On project key comment added", typeof(ProjectKeyCommentAddedHandler), Description = "Triggers when a new comment is added to a key")]
         public async Task<WebhookResponse<ProjectKeyCommentAddedPayload>> ProjectKeyCommentAddedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -313,7 +313,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project translation updated", typeof(ProjectTranslationUpdatedHandler))]
+        [Webhook("On project translation updated", typeof(ProjectTranslationUpdatedHandler), Description = "Triggered when a project translation is updated")]
         public async Task<WebhookResponse<ProjectTranslationUpdatedPayload>> ProjectTranslationUpdatedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -333,7 +333,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project translations updated", typeof(ProjectTranslationsUpdatedHandler))]
+        [Webhook("On project translations updated", typeof(ProjectTranslationsUpdatedHandler), Description = "Triggered when multiple project translations have been updated")]
         public async Task<WebhookResponse<ProjectTranslationsUpdatedPayload>> ProjectTranslationsUpdatedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -353,7 +353,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project translation proofread", typeof(ProjectTranslationProofreadHandler))]
+        [Webhook("On project translation proofread", typeof(ProjectTranslationProofreadHandler), Description = "Triggers when a proofreading has taken place")]
         public async Task<WebhookResponse<ProjectTranslationProofreadPayload>> ProjectTranslationProofreadHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -373,7 +373,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project contributor added", typeof(ProjectContributorAddedHandler))]
+        [Webhook("On project contributor added", typeof(ProjectContributorAddedHandler), Description = "Triggered when a contributor is added to a project")]
         public async Task<WebhookResponse<ProjectContributorAddedPayload>> ProjectContributorAddedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -393,7 +393,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project contributor deleted", typeof(ProjectContributorDeletedHandler))]
+        [Webhook("On project contributor deleted", typeof(ProjectContributorDeletedHandler), Description = "Triggered when a contributor was deleted from a project")]
         public async Task<WebhookResponse<ProjectContributorDeletedPayload>> ProjectContributorDeletedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -413,7 +413,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project task created", typeof(ProjectTaskCreatedHandler))]
+        [Webhook("On project task created", typeof(ProjectTaskCreatedHandler), Description = "Triggered when a new task is created in a project")]
         public async Task<WebhookResponse<ProjectTaskCreatedPayload>> ProjectTaskCreatedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -433,7 +433,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project task closed", typeof(ProjectTaskClosedHandler))]
+        [Webhook("On project task closed", typeof(ProjectTaskClosedHandler), Description = "Triggered when a project task is closed")]
         public async Task<WebhookResponse<ProjectTaskClosedPayload>> ProjectTaskClosedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -453,7 +453,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project task deleted", typeof(ProjectTaskDeletedHandler))]
+        [Webhook("On project task deleted", typeof(ProjectTaskDeletedHandler), Description = "Triggered when a project task is deleted")]
         public async Task<WebhookResponse<ProjectTaskDeletedPayload>> ProjectTaskDeletedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -473,7 +473,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project task language closed", typeof(ProjectTaskLanguageClosedHandler))]
+        [Webhook("On project task language closed", typeof(ProjectTaskLanguageClosedHandler), Description = "Triggered when a specific language task closes")]
         public async Task<WebhookResponse<ProjectTaskLanguageClosedPayload>> ProjectTaskLanguageClosedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -493,7 +493,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On team order created", typeof(TeamOrderCreatedHandler))]
+        [Webhook("On team order created", typeof(TeamOrderCreatedHandler), Description = "Triggered when a new team order is created")]
         public async Task<WebhookResponse<TeamOrderCreatedPayload>> TeamOrderCreatedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -513,7 +513,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On team order deleted", typeof(TeamOrderDeletedHandler))]
+        [Webhook("On team order deleted", typeof(TeamOrderDeletedHandler), Description = "Triggered when a new team order is deleted")]
         public async Task<WebhookResponse<BasePayload>> TeamOrderDeletedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -533,7 +533,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On team order completed", typeof(TeamOrderCompletedHandler))]
+        [Webhook("On team order completed", typeof(TeamOrderCompletedHandler), Description = "Triggered when a new team order is completed")]
         public async Task<WebhookResponse<TeamOrderCompletedPayload>> TeamOrderCompletedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
@@ -553,7 +553,7 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        [Webhook("On project task initial tm leverage calculated", typeof(ProjectTaskInitial_tm_leverageCalculatedHandler))]
+        [Webhook("On project task initial TM leverage calculated", typeof(ProjectTaskInitial_tm_leverageCalculatedHandler), Description = "Triggered when TM calculation finishes")]
         public async Task<WebhookResponse<ProjectTaskInitial_tm_leverageCalculatedPayload>> ProjectTaskInitial_tm_leverageCalculatedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
