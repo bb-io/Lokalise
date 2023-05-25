@@ -1,5 +1,4 @@
-﻿using Blackbird.Applications.Sdk.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Apps.Lokalise.Models.Requests
 {
-    public class ListAllFilesRequest
+    public class AddLanguageToProjectRequest
     {
-        [Display("Project Id")]
         public string ProjectId { get; set; }
+
+        public string LanguageCode { get; set; }
     }
 }
