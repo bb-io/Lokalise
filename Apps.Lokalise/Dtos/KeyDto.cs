@@ -8,7 +8,7 @@ namespace Apps.Lokalise.Dtos
 {
     public class KeyDto
     {
-        public string Key_id { get; set; }
+        public int Key_id { get; set; }
 
         public string Created_at { get; set; }
 

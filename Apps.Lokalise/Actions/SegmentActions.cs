@@ -23,7 +23,18 @@ namespace Apps.Lokalise.Actions
         {
             var client = new LokaliseClient();
             var request = new LokaliseRequest($"/projects/{input.ProjectId}/keys/{input.KeyId}/segments/{input.LanguageCode}", Method.Get, authenticationCredentialsProviders);
-            var result = client.Get<SegmentsWrapper>(request);
+            var result = new SegmentsWrapper();
+            try
+            {
+                result = client.Get<SegmentsWrapper>(request);
+            }
+            catch (HttpRequestException ex)
+            {
+                if (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    throw new Exception("Segmentation is not enabled or is not available in this project");
+                }
+            }
             return new ListAllSegmentsResponse()
             {
                 Segments = result.Segments
