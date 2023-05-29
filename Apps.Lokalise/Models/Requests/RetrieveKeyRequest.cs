@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Apps.Lokalise.Models.Requests
 {
-    public class CreateKeyRequest
+    public class RetrieveKeyRequest
     {
+        public string KeyId { get; set; }
+
         public string ProjectId { get; set; }
-        public string KeyName { get; set; }
-        public string PlatformName { get; set; }
     }
 }
