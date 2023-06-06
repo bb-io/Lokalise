@@ -11,7 +11,7 @@ namespace Apps.Lokalise.Webhooks.Payload
         public int Id { get; set; }
         public string Type { get; set; }
         public string Title { get; set; }
-        public string DueDate { get; set; }
+        public string Due_date { get; set; }
         public string Description { get; set; }
     }
 

@@ -413,12 +413,17 @@ namespace Apps.Localise.Webhooks
             };
         }
 
+        public class SimpleResponse
+        {
+            public string Message { get; set; }
+        }
+
         [Webhook("On project task created", typeof(ProjectTaskCreatedHandler), Description = "Triggered when a new task is created in a project")]
-        public async Task<WebhookResponse<ProjectTaskCreatedPayload>> ProjectTaskCreatedHandler(WebhookRequest webhookRequest)
+        public async Task<WebhookResponse<Lokalise.Webhooks.Payload.Task>> ProjectTaskCreatedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
             {
-                return new WebhookResponse<ProjectTaskCreatedPayload>
+                return new WebhookResponse<Lokalise.Webhooks.Payload.Task>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
                     Result = null
@@ -426,19 +431,19 @@ namespace Apps.Localise.Webhooks
             }
             var data = JsonConvert.DeserializeObject<ProjectTaskCreatedPayload>(webhookRequest.Body.ToString());
             if (data is null) { throw new InvalidCastException(nameof(webhookRequest.Body)); }
-            return new WebhookResponse<ProjectTaskCreatedPayload>
+            return new WebhookResponse<Lokalise.Webhooks.Payload.Task>
             {
                 HttpResponseMessage = null,
-                Result = data
+                Result = data.Task
             };
         }
 
         [Webhook("On project task closed", typeof(ProjectTaskClosedHandler), Description = "Triggered when a project task is closed")]
-        public async Task<WebhookResponse<ProjectTaskClosedPayload>> ProjectTaskClosedHandler(WebhookRequest webhookRequest)
+        public async Task<WebhookResponse<Lokalise.Webhooks.Payload.Task>> ProjectTaskClosedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
             {
-                return new WebhookResponse<ProjectTaskClosedPayload>
+                return new WebhookResponse<Lokalise.Webhooks.Payload.Task>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
                     Result = null
@@ -446,19 +451,19 @@ namespace Apps.Localise.Webhooks
             }
             var data = JsonConvert.DeserializeObject<ProjectTaskClosedPayload>(webhookRequest.Body.ToString());
             if (data is null) { throw new InvalidCastException(nameof(webhookRequest.Body)); }
-            return new WebhookResponse<ProjectTaskClosedPayload>
+            return new WebhookResponse<Lokalise.Webhooks.Payload.Task>
             {
                 HttpResponseMessage = null,
-                Result = data
+                Result = data.Task
             };
         }
 
         [Webhook("On project task deleted", typeof(ProjectTaskDeletedHandler), Description = "Triggered when a project task is deleted")]
-        public async Task<WebhookResponse<ProjectTaskDeletedPayload>> ProjectTaskDeletedHandler(WebhookRequest webhookRequest)
+        public async Task<WebhookResponse<Lokalise.Webhooks.Payload.Task>> ProjectTaskDeletedHandler(WebhookRequest webhookRequest)
         {
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
             {
-                return new WebhookResponse<ProjectTaskDeletedPayload>
+                return new WebhookResponse<Lokalise.Webhooks.Payload.Task>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
                     Result = null
@@ -466,10 +471,10 @@ namespace Apps.Localise.Webhooks
             }
             var data = JsonConvert.DeserializeObject<ProjectTaskDeletedPayload>(webhookRequest.Body.ToString());
             if (data is null) { throw new InvalidCastException(nameof(webhookRequest.Body)); }
-            return new WebhookResponse<ProjectTaskDeletedPayload>
+            return new WebhookResponse<Lokalise.Webhooks.Payload.Task>
             {
                 HttpResponseMessage = null,
-                Result = data
+                Result = data.Task
             };
         }
 
