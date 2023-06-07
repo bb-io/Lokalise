@@ -21,7 +21,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectImportedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectImportedPayload>(webhookRequest.Body.ToString());
@@ -41,7 +41,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectExportedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectExportedPayload>(webhookRequest.Body.ToString());
@@ -61,7 +61,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<BasePayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<BasePayload>(webhookRequest.Body.ToString());
@@ -81,7 +81,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<BasePayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<BasePayload>(webhookRequest.Body.ToString());
@@ -101,7 +101,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectBranchAddedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectBranchAddedPayload>(webhookRequest.Body.ToString());
@@ -121,7 +121,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectBranchDeletedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectBranchDeletedPayload>(webhookRequest.Body.ToString());
@@ -141,7 +141,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectBranchMergedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectBranchMergedPayload>(webhookRequest.Body.ToString());
@@ -161,7 +161,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectLanguagesAddedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectLanguagesAddedPayload>(webhookRequest.Body.ToString());
@@ -181,7 +181,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectLanguageRemovedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectLanguageRemovedPayload>(webhookRequest.Body.ToString());
@@ -201,7 +201,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectLanguageSettings_changedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectLanguageSettings_changedPayload>(webhookRequest.Body.ToString());
@@ -221,7 +221,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectKeyAddedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectKeyAddedPayload>(webhookRequest.Body.ToString());
@@ -241,7 +241,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectKeysAddedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectKeysAddedPayload>(webhookRequest.Body.ToString());
@@ -261,7 +261,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectKeyModifiedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectKeyModifiedPayload>(webhookRequest.Body.ToString());
@@ -281,7 +281,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectKeysDeletedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectKeysDeletedPayload>(webhookRequest.Body.ToString());
@@ -301,7 +301,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectKeyCommentAddedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectKeyCommentAddedPayload>(webhookRequest.Body.ToString());
@@ -321,7 +321,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectTranslationUpdatedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectTranslationUpdatedPayload>(webhookRequest.Body.ToString());
@@ -341,7 +341,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectTranslationsUpdatedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectTranslationsUpdatedPayload>(webhookRequest.Body.ToString());
@@ -361,7 +361,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectTranslationProofreadPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectTranslationProofreadPayload>(webhookRequest.Body.ToString());
@@ -381,7 +381,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectContributorAddedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectContributorAddedPayload>(webhookRequest.Body.ToString());
@@ -401,7 +401,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectContributorDeletedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectContributorDeletedPayload>(webhookRequest.Body.ToString());
@@ -426,7 +426,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<Lokalise.Webhooks.Payload.Task>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectTaskCreatedPayload>(webhookRequest.Body.ToString());
@@ -446,7 +446,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<Lokalise.Webhooks.Payload.Task>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectTaskClosedPayload>(webhookRequest.Body.ToString());
@@ -466,7 +466,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<Lokalise.Webhooks.Payload.Task>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectTaskDeletedPayload>(webhookRequest.Body.ToString());
@@ -486,7 +486,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectTaskLanguageClosedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectTaskLanguageClosedPayload>(webhookRequest.Body.ToString());
@@ -506,7 +506,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<TeamOrderCreatedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<TeamOrderCreatedPayload>(webhookRequest.Body.ToString());
@@ -526,7 +526,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<BasePayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<BasePayload>(webhookRequest.Body.ToString());
@@ -546,7 +546,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<TeamOrderCompletedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<TeamOrderCompletedPayload>(webhookRequest.Body.ToString());
@@ -566,7 +566,7 @@ namespace Apps.Localise.Webhooks
                 return new WebhookResponse<ProjectTaskInitial_tm_leverageCalculatedPayload>
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                    Result = null
+                    Result = null, ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
             }
             var data = JsonConvert.DeserializeObject<ProjectTaskInitial_tm_leverageCalculatedPayload>(webhookRequest.Body.ToString());
