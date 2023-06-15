@@ -37,10 +37,15 @@ namespace Apps.Localise.Webhooks.Handlers
             var client = new LokaliseClient();
             var getRequest = new LokaliseRequest($"/projects/{values["projectIdForWebhooks"]}/webhooks?limit=5000", Method.Post, authenticationCredentialsProvider);
             var webhooks = await client.GetAsync<WebhooksResponseWrapper>(getRequest);
-            var webhook = webhooks.Webhooks.FirstOrDefault(w => w.Url == values["payloadUrl"]);
+            var webhook = webhooks?.Webhooks.FirstOrDefault(w => w.Url == values["payloadUrl"]);
 
-            var deleteRequest = new LokaliseRequest($"/projects/{values["projectIdForWebhooks"]}/webhooks/{webhook.WebhookId}", Method.Delete, authenticationCredentialsProvider);
-            await client.ExecuteAsync(deleteRequest);
+            if (webhook != null)
+            {
+                var deleteRequest = new LokaliseRequest($"/projects/{values["projectIdForWebhooks"]}/webhooks/{webhook.WebhookId}", Method.Delete, authenticationCredentialsProvider);
+                await client.ExecuteAsync(deleteRequest);
+            }
+
+            await Task.CompletedTask;
         }
     }
 }
