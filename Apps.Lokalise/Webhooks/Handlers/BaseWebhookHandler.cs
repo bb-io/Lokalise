@@ -27,7 +27,7 @@ namespace Apps.Localise.Webhooks.Handlers
             });
             Task.Run(async () =>
             {
-                await Task.Delay(2000);
+                await Task.Delay(1000);
                 client.Execute(request);
             });
         }
