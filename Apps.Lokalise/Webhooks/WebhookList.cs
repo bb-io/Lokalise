@@ -413,11 +413,6 @@ namespace Apps.Localise.Webhooks
             };
         }
 
-        public class SimpleResponse
-        {
-            public string Message { get; set; }
-        }
-
         [Webhook("On project task created", typeof(ProjectTaskCreatedHandler), Description = "Triggered when a new task is created in a project")]
         public async Task<WebhookResponse<Lokalise.Webhooks.Payload.Task>> ProjectTaskCreatedHandler(WebhookRequest webhookRequest)
         {
