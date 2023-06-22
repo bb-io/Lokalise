@@ -28,24 +28,37 @@ namespace Apps.Lokalise.Actions
             return client.Get<ListProjectKeysResponse>(request);
         }
 
+        private static List<string> possiblePlatforms = new List<string> { "android", "ios", "other", "web" };
+
         [Action("Create key", Description = "Create key in project")]
-        public KeyDto CreateKey(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        public Key CreateKey(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
             [ActionParameter] CreateKeyRequest input)
         {
             var client = new LokaliseClient();
             var request = new LokaliseRequest($"/projects/{input.ProjectId}/keys", Method.Post, authenticationCredentialsProviders);
-            request.AddJsonBody(new
+
+            if (input.Platforms.Any(x => !possiblePlatforms.Contains(x)))
+                throw new Exception($"Platforms can only contain {String.Join(", ", possiblePlatforms)}");
+
+            var body = new
             {
                 keys = new[]
                 {
                     new
                     {
                         key_name = input.KeyName,
-                        platforms = new[]{ input.PlatformName }
+                        platforms = input.Platforms
                     }
                 }
-            });
-            return client.Get<ListProjectKeysResponse>(request).Keys.First();
+            };
+
+            request.AddJsonBody(body);
+            var key = client.Post<ListProjectKeysResponse>(request)?.Keys.FirstOrDefault();
+
+            if (key == null)
+                throw new Exception("Unknown error occured during key creation");
+
+            return new Key { Id = key.Key_id };
         }
 
         [Action("Get key", Description = "Get key by id")]

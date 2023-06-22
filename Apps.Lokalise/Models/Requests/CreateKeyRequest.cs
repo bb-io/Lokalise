@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Blackbird.Applications.Sdk.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,11 @@ namespace Apps.Lokalise.Models.Requests
 {
     public class CreateKeyRequest
     {
+        [Display("Project ID")]
         public string ProjectId { get; set; }
+        [Display("Key name")]
         public string KeyName { get; set; }
-        public string PlatformName { get; set; }
+        [Display("Platforms")]
+        public List<string> Platforms { get; set; }
     }
 }
