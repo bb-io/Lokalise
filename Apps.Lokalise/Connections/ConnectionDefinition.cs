@@ -22,17 +22,7 @@ namespace Apps.Lokalise.Connections
                 {
                     new ConnectionProperty("apiToken"),
                 }
-            },
-            new ConnectionPropertyGroup
-            {
-                Name = "Project Id for webhooks",
-                AuthenticationType = ConnectionAuthenticationType.Undefined,
-                ConnectionUsage = ConnectionUsage.Webhooks,
-                ConnectionProperties = new List<ConnectionProperty>()
-                {
-                    new ConnectionProperty("projectIdForWebhooks")
-                }
-            }
+            }            
         };
 
         public IEnumerable<AuthenticationCredentialsProvider> CreateAuthorizationCredentialsProviders(Dictionary<string, string> values)
