@@ -1,4 +1,5 @@
 using Apps.Localise.Webhooks.Handlers;
+using Blackbird.Applications.Sdk.Common.Webhooks;
 
 namespace Apps.Lokalise.Webhooks.Handlers
 {
@@ -6,6 +7,8 @@ namespace Apps.Lokalise.Webhooks.Handlers
     {
         const string SubscriptionEvent = "project.branch.added";
 
-        public ProjectBranchAddedHandler() : base(SubscriptionEvent) { }
+        public ProjectBranchAddedHandler([WebhookParameter] WebhookInput input) : base(SubscriptionEvent, input)
+        {
+        }
     }
 }

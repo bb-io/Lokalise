@@ -11,14 +11,9 @@ namespace Apps.Localise.Webhooks.Handlers
     {
 
         private string SubscriptionEvent;
-        private WebhookInput _webhookInput;
+        private readonly WebhookInput _webhookInput;
 
-        public BaseWebhookHandler(string subEvent)
-        {
-            SubscriptionEvent = subEvent;
-        }
-
-        public BaseWebhookHandler(string subEvent, [WebhookParameter] WebhookInput input):this(subEvent)
+        public BaseWebhookHandler(string subEvent, [WebhookParameter] WebhookInput input)
         {
             SubscriptionEvent = subEvent;
             _webhookInput = input;
