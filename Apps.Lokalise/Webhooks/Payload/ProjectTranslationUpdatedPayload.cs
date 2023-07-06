@@ -1,3 +1,5 @@
+using Apps.Lokalise.Webhooks.Models;
+
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectTranslationUpdatedPayload : BasePayload myDeserializedClass = JsonConvert.DeserializeObject<ProjectTranslationUpdatedPayload : BasePayload>(myJsonResponse);
@@ -6,6 +8,25 @@ namespace Apps.Lokalise.Webhooks.Payload
         public TranslationUpdated Translation { get; set; }
         public KeyName Key { get; set; }
         public Language Language { get; set; }
+
+        public new TranslationEvent Convert()
+        {
+            return new TranslationEvent
+            {
+                ProjectId = Project.Id,
+                ProjectName = Project.Name,
+                UserEmail = User.Email,
+                UserName = User.Email,
+                LanguageId = Language.Id,
+                Iso = Language.Iso,
+                LanguageName = Language.Name,
+                KeyId= Key.Id,
+                KeyName= Key.Name,
+                TranslationId= Translation.Id,
+                TranslationValue= Translation.Value,
+                PreviousTranslationValue = Translation.PreviousValue
+            };
+        }
     }
 
     public class TranslationUpdated
@@ -13,6 +34,8 @@ namespace Apps.Lokalise.Webhooks.Payload
         public int Id { get; set; }
         public string Value { get; set; }
         public string PreviousValue { get; set; }
+
+        
     }
 
 

@@ -1,3 +1,5 @@
+using Apps.Lokalise.Webhooks.Models;
+
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectKeyCommentAddedPayload : BasePayload myDeserializedClass = JsonConvert.DeserializeObject<ProjectKeyCommentAddedPayload : BasePayload>(myJsonResponse);
@@ -25,6 +27,24 @@ namespace Apps.Lokalise.Webhooks.Payload
     {
         public KeyCommentAdded Key { get; set; }
         public Comment Comment { get; set; }
+
+        public new KeyCommentEvent Convert()
+        {
+            return new KeyCommentEvent
+            {
+                ProjectId = Project.Id,
+                ProjectName = Project.Name,
+                UserEmail = User.Email,
+                UserName = User.Email,
+                Id = Key.Id,
+                Name = Key.Name,
+                Comment = Comment.Value,
+                IOS = Key.Filenames.Ios,
+                Android = Key.Filenames.Android,
+                Web = Key.Filenames.Web,
+                Other = Key.Filenames.Other,
+            };
+        }
     }
 
 

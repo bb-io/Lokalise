@@ -1,3 +1,5 @@
+using Apps.Lokalise.Webhooks.Models;
+
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectImportedPayload : BasePayload myDeserializedClass = JsonConvert.DeserializeObject<ProjectImportedPayload : BasePayload>(myJsonResponse);
@@ -13,6 +15,22 @@ namespace Apps.Lokalise.Webhooks.Payload
     public class ProjectImportedPayload : BasePayload
     {
         public Import Import { get; set; }
+
+        public new ProjectImportedEvent Convert()
+        {
+            return new ProjectImportedEvent
+            {
+                ProjectId = Project.Id,
+                ProjectName = Project.Name,
+                UserEmail = User.Email,
+                UserName = User.Email,
+                Filename = Import.Filename,
+                Format = Import.Format,
+                Inserted = Import.Inserted,
+                Updated = Import.Updated,
+                Skipped = Import.Skipped
+            };
+        }
     }
 
 

@@ -1,3 +1,4 @@
+using Apps.Lokalise.Webhooks.Models;
 using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
@@ -57,6 +58,21 @@ namespace Apps.Lokalise.Webhooks.Payload
     public class ProjectTaskInitial_tm_leverageCalculatedPayload : BasePayload
     {
         public TaskLeverage Task { get; set; }
+
+        public new TaskLeverageEvent Convert()
+        {
+            return new TaskLeverageEvent
+            {
+                ProjectId = Project.Id,
+                ProjectName = Project.Name,
+                UserEmail = User.Email,
+                UserName = User.Email,
+                TaskId = Task.Id,
+                Title = Task.Title,
+                Leverage = Task.InitialTmLeverage,
+                Description = Task.Description,
+            };
+        }
     }
 
     public class TaskLeverage
