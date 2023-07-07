@@ -9,7 +9,7 @@ namespace Apps.Lokalise.Webhooks.Payload
         public Task Task { get; set; }
         public Language Language { get; set; }
 
-        public new TaskLanguageEvent Convert()
+        public override TaskLanguageEvent Convert()
         {
             return new TaskLanguageEvent
             {

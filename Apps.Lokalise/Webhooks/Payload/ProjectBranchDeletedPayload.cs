@@ -6,7 +6,7 @@ namespace Apps.Lokalise.Webhooks.Payload
     public class ProjectBranchDeletedPayload : BasePayload
     {
         public Branch Branch { get; set; }
-        public new BranchEvent Convert()
+        public override BranchEvent Convert()
         {
             return new BranchEvent
             {

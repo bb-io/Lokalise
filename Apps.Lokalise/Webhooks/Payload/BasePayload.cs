@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
-    public class BasePayload : IModellable
+    public class BasePayload
     {
         public string Event { get; set; }
         public Project Project { get; set; }
         public User User { get; set; }
         public string CreatedAt { get; set; }
         public int CreatedAtTimestamp { get; set; }
-        public BaseEvent Convert()
+        public virtual BaseEvent Convert()
         {
             return new BaseEvent
             {

@@ -7,7 +7,7 @@ namespace Apps.Lokalise.Webhooks.Payload
     {
         public Task Task { get; set; }
 
-        public new TaskEvent Convert()
+        public override TaskEvent Convert()
         {
             return new TaskEvent
             {

@@ -19,7 +19,7 @@ namespace Apps.Lokalise.Webhooks.Payload
     {
         public List<Key> Keys { get; set; }
 
-        public new KeysDeletedEvent Convert()
+        public override KeysDeletedEvent Convert()
         {
             return new KeysDeletedEvent
             {

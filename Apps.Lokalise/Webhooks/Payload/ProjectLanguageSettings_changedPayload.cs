@@ -7,7 +7,7 @@ namespace Apps.Lokalise.Webhooks.Payload
     {
         public Language Language { get; set; }
 
-        public new LanguageEvent Convert()
+        public override LanguageEvent Convert()
         {
             return new LanguageEvent
             {

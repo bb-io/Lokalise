@@ -9,7 +9,7 @@ namespace Apps.Lokalise.Webhooks.Payload
         public KeyName Key { get; set; }
         public Language Language { get; set; }
 
-        public new TranslationEvent Convert()
+        public override TranslationEvent Convert()
         {
             return new TranslationEvent
             {

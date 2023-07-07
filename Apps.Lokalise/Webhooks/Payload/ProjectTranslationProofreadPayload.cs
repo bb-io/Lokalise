@@ -15,7 +15,7 @@ namespace Apps.Lokalise.Webhooks.Payload
         public KeyName Key { get; set; }
         public Language Language { get; set; }
 
-        public new ProofreadEvent Convert()
+        public override ProofreadEvent Convert()
         {
             return new ProofreadEvent
             {

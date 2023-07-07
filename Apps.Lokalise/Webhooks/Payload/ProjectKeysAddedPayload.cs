@@ -8,7 +8,7 @@ namespace Apps.Lokalise.Webhooks.Payload
     {
         public List<KeyWithTags> Keys { get; set; }
 
-        public new KeysEvent Convert()
+        public override KeysEvent Convert()
         {
             return new KeysEvent
             {

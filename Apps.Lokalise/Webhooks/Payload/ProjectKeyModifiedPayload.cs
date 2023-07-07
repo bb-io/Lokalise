@@ -16,7 +16,7 @@ namespace Apps.Lokalise.Webhooks.Payload
     {
         public KeyModified Key { get; set; }
 
-        public new KeyModifiedEvent Convert()
+        public override KeyModifiedEvent Convert()
         {
             return new KeyModifiedEvent
             {

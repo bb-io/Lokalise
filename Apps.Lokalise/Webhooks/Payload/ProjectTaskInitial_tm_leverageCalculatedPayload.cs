@@ -59,7 +59,7 @@ namespace Apps.Lokalise.Webhooks.Payload
     {
         public TaskLeverage Task { get; set; }
 
-        public new TaskLeverageEvent Convert()
+        public override TaskLeverageEvent Convert()
         {
             return new TaskLeverageEvent
             {

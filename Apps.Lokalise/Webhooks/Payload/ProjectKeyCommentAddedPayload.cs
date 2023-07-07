@@ -28,7 +28,7 @@ namespace Apps.Lokalise.Webhooks.Payload
         public KeyCommentAdded Key { get; set; }
         public Comment Comment { get; set; }
 
-        public new KeyCommentEvent Convert()
+        public override KeyCommentEvent Convert()
         {
             return new KeyCommentEvent
             {

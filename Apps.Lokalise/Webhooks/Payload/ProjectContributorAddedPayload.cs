@@ -12,7 +12,7 @@ namespace Apps.Lokalise.Webhooks.Payload
     {
         public Contributor Contributor { get; set; }
 
-        public new ContributerEvent Convert()
+        public override ContributerEvent Convert()
         {
             return new ContributerEvent
             {

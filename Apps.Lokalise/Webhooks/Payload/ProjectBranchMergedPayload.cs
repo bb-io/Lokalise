@@ -15,7 +15,7 @@ namespace Apps.Lokalise.Webhooks.Payload
         public Branch Branch { get; set; }
         public AffectedKeys AffectedKeys { get; set; }
 
-        public new BranchMergeEvent Convert()
+        public override BranchMergeEvent Convert()
         {
             return new BranchMergeEvent
             {

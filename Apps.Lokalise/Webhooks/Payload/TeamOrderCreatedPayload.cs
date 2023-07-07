@@ -15,7 +15,7 @@ namespace Apps.Lokalise.Webhooks.Payload
     {
         public Order Order { get; set; }
 
-        public new OrderEvent Convert()
+        public override OrderEvent Convert()
         {
             return new OrderEvent
             {

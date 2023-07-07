@@ -23,7 +23,7 @@ namespace Apps.Lokalise.Webhooks.Payload
     {
         public KeyWithTags Key { get; set; }
 
-        public new KeyEvent Convert()
+        public override KeyEvent Convert()
         {
             return new KeyEvent
             {

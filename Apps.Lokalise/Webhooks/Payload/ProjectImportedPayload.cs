@@ -16,7 +16,7 @@ namespace Apps.Lokalise.Webhooks.Payload
     {
         public Import Import { get; set; }
 
-        public new ProjectImportedEvent Convert()
+        public override ProjectImportedEvent Convert()
         {
             return new ProjectImportedEvent
             {
