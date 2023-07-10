@@ -18,8 +18,8 @@ namespace Apps.Lokalise.Webhooks.Models
         [Display("Task title")]
         public string Title { get; set; }
 
-        [Display("Task due date")]
-        public DateTime DueDate { get; set; }
+        //[Display("Task due date")]
+        //public DateTime DueDate { get; set; }
 
         [Display("Task description")]
         public string Description { get; set; }

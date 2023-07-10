@@ -16,7 +16,7 @@ namespace Apps.Lokalise.Webhooks.Payload
                 UserName = User.Email,
                 TaskId = Task.Id,
                 Title= Task.Title,
-                DueDate= Task.Due_date,
+                //DueDate= Task.Due_date,
                 Description= Task.Description,
             };
         }
