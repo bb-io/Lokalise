@@ -25,6 +25,7 @@ namespace Apps.Lokalise.Actions
         {
             var client = new LokaliseClient();
             var request = new LokaliseRequest($"/projects/{input.ProjectId}/files", Method.Get, authenticationCredentialsProviders);
+            request.AddQueryParameter("filter_filename", input.FileNameFilter);
             var result = client.Get<FilesWrapper>(request);
             return new ListAllFilesResponse()
             {

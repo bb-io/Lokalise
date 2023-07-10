@@ -11,5 +11,8 @@ namespace Apps.Lokalise.Models.Requests
     {
         [Display("Project Id")]
         public string ProjectId { get; set; }
+
+        [Display("Filename")]
+        public string? FileNameFilter { get; set; }
     }
 }
