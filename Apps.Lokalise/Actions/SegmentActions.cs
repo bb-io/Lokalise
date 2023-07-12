@@ -1,16 +1,10 @@
 ﻿using Apps.Lokalise.Dtos;
-using Apps.Lokalise.Models.Requests;
-using Apps.Lokalise.Models.Responses.Files;
+using Apps.Lokalise.Models.Requests.Segments;
 using Apps.Lokalise.Models.Responses.Segments;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Apps.Lokalise.Actions
 {
@@ -35,7 +29,7 @@ namespace Apps.Lokalise.Actions
                     throw new Exception("Segmentation is not enabled or is not available in this project");
                 }
             }
-            return new ListAllSegmentsResponse()
+            return new ListAllSegmentsResponse
             {
                 Segments = result.Segments
             };

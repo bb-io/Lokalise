@@ -1,5 +1,5 @@
 ﻿using Apps.Lokalise.ModelConverters;
-using Apps.Lokalise.Models.Requests;
+using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.Models.Responses.Projects;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;

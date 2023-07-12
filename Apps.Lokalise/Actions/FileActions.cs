@@ -1,98 +1,108 @@
 ﻿using Apps.Lokalise.Dtos;
-using Apps.Lokalise.ModelConverters;
-using Apps.Lokalise.Models.Requests;
 using Apps.Lokalise.Models.Responses.Files;
-using Apps.Lokalise.Models.Responses.Projects;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Apps.Lokalise.Extensions;
+using Apps.Lokalise.Models.Requests.Files;
+using Apps.Lokalise.Models.Requests.Projects;
+using Apps.Lokalise.Utils;
 
 namespace Apps.Lokalise.Actions
 {
     [ActionList]
     public class FileActions
     {
+        #region Fields
+
+        private readonly LokaliseClient _client;
+
+        #endregion
+
+        #region Constructors
+
+        public FileActions()
+        {
+            _client = new();
+        }
+
+        #endregion
+        
+        #region Actions
+        
         [Action("List all project files", Description = "List all project files")]
-        public ListAllFilesResponse? ListAllFiles(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        public async Task<ListAllFilesResponse> ListAllFiles(
+            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
             [ActionParameter] ListAllFilesRequest input)
         {
-            var client = new LokaliseClient();
-            var request = new LokaliseRequest($"/projects/{input.ProjectId}/files", Method.Get, authenticationCredentialsProviders);
-            var result = client.Get<FilesWrapper>(request);
-            return new ListAllFilesResponse()
-            {
-                Files = result.Files
-            };
+            var endpoint =
+                $"/projects/{input.ProjectId}/files?filter_filename={input.FilterFileName}";
+
+            var items = await Paginator.GetAll<FilesWrapper, FileInfoDto>(
+                authenticationCredentialsProviders.ToArray(),
+                endpoint);
+
+            return new(items);
         }
 
         [Action("Upload file to project", Description = "Upload file to project")]
-        public void UploadFile(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        public async Task<QueuedProcessDto> UploadFile(
+            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+            [ActionParameter] [Display("Project ID")]
+            string projectId,
             [ActionParameter] UploadFileRequest input)
         {
-            var client = new LokaliseClient();
-            var request = new LokaliseRequest($"/projects/{input.ProjectId}/files/upload", Method.Post, authenticationCredentialsProviders);
-            request.AddJsonBody(new
-            {
-                data = Convert.ToBase64String(input.File),
-                filename = input.FileName,
-                lang_iso = input.LanguageCode,
-            });
-            var uploadResult = client.Execute<QueuedProcessDto>(request).Data;
-            client.PollFileImportOperation(input.ProjectId, uploadResult.Process.Process_id, authenticationCredentialsProviders);
+            var creds = authenticationCredentialsProviders.ToArray();
+            var endpoint = $"/projects/{projectId}/files/upload";
+
+            var request = new LokaliseRequest(endpoint, Method.Post, creds).WithJsonBody(input);
+            var uploadResult = await _client.ExecuteWithHandling<QueuedProcessDto>(request);
+
+            return await _client
+                .PollFileImportOperation(projectId, uploadResult.Process.ProcessId, creds);
         }
 
         [Action("Download all project files", Description = "Download all project files as zip archive")]
-        public DownloadProjectFilesResponse DownloadProjectFiles(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        public async Task<DownloadProjectFilesResponse> DownloadProjectFiles(
+            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+            [ActionParameter] [Display("Project ID")]
+            string projectId,
             [ActionParameter] DownloadFileRequest input)
         {
-            var client = new LokaliseClient();
-            var request = new LokaliseRequest($"/projects/{input.ProjectId}/files/download", Method.Post, authenticationCredentialsProviders);
-            request.AddJsonBody(new
-            {
-                format = input.FileFormat
-            });
-            var exportResult = client.Execute<ExportFilesDto>(request).Data;
+            var endpoint = $"/projects/{projectId}/files/download";
+            var request = new LokaliseRequest(endpoint, Method.Post, authenticationCredentialsProviders)
+                .WithJsonBody(input);
 
-            var fileUri = new Uri(exportResult.Bundle_url);
-            var externalFileClient = new RestClient(fileUri.GetLeftPart(UriPartial.Authority));
-            var data = externalFileClient.Get(new RestRequest(fileUri.AbsolutePath, Method.Get)).RawBytes;
-            return new DownloadProjectFilesResponse()
+            var exportResult = await _client.ExecuteWithHandling<ExportFilesDto>(request);
+
+            var fileUri = new Uri(exportResult.BundleUrl);
+            var dataResponse = await _client.ExecuteWithHandling(new(fileUri));
+
+            return new()
             {
                 FileName = fileUri.Segments.Last(),
-                File = data
+                File = dataResponse.RawBytes
             };
         }
 
         [Action("Download translated project file", Description = "Download translated project file by name")]
-        public DownloadProjectFilesResponse DownloadTranslatedFile(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        public async Task<DownloadProjectFilesResponse> DownloadTranslatedFile(
+            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+            [ActionParameter] [Display("Project ID")]
+            string projectId,
             [ActionParameter] DownloadTranslatedFileRequest input)
         {
-            var allFiles = DownloadProjectFiles(authenticationCredentialsProviders, new DownloadFileRequest() 
-            { 
-                ProjectId = input.ProjectId,
-                FileFormat = input.FileFormat
-            });
-            byte[] fileData = new byte[0];
-            using(var memoryStream = new MemoryStream(allFiles.File))
-            {
-                using (var zip = new ZipArchive(memoryStream, ZipArchiveMode.Read))
-                {
-                    var entry = zip.Entries.FirstOrDefault(en => en.FullName.Split('/').First() == input.LanguageCode.Replace("-", "_") && en.Name == input.FileName);
-                    using(var resultFileStream = new MemoryStream())
-                    {
-                        entry.Open().CopyTo(resultFileStream);
-                        fileData = resultFileStream.ToArray();
-                    }   
-                }
-            }
-            return new DownloadProjectFilesResponse()
+            var allFiles = await DownloadProjectFiles(
+                authenticationCredentialsProviders,
+                projectId,
+                input);
+
+            var fileData = allFiles.File.GetFileFromZip(en =>
+                en.FullName.Split('/').First() == input.LanguageCode.Replace("-", "_") &&
+                en.Name == input.FileName);
+
+            return new()
             {
                 FileName = input.FileName,
                 File = fileData
@@ -100,12 +110,17 @@ namespace Apps.Lokalise.Actions
         }
 
         [Action("Delete file", Description = "Delete file from project")]
-        public void DeleteFile(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        public Task DeleteFile(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
             [ActionParameter] DeleteFileRequest input)
         {
-            var client = new LokaliseClient();
-            var request = new LokaliseRequest($"/projects/{input.ProjectId}/files/{input.FileId}", Method.Delete, authenticationCredentialsProviders);
-            client.Execute(request);
+            var request = new LokaliseRequest(
+                $"/projects/{input.ProjectId}/files/{input.FileId}",
+                Method.Delete,
+                authenticationCredentialsProviders);
+
+            return _client.ExecuteWithHandling(request);
         }
+        
+        #endregion
     }
 }

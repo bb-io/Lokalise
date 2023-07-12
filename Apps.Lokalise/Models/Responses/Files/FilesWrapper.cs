@@ -1,14 +1,12 @@
-﻿using Apps.Lokalise.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
+using Apps.Lokalise.Dtos;
+using Apps.Lokalise.Models.Responses.Base;
 
 namespace Apps.Lokalise.Models.Responses.Files
 {
-    public class FilesWrapper
+    public class FilesWrapper : PaginationResponse<FileInfoDto>
     {
-        public IEnumerable<FileInfoDto> Files { get; set; }
+        [JsonPropertyName("files")]
+        public override IEnumerable<FileInfoDto> Items { get; set; }
     }
 }

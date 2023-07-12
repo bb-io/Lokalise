@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
+using Blackbird.Applications.Sdk.Common;
 
 namespace Apps.Lokalise.Dtos
 {
@@ -13,8 +10,11 @@ namespace Apps.Lokalise.Dtos
 
     public class ProcessObj
     {
-        public string Process_id { get; set; }
+        [JsonPropertyName("process_id")]
+        [Display("Process id")]
+        public string ProcessId { get; set; }
 
+        [JsonPropertyName("status")]
         public string Status { get; set; }
     }
 }

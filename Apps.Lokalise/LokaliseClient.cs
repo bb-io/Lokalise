@@ -1,30 +1,64 @@
 ﻿using Apps.Lokalise.Dtos;
+using Apps.Lokalise.Models.Responses.Errors;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Newtonsoft.Json;
 using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Apps.Lokalise
 {
     public class LokaliseClient : RestClient
     {
-        public LokaliseClient() : base(new RestClientOptions() { ThrowOnAnyError = true, BaseUrl = new Uri("https://api.lokalise.com/api2/") }) { }
+        #region Constructors
 
+        public LokaliseClient() : base(new RestClientOptions { BaseUrl = new Uri("https://api.lokalise.com/api2/") })
+        {
+        }
 
-        public QueuedProcessDto PollFileImportOperation(string projectId, string processId,
+        #endregion
+
+        #region Execute methods
+
+        public async Task<T> ExecuteWithHandling<T>(RestRequest request)
+        {
+            var response = await this.ExecuteAsync<T>(request);
+
+            if (response.IsSuccessStatusCode)
+                return response.Data;
+
+            throw ConfigureRequestException(response.Content);
+        }
+
+        public async Task<RestResponse> ExecuteWithHandling(RestRequest request)
+        {
+            var response = await ExecuteAsync(request);
+
+            if (response.IsSuccessStatusCode)
+                return response;
+
+            throw ConfigureRequestException(response.Content);
+        }
+
+        private Exception ConfigureRequestException(string content)
+        {
+            var error = JsonConvert.DeserializeObject<ErrorResponse>(content);
+            return new($"{error.Error.Message}; Code: {error.Error.Code}");
+        }
+
+        #endregion
+
+        public async Task<QueuedProcessDto> PollFileImportOperation(string projectId, string processId,
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders)
         {
             var request = new LokaliseRequest($"/projects/{projectId}/processes/{processId}",
                 Method.Get, authenticationCredentialsProviders);
-            var response = this.Get<QueuedProcessDto>(request);
+
+            var response = await ExecuteWithHandling<QueuedProcessDto>(request);
             while (response?.Process.Status != "finished")
             {
                 Task.Delay(2000);
-                response = this.Get<QueuedProcessDto>(request);
+                response = await ExecuteWithHandling<QueuedProcessDto>(request);
             }
+
             return response;
         }
     }

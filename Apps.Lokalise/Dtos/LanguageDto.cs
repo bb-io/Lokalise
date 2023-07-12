@@ -1,18 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
+using Blackbird.Applications.Sdk.Common;
 
 namespace Apps.Lokalise.Dtos
 {
     public class LanguageDto
     {
-        public string Lang_id { get; set; }
+        [JsonPropertyName("lang_id")]
+        [Display("Language id")]
+        public long LangId { get; set; }
 
-        public string Lang_iso { get; set; }
-        public string Lang_name { get; set; }
-        public string Is_rtl { get; set; }
+        [JsonPropertyName("lang_iso")]
+        [Display("Language iso")]
+        public string LangIso { get; set; }
+        
+        [JsonPropertyName("lang_name")]
+        [Display("Language name")]
+        public string LangName { get; set; }
+        
+        [JsonPropertyName("is_rtl")]
+        [Display("Is rtl")]
+        public bool IsRtl { get; set; }
 
     }
 }

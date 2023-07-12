@@ -5,7 +5,7 @@ public class BoolToBitConverter : JsonConverter
 {
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
-        writer.WriteValue(((bool)value) ? 1 : 0);
+        writer.WriteValue((bool)value ? 1 : 0);
     }
 
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

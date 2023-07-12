@@ -1,12 +1,10 @@
-﻿
+﻿using System.Net;
 using Apps.Lokalise.Webhooks.Handlers;
 using Apps.Lokalise.Webhooks.Payload;
 using Blackbird.Applications.Sdk.Common.Webhooks;
 using Newtonsoft.Json;
-using System.Net;
-using System.Text.Json;
 
-namespace Apps.Localise.Webhooks
+namespace Apps.Lokalise.Webhooks
 {
     [WebhookList]
     public class WebhookList 

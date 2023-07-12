@@ -1,10 +1,9 @@
-﻿using Apps.Lokalise;
-using Apps.Lokalise.Dtos;
+﻿using Apps.Lokalise.Dtos;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Webhooks;
 using RestSharp;
 
-namespace Apps.Localise.Webhooks.Handlers
+namespace Apps.Lokalise.Webhooks.Handlers
 {
     public class BaseWebhookHandler : IWebhookEventHandler
     {
@@ -28,7 +27,7 @@ namespace Apps.Localise.Webhooks.Handlers
             Task.Run(async () =>
             {
                 await Task.Delay(1000);
-                client.Execute(request);
+                await client.ExecuteWithHandling(request);
             });
         }
 
@@ -42,7 +41,7 @@ namespace Apps.Localise.Webhooks.Handlers
             if (webhook != null)
             {
                 var deleteRequest = new LokaliseRequest($"/projects/{values["projectIdForWebhooks"]}/webhooks/{webhook.WebhookId}", Method.Delete, authenticationCredentialsProvider);
-                await client.ExecuteAsync(deleteRequest);
+                await client.ExecuteWithHandling(deleteRequest);
             }
 
             await Task.CompletedTask;
