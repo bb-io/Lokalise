@@ -1,3 +1,5 @@
+using Blackbird.Applications.Sdk.Common;
+
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectTaskClosedPayload : BasePayload myDeserializedClass = JsonConvert.DeserializeObject<ProjectTaskClosedPayload : BasePayload>(myJsonResponse);
@@ -11,7 +13,9 @@ namespace Apps.Lokalise.Webhooks.Payload
         public int Id { get; set; }
         public string Type { get; set; }
         public string Title { get; set; }
-        //public string Due_date { get; set; }
+
+        [Display("Due date")]
+        public DateTime Due_date { get; set; }
         public string Description { get; set; }
     }
 
