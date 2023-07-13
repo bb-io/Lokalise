@@ -14,6 +14,6 @@ namespace Apps.Lokalise.Dtos
 
     public class WebhooksResponseWrapper
     {
-        public IEnumerable<WebhookDto> Webhooks { get; set; }
+        public IEnumerable<WebhookDto?> Webhooks { get; set; }
     }
 }

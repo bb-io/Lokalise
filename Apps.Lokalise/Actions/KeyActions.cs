@@ -4,6 +4,7 @@ using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Models.Requests.Keys;
 using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.Models.Responses.Keys;
+using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
@@ -41,9 +42,7 @@ namespace Apps.Lokalise.Actions
             [ActionParameter] ListProjectKeysRequest input)
         {
             var baseEndpoint = $"/projects/{projectId}/keys";
-            var query = input.AsDictionary()
-                .Where(x => !string.IsNullOrEmpty(x.Value))
-                .ToDictionary(x => x.Key, x => x.Value.AsLokaliseQuery());
+            var query = input.AsDictionary().AllIsNotNull();
 
             var endpointWithQuery = QueryHelpers.AddQueryString(baseEndpoint, query);
 
@@ -85,7 +84,7 @@ namespace Apps.Lokalise.Actions
             var endpoint = $"/projects/{input.ProjectId}/keys/{input.KeyId}";
 
             if (input.DisableReferences is not null)
-                endpoint += $"?disable_references={input.DisableReferences.ToString()!.AsLokaliseQuery()}";
+                endpoint += $"?disable_references={input.DisableReferences.AsLokaliseQuery()}";
 
             var request = new LokaliseRequest(endpoint, Method.Get, authenticationCredentialsProviders);
             var response = await _client.ExecuteWithHandling<KeyResponse>(request);

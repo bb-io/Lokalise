@@ -13,4 +13,12 @@ public static class ObjectExtensions
         });
         return JsonSerializer.Deserialize<Dictionary<string, string>>(json)!;
     }
+    
+    public static string AsLokaliseQuery(this object queryValue)
+        => queryValue.ToString() switch
+        {
+            "True" => "1",
+            "False" => "0",
+            _ => queryValue.ToString()
+        } ?? string.Empty;
 }

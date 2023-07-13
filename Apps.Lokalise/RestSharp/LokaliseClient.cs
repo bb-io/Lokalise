@@ -4,7 +4,7 @@ using Blackbird.Applications.Sdk.Common.Authentication;
 using Newtonsoft.Json;
 using RestSharp;
 
-namespace Apps.Lokalise
+namespace Apps.Lokalise.RestSharp
 {
     public class LokaliseClient : RestClient
     {
@@ -55,7 +55,7 @@ namespace Apps.Lokalise
             var response = await ExecuteWithHandling<QueuedProcessDto>(request);
             while (response?.Process.Status != "finished")
             {
-                Task.Delay(2000);
+                await Task.Delay(2000);
                 response = await ExecuteWithHandling<QueuedProcessDto>(request);
             }
 

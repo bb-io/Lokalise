@@ -1,15 +1,23 @@
-﻿using Apps.Lokalise.ModelConverters;
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
+using Blackbird.Applications.Sdk.Common;
 
 namespace Apps.Lokalise.Models.Requests.Projects;
 public class ProjectListParameters
 {
-    public string FilterTeamId { get; set; }
-    public string FilterNames { get; set; }
-    [JsonConverter(typeof(BoolToBitConverter))]
-    public bool IncludeStatistics { get; set; }
-    [JsonConverter(typeof(BoolToBitConverter))]
-    public bool IncludeSettings { get; set; }
-    public int Limit { get; set; }
-    public int Page { get; set; }
+    
+    [JsonPropertyName("filter_team_id")]
+    [Display("Filter team id")]
+    public string? FilterTeamId { get; set; }
+    
+    [JsonPropertyName("filter_names")]
+    [Display("Filter names")]
+    public string? FilterNames { get; set; }
+    
+    [JsonPropertyName("include_statistics")]
+    [Display("Include statistics")]
+    public bool? IncludeStatistics { get; set; }
+    
+    [JsonPropertyName("include_settings")]
+    [Display("Include settings")]
+    public bool? IncludeSettings { get; set; }
 }

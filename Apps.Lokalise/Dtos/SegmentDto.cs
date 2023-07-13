@@ -1,14 +1,36 @@
-﻿namespace Apps.Lokalise.Dtos
+﻿using System.Text.Json.Serialization;
+using Blackbird.Applications.Sdk.Common;
+
+namespace Apps.Lokalise.Dtos
 {
     public class SegmentDto
     {
-        public int Segment_number { get; set; }
-        public string Language_iso { get; set; }
-        public string Modified_at { get; set; }
-        public string Modified_by_email { get; set; }
-        public string Value { get; set; }
-        public bool Is_fuzzy { get; set; }
-        public bool Is_reviewed { get; set; }
-        public int Words { get; set; }
+        [JsonPropertyName("segment_number")]
+        [Display("Segment number")]
+        public int SegmentNumber { get; set; }
+
+        [JsonPropertyName("language_iso")]
+        [Display("Language iso")]
+        public string LanguageIso { get; set; }
+
+        [JsonPropertyName("modified_at")]
+        [Display("Modified at")]
+        public string ModifiedAt { get; set; }
+
+        [JsonPropertyName("modified_by_email")]
+        [Display("Modified by email")]
+        public string ModifiedByEmail { get; set; }
+
+        [JsonPropertyName("value")] public string Value { get; set; }
+
+        [JsonPropertyName("is_fuzzy")]
+        [Display("Is fuzzy")]
+        public bool IsFuzzy { get; set; }
+
+        [JsonPropertyName("is_reviewed")]
+        [Display("Is reviewed")]
+        public bool IsReviewed { get; set; }
+
+        [JsonPropertyName("words")] public int Words { get; set; }
     }
 }

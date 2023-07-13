@@ -1,4 +1,5 @@
 ﻿using Apps.Lokalise.Models.Responses.Base;
+using Apps.Lokalise.RestSharp;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using RestSharp;
 

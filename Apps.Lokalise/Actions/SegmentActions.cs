@@ -1,9 +1,13 @@
 ﻿using Apps.Lokalise.Dtos;
+using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Models.Requests.Segments;
 using Apps.Lokalise.Models.Responses.Segments;
+using Apps.Lokalise.RestSharp;
+using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Microsoft.AspNetCore.WebUtilities;
 using RestSharp;
 
 namespace Apps.Lokalise.Actions
@@ -11,50 +15,73 @@ namespace Apps.Lokalise.Actions
     [ActionList]
     public class SegmentActions
     {
-        [Action("List all segments", Description = "List all key segments")]
-        public ListAllSegmentsResponse? ListAllSegments(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] ListAllSegmentsRequest input)
+        #region Fields
+
+        private readonly LokaliseClient _client;
+
+        #endregion
+
+        #region Constructors
+
+        public SegmentActions()
         {
-            var client = new LokaliseClient();
-            var request = new LokaliseRequest($"/projects/{input.ProjectId}/keys/{input.KeyId}/segments/{input.LanguageCode}", Method.Get, authenticationCredentialsProviders);
-            var result = new SegmentsWrapper();
-            try
-            {
-                result = client.Get<SegmentsWrapper>(request);
-            }
-            catch (HttpRequestException ex)
-            {
-                if (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
-                {
-                    throw new Exception("Segmentation is not enabled or is not available in this project");
-                }
-            }
+            _client = new();
+        }
+
+        #endregion
+
+        #region Actions
+
+        [Action("List all segments", Description = "List all key segments")]
+        public async Task<ListAllSegmentsResponse> ListAllSegments(
+            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+            [ActionParameter] ListAllSegmentsPathRequest pathInput,
+            [ActionParameter] ListAllSegmentsQueryRequest queryInput)
+        {
+            var creds = authenticationCredentialsProviders.ToArray();
+
+            var endpoint = $"/projects/{pathInput.ProjectId}/keys/{pathInput.KeyId}/segments/{pathInput.LanguageCode}";
+            var query = queryInput.AsDictionary().AllIsNotNull();
+
+            var url = QueryHelpers.AddQueryString(endpoint, query);
+
+            var segments = await Paginator.GetAll<SegmentsWrapper, SegmentDto>(creds, url);
+
             return new ListAllSegmentsResponse
             {
-                Segments = result.Segments
+                Segments = segments
             };
         }
 
         [Action("Get segment", Description = "Get segment by number")]
-        public SegmentDto? GetSegment(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-                                    [ActionParameter] GetSegmentRequest input)
+        public Task<SegmentResponse> GetSegment(
+            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+            [ActionParameter] GetSegmentRequest input)
         {
-            var client = new LokaliseClient();
-            var request = new LokaliseRequest($"/projects/{input.ProjectId}/keys/{input.KeyId}/segments/{input.LanguageCode}/{input.SegmentNumber}", Method.Get, authenticationCredentialsProviders);
-            return client.Get<SegmentDto>(request);
+            var endpoint =
+                $"/projects/{input.ProjectId}/keys/{input.KeyId}/segments/{input.LanguageCode}/{input.SegmentNumber}";
+
+            if (input.DisableReferences is not null)
+                endpoint += $"?disable_references={input.DisableReferences.AsLokaliseQuery()}";
+
+            var request = new LokaliseRequest(endpoint, Method.Get, authenticationCredentialsProviders);
+            return _client.ExecuteWithHandling<SegmentResponse>(request);
         }
 
         [Action("Update segment", Description = "Update segment by number")]
-        public void UpdateSegment(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-                                    [ActionParameter] UpdateSegmentRequest input)
+        public Task<SegmentResponse> UpdateSegment(
+            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+            [ActionParameter] UpdateSegmentPathRequest pathInput,
+            [ActionParameter] UpdateSegmentBodyRequest body)
         {
-            var client = new LokaliseClient();
-            var request = new LokaliseRequest($"/projects/{input.ProjectId}/keys/{input.KeyId}/segments/{input.LanguageCode}/{input.SegmentNumber}", Method.Put, authenticationCredentialsProviders);
-            request.AddJsonBody(new
-            {
-                value = input.NewValue
-            });
-            client.Execute(request);
+            var endpoint =
+                $"/projects/{pathInput.ProjectId}/keys/{pathInput.KeyId}/segments/{pathInput.LanguageCode}/{pathInput.SegmentNumber}";
+            var request = new LokaliseRequest(endpoint, Method.Put, authenticationCredentialsProviders)
+                .WithJsonBody(body);
+            
+            return _client.ExecuteWithHandling<SegmentResponse>(request);
         }
+
+        #endregion
     }
 }

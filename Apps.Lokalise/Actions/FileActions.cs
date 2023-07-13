@@ -7,6 +7,7 @@ using RestSharp;
 using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Models.Requests.Files;
 using Apps.Lokalise.Models.Requests.Projects;
+using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
 
 namespace Apps.Lokalise.Actions

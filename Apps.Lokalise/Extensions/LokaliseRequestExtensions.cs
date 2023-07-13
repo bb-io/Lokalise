@@ -1,4 +1,5 @@
-﻿using RestSharp;
+﻿using Apps.Lokalise.RestSharp;
+using RestSharp;
 
 namespace Apps.Lokalise.Extensions;
 

@@ -1,9 +1,12 @@
-﻿using Apps.Lokalise.ModelConverters;
+﻿using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Models.Requests.Tasks;
 using Apps.Lokalise.Models.Responses.Tasks;
+using Apps.Lokalise.RestSharp;
+using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Microsoft.AspNetCore.WebUtilities;
 using RestSharp;
 
 namespace Apps.Lokalise.Actions;
@@ -11,66 +14,97 @@ namespace Apps.Lokalise.Actions;
 [ActionList]
 public class TaskActions
 {
-    private const string TasksUrlPart = "tasks";
-    private const string ProjectsUrl = "https://api.lokalise.com/api2/projects";
+    #region Fields
+
+    private readonly LokaliseClient _client;
+
+    #endregion
+
+    #region Constructors
+
+    public TaskActions()
+    {
+        _client = new();
+    }
+
+    #endregion
+
+    #region Actions
 
     [Action("List tasks", Description = "Get all tasks of a certain project")]
-    public TasksResponse? ListAllTasks(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-                                            [ActionParameter] string projectId,
-                                            [ActionParameter] TaskListParameters parameters)
+    public async Task<ListTasksResponse> ListAllTasks(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] [Display("Project id")]
+        string projectId,
+        [ActionParameter] TaskListParameters parameters)
     {
-        var client = new LokaliseClient();
-        var request = new LokaliseRequest($"/projects/{projectId}/tasks", Method.Get, authenticationCredentialsProviders);
-        request.AddParameters(SnakeCaseConverter.ModelToSnakeCaseKeyPair(parameters));
-        var result = client.Get(request);
-        return SnakeCaseConverter.Deserialize<TasksResponse>(result.Content);
+        var endpoint = $"/projects/{projectId}/tasks";
+
+        var query = parameters.AsDictionary().AllIsNotNull();
+        var endpointWithQuery = QueryHelpers.AddQueryString(endpoint, query);
+
+        var items = await Paginator.GetAll<TasksWrapper, TaskResponse>(
+            authenticationCredentialsProviders.ToArray(),
+            endpointWithQuery);
+
+        return new(items);
     }
 
     [Action("Create task", Description = "Create a new task")]
-    public TaskResponse? CreateTask(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-                                        [ActionParameter] string projectId,
-                                        [ActionParameter] TaskCreateRequest? parameters)
+    public async Task<TaskResponse> CreateTask(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] [Display("Project id")]
+        string projectId,
+        [ActionParameter] TaskCreateRequest parameters)
     {
-        var client = new LokaliseClient();
-        var request = new LokaliseRequest($"/projects/{projectId}/tasks", Method.Post, authenticationCredentialsProviders);
-        request.AddJsonBody(parameters);
-        var result = client.Post(request);
-        return SnakeCaseConverter.Deserialize<TaskResponse>(result.Content);
+        var request = new LokaliseRequest($"/projects/{projectId}/tasks", Method.Post,
+                authenticationCredentialsProviders)
+            .WithJsonBody(parameters);
+
+        var response = await _client.ExecuteWithHandling<TaskRetriveResponse>(request);
+        return response.Task;
     }
 
     [Action("Get task", Description = "Get information about a specific task")]
-    public TaskResponse? RetrieveTask(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-                                    [ActionParameter] string projectId,
-                                    [ActionParameter] string taskId)
+    public async Task<TaskResponse> RetrieveTask(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] [Display("Project id")]
+        string projectId,
+        [ActionParameter] [Display("Task id")] string taskId)
     {
-        var client = new LokaliseClient();
-        var request = new LokaliseRequest($"/projects/{projectId}/tasks/${taskId}", Method.Get, authenticationCredentialsProviders);
-        var result = client.Get(request);
-        var res = SnakeCaseConverter.Deserialize<TaskRetriveResponse>(result.Content);
-        return res.Task;
+        var request = new LokaliseRequest($"/projects/{projectId}/tasks/{taskId}", Method.Get,
+            authenticationCredentialsProviders);
+
+        var response = await _client.ExecuteWithHandling<TaskRetriveResponse>(request);
+        return response.Task;
     }
 
     [Action("Update task", Description = "Update information on a specific task")]
-    public TaskRetriveResponse? UpdateTask(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-                                  [ActionParameter] string projectId,
-                                  [ActionParameter] string taskId,
-                                  [ActionParameter] TaskUpdateRequest taskUpdateRequest)
+    public async Task<TaskResponse> UpdateTask(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] [Display("Project id")] string projectId,
+        [ActionParameter] [Display("Task id")] string taskId,
+        [ActionParameter] TaskUpdateRequest taskUpdateRequest)
     {
-        var client = new LokaliseClient();
-        var request = new LokaliseRequest($"/projects/{projectId}/tasks/${taskId}", Method.Put, authenticationCredentialsProviders);
-        request.AddJsonBody(taskUpdateRequest);
-        var result = client.Put(request);
-        return SnakeCaseConverter.Deserialize<TaskRetriveResponse>(result.Content);
+        var endpoint = $"/projects/{projectId}/tasks/{taskId}";
+        var request = new LokaliseRequest(endpoint, Method.Put, authenticationCredentialsProviders)
+            .WithJsonBody(taskUpdateRequest);
+
+        var response = await _client.ExecuteWithHandling<TaskRetriveResponse>(request);
+        return response.Task;
     }
 
     [Action("Delete task", Description = "Delete a specific task")]
-    public TaskDeleteResponse? DeleteTask(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-                                [ActionParameter] string projectId,
-                                [ActionParameter] string taskId)
+    public Task<TaskDeleteResponse> DeleteTask(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] [Display("Project id")] string projectId,
+        [ActionParameter] [Display("Task id")] string taskId)
     {
-        var client = new LokaliseClient();
-        var request = new LokaliseRequest($"/projects/{projectId}/tasks/${taskId}", Method.Delete, authenticationCredentialsProviders);
-        var result = client.Delete(request);
-        return SnakeCaseConverter.Deserialize<TaskDeleteResponse>(result.Content);
+        var endpoint = $"/projects/{projectId}/tasks/{taskId}";
+        var request = new LokaliseRequest(endpoint, Method.Delete, authenticationCredentialsProviders);
+        
+        return _client.ExecuteWithHandling<TaskDeleteResponse>(request);
     }
+
+    #endregion
 }

@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Apps.Lokalise.Extensions;
 
 namespace Apps.Lokalise.Utils.Converters;
 
@@ -19,17 +20,11 @@ public class StringValueConverter : JsonConverter<object>
 
         foreach (var property in properties)
         {
-            var stringValue = GetStringValue(property, value);
-            writer.WriteString(GetJsonPropertyName(property), stringValue);
+            var propertyValue = property.GetValue(value);
+            writer.WriteString(GetJsonPropertyName(property), propertyValue?.AsLokaliseQuery() ?? string.Empty);
         }
 
         writer.WriteEndObject();
-    }
-    
-    private string GetStringValue(PropertyInfo property, object value)
-    {
-        var propertyValue = property.GetValue(value);
-        return propertyValue?.ToString() ?? string.Empty;
     }
 
     private string GetJsonPropertyName(PropertyInfo property)

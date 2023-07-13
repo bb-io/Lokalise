@@ -1,7 +1,9 @@
-﻿namespace Apps.Lokalise.Models.Responses.Tasks;
+﻿using System.Text.Json.Serialization;
+
+namespace Apps.Lokalise.Models.Responses.Tasks;
 
 public class TaskRetriveResponse
 {
-    public string ProjectId { get; set; }
+    [JsonPropertyName("task")]
     public TaskResponse Task { get; set; }
 }

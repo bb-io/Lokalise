@@ -1,4 +1,6 @@
 ﻿using Apps.Lokalise.Dtos;
+using Apps.Lokalise.Extensions;
+using Apps.Lokalise.RestSharp;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Webhooks;
 using RestSharp;
@@ -7,44 +9,83 @@ namespace Apps.Lokalise.Webhooks.Handlers
 {
     public class BaseWebhookHandler : IWebhookEventHandler
     {
+        #region Fields
 
         private string SubscriptionEvent;
+        private readonly LokaliseClient _client;
+
+        #endregion
+
+        #region Constructors
 
         public BaseWebhookHandler(string subEvent)
         {
             SubscriptionEvent = subEvent;
+            _client = new();
         }
 
-        public async Task SubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider, Dictionary<string, string> values)
+        #endregion
+
+        #region Subscriptions
+
+        public Task SubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider,
+            Dictionary<string, string> values)
         {
-            var client = new LokaliseClient();
-            var request = new LokaliseRequest($"/projects/{values["projectIdForWebhooks"]}/webhooks", Method.Post, authenticationCredentialsProvider);
-            request.AddJsonBody(new
-            {
-                url = values["payloadUrl"],
-                events = new[] { SubscriptionEvent }
-            });
-            Task.Run(async () =>
+            var endpoint = $"/projects/{values["projectIdForWebhooks"]}/webhooks";
+            var request = new LokaliseRequest(endpoint, Method.Post, authenticationCredentialsProvider)
+                .WithJsonBody(new
+                {
+                    url = values["payloadUrl"],
+                    events = new[] { SubscriptionEvent }
+                });
+
+            return Task.Run(async () =>
             {
                 await Task.Delay(1000);
-                await client.ExecuteWithHandling(request);
+                await _client.ExecuteWithHandling(request);
             });
         }
 
-        public async Task UnsubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider, Dictionary<string, string> values)
+        public async Task UnsubscribeAsync(
+            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider,
+            Dictionary<string, string> values)
         {
-            var client = new LokaliseClient();
-            var getRequest = new LokaliseRequest($"/projects/{values["projectIdForWebhooks"]}/webhooks?limit=5000", Method.Post, authenticationCredentialsProvider);
-            var webhooks = await client.GetAsync<WebhooksResponseWrapper>(getRequest);
-            var webhook = webhooks?.Webhooks.FirstOrDefault(w => w.Url == values["payloadUrl"]);
+            var creds = authenticationCredentialsProvider.ToArray();
 
-            if (webhook != null)
-            {
-                var deleteRequest = new LokaliseRequest($"/projects/{values["projectIdForWebhooks"]}/webhooks/{webhook.WebhookId}", Method.Delete, authenticationCredentialsProvider);
-                await client.ExecuteWithHandling(deleteRequest);
-            }
+            var webhook = await GetWebhook(creds, values);
 
-            await Task.CompletedTask;
+            if (webhook is null)
+                return;
+
+            await DeleteWebhook(creds, values, webhook.WebhookId);
         }
+
+        #endregion
+
+        #region Utils
+
+        private Task DeleteWebhook(
+            AuthenticationCredentialsProvider[] creds,
+            Dictionary<string, string> values,
+            string webhookId)
+        {
+            var endpoint = $"/projects/{values["projectIdForWebhooks"]}/webhooks/{webhookId}";
+            var request = new LokaliseRequest(endpoint, Method.Delete, creds);
+
+            return _client.ExecuteWithHandling(request);
+        }
+
+        private async Task<WebhookDto?> GetWebhook(
+            AuthenticationCredentialsProvider[] creds,
+            Dictionary<string, string> values)
+        {
+            var endpoint = $"/projects/{values["projectIdForWebhooks"]}/webhooks?limit=5000";
+            var request = new LokaliseRequest(endpoint, Method.Get, creds);
+
+            var response = await _client.ExecuteWithHandling<WebhooksResponseWrapper>(request);
+            return response?.Webhooks.FirstOrDefault(w => w.Url == values["payloadUrl"]);
+        }
+
+        #endregion
     }
 }

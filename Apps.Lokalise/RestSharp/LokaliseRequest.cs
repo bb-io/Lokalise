@@ -1,7 +1,7 @@
 ﻿using Blackbird.Applications.Sdk.Common.Authentication;
 using RestSharp;
 
-namespace Apps.Lokalise
+namespace Apps.Lokalise.RestSharp
 {
     public class LokaliseRequest : RestRequest
     {
@@ -11,16 +11,13 @@ namespace Apps.Lokalise
             this.AddHeader("X-Api-Token", apiToken);
         }
 
-        public void AddParameters(Dictionary<string, string> queryParameters)
+        public void AddParameters(Dictionary<string, string?>? queryParameters)
         {
             if (queryParameters == null || !queryParameters.Any())
-            {
                 return;
-            }
+            
             foreach (var queryParameter in queryParameters.Where(x => x.Value is not null))
-            {
                 this.AddParameter(queryParameter.Key, queryParameter.Value);
-            }
         }
     }
 }
