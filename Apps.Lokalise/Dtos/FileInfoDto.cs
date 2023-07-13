@@ -15,6 +15,6 @@ namespace Apps.Lokalise.Dtos
 
         [JsonPropertyName("key_count")]
         [Display("Key count")]
-        public int Key_count { get; set; }
+        public int KeyCount { get; set; }
     }
 }

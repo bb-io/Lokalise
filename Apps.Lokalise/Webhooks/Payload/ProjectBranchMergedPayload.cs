@@ -1,9 +1,10 @@
 using System.Text.Json.Serialization;
 using Blackbird.Applications.Sdk.Common;
+using Apps.Lokalise.Webhooks.Models;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
-    // ProjectBranchMergedPayload : BasePayload myDeserializedClass = JsonConvert.DeserializeObject<ProjectBranchMergedPayload : BasePayload>(myJsonResponse);
+    // ProjectBranchMergedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectBranchMergedPayload : BasePayload>(myJsonResponse);
     public class AffectedKeys
     {
         [JsonPropertyName("inserted_count")]
@@ -28,6 +29,21 @@ namespace Apps.Lokalise.Webhooks.Payload
         [JsonPropertyName("affected_keys")]
         [Display("Affected keys")]
         public AffectedKeys AffectedKeys { get; set; }
+
+        public override BranchMergeEvent Convert()
+        {
+            return new BranchMergeEvent
+            {
+                ProjectId = Project.Id,
+                ProjectName = Project.Name,
+                UserEmail = User.Email,
+                UserName = User.Email,
+                SourceBranchName = Branch.Name,
+                TargetBranchName = TargetBranch.Name,
+                InsertedCount = AffectedKeys.InsertedCount,
+                UpdatedCount = AffectedKeys.UpdatedCount,
+            };
+        }
     }
 
     public class TargetBranch

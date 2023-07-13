@@ -1,9 +1,10 @@
 using System.Text.Json.Serialization;
 using Blackbird.Applications.Sdk.Common;
+using Apps.Lokalise.Webhooks.Models;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
-    // ProjectImportedPayload : BasePayload myDeserializedClass = JsonConvert.DeserializeObject<ProjectImportedPayload : BasePayload>(myJsonResponse);
+    // ProjectImportedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectImportedPayload : BasePayload>(myJsonResponse);
     public class Import
     {
         [JsonPropertyName("filename")]
@@ -32,5 +33,21 @@ namespace Apps.Lokalise.Webhooks.Payload
         [JsonPropertyName("import")]
         [Display("Import")]
         public Import Import { get; set; }
+
+        public override ProjectImportedEvent Convert()
+        {
+            return new ProjectImportedEvent
+            {
+                ProjectId = Project.Id,
+                ProjectName = Project.Name,
+                UserEmail = User.Email,
+                UserName = User.Email,
+                Filename = Import.Filename,
+                Format = Import.Format,
+                Inserted = Import.Inserted,
+                Updated = Import.Updated,
+                Skipped = Import.Skipped
+            };
+        }
     }
 }

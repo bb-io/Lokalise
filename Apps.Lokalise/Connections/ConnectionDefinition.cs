@@ -8,26 +8,16 @@ namespace Apps.Lokalise.Connections
 
         public IEnumerable<ConnectionPropertyGroup> ConnectionPropertyGroups => new List<ConnectionPropertyGroup>
         {
-            new ConnectionPropertyGroup
+            new()
             {
                 Name = "Developer API token",
                 AuthenticationType = ConnectionAuthenticationType.Undefined,
                 ConnectionUsage = ConnectionUsage.Actions,
                 ConnectionProperties = new List<ConnectionProperty>
                 {
-                    new ConnectionProperty("apiToken"),
+                    new("apiToken"),
                 }
-            },
-            new ConnectionPropertyGroup
-            {
-                Name = "Project Id for webhooks",
-                AuthenticationType = ConnectionAuthenticationType.Undefined,
-                ConnectionUsage = ConnectionUsage.Webhooks,
-                ConnectionProperties = new List<ConnectionProperty>
-                {
-                    new ConnectionProperty("projectIdForWebhooks")
-                }
-            }
+            }            
         };
 
         public IEnumerable<AuthenticationCredentialsProvider> CreateAuthorizationCredentialsProviders(Dictionary<string, string> values)

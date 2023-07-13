@@ -1,20 +1,20 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Apps.Lokalise.Models.Responses.Tasks;
 public class InitialTmLeverage
 {
-    [JsonProperty("0%+")]
+    [JsonPropertyName("0%+")]
     public int _0 { get; set; }
 
-    [JsonProperty("60%+")]
+    [JsonPropertyName("60%+")]
     public int _60 { get; set; }
 
-    [JsonProperty("75%+")]
+    [JsonPropertyName("75%+")]
     public int _75 { get; set; }
 
-    [JsonProperty("95%+")]
+    [JsonPropertyName("95%+")]
     public int _95 { get; set; }
 
-    [JsonProperty("100%")]
+    [JsonPropertyName("100%")]
     public int _100 { get; set; }
 }

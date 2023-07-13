@@ -29,9 +29,9 @@ namespace Apps.Lokalise.Actions
         }
 
         #endregion
-        
+
         #region Actions
-        
+
         [Action("List all project files", Description = "List all project files")]
         public async Task<ListAllFilesResponse> ListAllFiles(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
@@ -83,7 +83,7 @@ namespace Apps.Lokalise.Actions
             return new()
             {
                 FileName = fileUri.Segments.Last(),
-                File = dataResponse.RawBytes
+                File = dataResponse.RawBytes!
             };
         }
 
@@ -121,7 +121,7 @@ namespace Apps.Lokalise.Actions
 
             return _client.ExecuteWithHandling(request);
         }
-        
+
         #endregion
     }
 }

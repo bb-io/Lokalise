@@ -1,9 +1,11 @@
+using Blackbird.Applications.Sdk.Common.Webhooks;
+
 namespace Apps.Lokalise.Webhooks.Handlers
 {
     public class ProjectTranslationProofreadHandler : BaseWebhookHandler
     {
         const string SubscriptionEvent = "project.translation.proofread";
 
-        public ProjectTranslationProofreadHandler() : base(SubscriptionEvent) { }
+        public ProjectTranslationProofreadHandler([WebhookParameter] WebhookInput input) : base(SubscriptionEvent, input) { }
     }
 }

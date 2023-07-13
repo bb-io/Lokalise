@@ -1,5 +1,6 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using Blackbird.Applications.Sdk.Common;
+using Apps.Lokalise.Webhooks.Models;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
@@ -24,6 +25,16 @@ namespace Apps.Lokalise.Webhooks.Payload
         [JsonPropertyName("created_at_timestamp")]
         [Display("Created at timestamp")]
         public int CreatedAtTimestamp { get; set; }
+        public virtual BaseEvent Convert()
+        {
+            return new BaseEvent
+            {
+                ProjectId = Project.Id,
+                ProjectName = Project.Name,
+                UserEmail = User.Email,
+                UserName = User.Email,
+            };
+        }
     }
 
     public class Project

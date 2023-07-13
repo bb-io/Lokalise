@@ -1,9 +1,10 @@
 using System.Text.Json.Serialization;
 using Blackbird.Applications.Sdk.Common;
+using Apps.Lokalise.Webhooks.Models;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
-    // ProjectKeyModifiedPayload : BasePayload myDeserializedClass = JsonConvert.DeserializeObject<ProjectKeyModifiedPayload : BasePayload>(myJsonResponse);
+    // ProjectKeyModifiedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectKeyModifiedPayload : BasePayload>(myJsonResponse);
 
     public class KeyModified
     {
@@ -11,7 +12,7 @@ namespace Apps.Lokalise.Webhooks.Payload
         public int Id { get; set; }
 
         [JsonPropertyName("name")]
-        [Display("Name")]
+        [Display("Key name")]
         public string Name { get; set; }
 
         [JsonPropertyName("filenames")]
@@ -25,8 +26,26 @@ namespace Apps.Lokalise.Webhooks.Payload
 
     public class ProjectKeyModifiedPayload : BasePayload
     {
-        [JsonPropertyName("name")]
+        [JsonPropertyName("key")]
         public KeyModified Key { get; set; }
+
+        public override KeyModifiedEvent Convert()
+        {
+            return new KeyModifiedEvent
+            {
+                ProjectId = Project.Id,
+                ProjectName = Project.Name,
+                UserEmail = User.Email,
+                UserName = User.Email,
+                Id = Key.Id,
+                Name = Key.Name,
+                PreviousName = Key.PreviousName,
+                IOS = Key.Filenames.Ios,
+                Android= Key.Filenames.Android,
+                Web = Key.Filenames.Web,
+                Other= Key.Filenames.Other,
+            };
+        }
     }
 
 

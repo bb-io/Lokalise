@@ -1,7 +1,7 @@
-﻿using Apps.Lokalise.Dtos;
+﻿using System.Text.Json;
+using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Models.Responses.Errors;
 using Blackbird.Applications.Sdk.Common.Authentication;
-using Newtonsoft.Json;
 using RestSharp;
 
 namespace Apps.Lokalise.RestSharp
@@ -40,7 +40,7 @@ namespace Apps.Lokalise.RestSharp
 
         private Exception ConfigureRequestException(string content)
         {
-            var error = JsonConvert.DeserializeObject<ErrorResponse>(content);
+            var error = JsonSerializer.Deserialize<ErrorResponse>(content);
             return new($"{error.Error.Message}; Code: {error.Error.Code}");
         }
 
