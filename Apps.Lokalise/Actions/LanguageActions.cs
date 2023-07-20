@@ -39,13 +39,13 @@ namespace Apps.Lokalise.Actions
         [Action("List all project languages", Description = "List all project languages")]
         public Task<ListLanguagesResponse> ListProjectLanguages(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] [Display("Project id")] string projectId)
+            [ActionParameter] [Display("Project ID")] string projectId)
             => ListLanguages(authenticationCredentialsProviders, $"/projects/{projectId}/languages");
 
         [Action("Add language to project", Description = "Add language to project")]
         public Task AddLanguageToProject(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] [Display("Project id")]
+            [ActionParameter] [Display("Project ID")]
             string projectId,
             [ActionParameter] AddLanguageToProjectInput input)
         {

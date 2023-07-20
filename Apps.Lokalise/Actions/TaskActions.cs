@@ -34,7 +34,7 @@ public class TaskActions
     [Action("List tasks", Description = "Get all tasks of a certain project")]
     public async Task<ListTasksResponse> ListAllTasks(
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] [Display("Project id")]
+        [ActionParameter] [Display("Project ID")]
         string projectId,
         [ActionParameter] TaskListParameters parameters)
     {
@@ -53,7 +53,7 @@ public class TaskActions
     [Action("Create task", Description = "Create a new task")]
     public async Task<TaskResponse> CreateTask(
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] [Display("Project id")]
+        [ActionParameter] [Display("Project ID")]
         string projectId,
         [ActionParameter] TaskCreateRequest parameters)
     {
@@ -68,9 +68,9 @@ public class TaskActions
     [Action("Get task", Description = "Get information about a specific task")]
     public async Task<TaskResponse> RetrieveTask(
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] [Display("Project id")]
+        [ActionParameter] [Display("Project ID")]
         string projectId,
-        [ActionParameter] [Display("Task id")] string taskId)
+        [ActionParameter] [Display("Task ID")] string taskId)
     {
         var request = new LokaliseRequest($"/projects/{projectId}/tasks/{taskId}", Method.Get,
             authenticationCredentialsProviders);
@@ -82,8 +82,8 @@ public class TaskActions
     [Action("Update task", Description = "Update information on a specific task")]
     public async Task<TaskResponse> UpdateTask(
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] [Display("Project id")] string projectId,
-        [ActionParameter] [Display("Task id")] string taskId,
+        [ActionParameter] [Display("Project ID")] string projectId,
+        [ActionParameter] [Display("Task ID")] string taskId,
         [ActionParameter] TaskUpdateRequest taskUpdateRequest)
     {
         var endpoint = $"/projects/{projectId}/tasks/{taskId}";
@@ -97,8 +97,8 @@ public class TaskActions
     [Action("Delete task", Description = "Delete a specific task")]
     public Task<TaskDeleteResponse> DeleteTask(
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] [Display("Project id")] string projectId,
-        [ActionParameter] [Display("Task id")] string taskId)
+        [ActionParameter] [Display("Project ID")] string projectId,
+        [ActionParameter] [Display("Task ID")] string taskId)
     {
         var endpoint = $"/projects/{projectId}/tasks/{taskId}";
         var request = new LokaliseRequest(endpoint, Method.Delete, authenticationCredentialsProviders);

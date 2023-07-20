@@ -5,10 +5,10 @@ namespace Apps.Lokalise.Models.Requests.Segments
 {
     public class GetSegmentRequest
     {
-        [Display("Project id")]
+        [Display("Project ID")]
         public string ProjectId { get; set; }
         
-        [Display("Key id")]
+        [Display("Key ID")]
         public long KeyId { get; set; }
         
         [Display("Language code")]

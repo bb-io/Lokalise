@@ -6,7 +6,7 @@ namespace Apps.Lokalise.Models.Responses.Projects;
 public class ProjectResponse
 {
     [JsonPropertyName("project_id")]
-    [Display("Project id")]
+    [Display("Project ID")]
     public string ProjectId { get; set; }
     
     [JsonPropertyName("project_type")]
@@ -36,11 +36,11 @@ public class ProjectResponse
     public string CreatedByEmail { get; set; }
     
     [JsonPropertyName("team_id")]
-    [Display("Team id")]
+    [Display("Team ID")]
     public int TeamId { get; set; }
     
     [JsonPropertyName("base_language_id")]
-    [Display("Base language id")]
+    [Display("Base language ID")]
     public int BaseLanguageId { get; set; }
     
     [JsonPropertyName("base_language_iso")]

@@ -72,7 +72,7 @@ namespace Apps.Lokalise.Models.Requests.Files
         public bool? CleanupMode { get; set; }
         
         [JsonPropertyName("custom_translation_status_ids")]
-        [Display("Custom translation status ids")]
+        [Display("Custom translation status IDs")]
         public IEnumerable<string>? CustomTranslationStatusIds { get; set; }
         
         [JsonPropertyName("custom_translation_status_inserted_keys")]
@@ -95,7 +95,7 @@ namespace Apps.Lokalise.Models.Requests.Files
         public string? Format { get; set; }
         
         [JsonPropertyName("filter_task_id")]
-        [Display("Filter task id")]
+        [Display("Filter task ID")]
         public long? FilterTaskId { get; set; }
     }
 }

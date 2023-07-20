@@ -23,8 +23,7 @@ namespace Apps.Lokalise.Webhooks
                     Result = null,
                     ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
-
-
+            
             var data = JsonSerializer.Deserialize<T2>(webhookRequest.Body.ToString()!);
 
             if (data is null)

@@ -5,7 +5,7 @@ namespace Apps.Lokalise.Models.Responses.Tasks;
 public class TaskDeleteResponse
 {
     [JsonPropertyName("project_id")]
-    [Display("Project id")]
+    [Display("Project ID")]
     public string ProjectId { get; set; }
 
     [JsonPropertyName("task_deleted")]

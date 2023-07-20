@@ -4,9 +4,9 @@ namespace Apps.Lokalise.Models.Requests.Keys;
 
 public class DeleteKeyRequest
 {
-    [Display("Key id")]
+    [Display("Key ID")]
     public int KeyId { get; set; }
 
-    [Display("Project id")]
+    [Display("Project ID")]
     public string ProjectId { get; set; }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Apps.Lokalise.Utils.Converters;
 using Blackbird.Applications.Sdk.Common;
 
 namespace Apps.Lokalise.Dtos;
@@ -6,11 +7,12 @@ namespace Apps.Lokalise.Dtos;
 public class TranslationObj
 {
     [JsonPropertyName("translation_id")]
-    [Display("Translation id")]
-    public long TranslationId { get; set; }
+    [Display("Translation ID")]
+    [JsonConverter(typeof(IntToStringConverter))]
+    public string TranslationId { get; set; }
 
     [JsonPropertyName("key_id")]
-    [Display("Key id")]
+    [Display("Key ID")]
     public int KeyId { get; set; }
 
     [JsonPropertyName("language_iso")]
@@ -50,6 +52,6 @@ public class TranslationObj
     [JsonPropertyName("words")] public int Words { get; set; }
 
     [JsonPropertyName("task_id")]
-    [Display("Task id")]
+    [Display("Task ID")]
     public int? TaskId { get; set; }
 }

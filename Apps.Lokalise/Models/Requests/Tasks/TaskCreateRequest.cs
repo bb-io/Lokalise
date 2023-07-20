@@ -45,7 +45,7 @@ public class TaskCreateRequest
     public string? TaskType { get; set; }
 
     [JsonPropertyName("parent_task_id")]
-    [Display("Parent task id")]
+    [Display("Parent task ID")]
     public string? ParentTaskId { get; set; }
 
     [JsonPropertyName("closing_tags")]
@@ -57,6 +57,6 @@ public class TaskCreateRequest
     public bool? DoLockTranslations { get; set; }
 
     [JsonPropertyName("custom_translation_status_ids")]
-    [Display("Custom translation status ids")]
+    [Display("Custom translation status IDs")]
     public string[]? CustomTranslationStatusIds { get; set; }
 }

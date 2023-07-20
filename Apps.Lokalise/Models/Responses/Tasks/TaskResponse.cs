@@ -5,7 +5,7 @@ namespace Apps.Lokalise.Models.Responses.Tasks;
 public class TaskResponse
 {
    [JsonPropertyName("task_id")]
-    [Display("Task id")]
+    [Display("Task ID")]
     public int TaskId { get; set; }
     
     [JsonPropertyName("title")]
@@ -21,7 +21,7 @@ public class TaskResponse
     public string TaskType { get; set; }
     
     [JsonPropertyName("parent_task_id")]
-    [Display("Parent task id")]
+    [Display("Parent task ID")]
     public string ParentTaskId { get; set; }
     
     [JsonPropertyName("closing_tags")]

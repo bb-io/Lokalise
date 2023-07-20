@@ -8,7 +8,7 @@ public class ProjectCreateRequest
     [JsonPropertyName("name")] public string Name { get; set; }
 
     [JsonPropertyName("team_id")]
-    [Display("Team id")]
+    [Display("Team ID")]
     public long? TeamId { get; set; }
 
     [JsonPropertyName("description")] public string? Description { get; set; }

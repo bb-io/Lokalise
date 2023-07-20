@@ -4,10 +4,10 @@ namespace Apps.Lokalise.Models.Requests.Projects
 {
     public class DeleteFileRequest
     {
-        [Display("Project id")]
+        [Display("Project ID")]
         public string ProjectId { get; set; }
 
-        [Display("File id")]
+        [Display("File ID")]
         public string FileId { get; set; }
     }
 }

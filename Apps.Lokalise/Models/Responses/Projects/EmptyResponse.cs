@@ -6,7 +6,7 @@ namespace Apps.Lokalise.Models.Responses.Projects;
 public class EmptyResponse
 {
     [JsonPropertyName("project_id")]
-    [Display("Project id")]
+    [Display("Project ID")]
     public string ProjectId { get; set; }
     
     [JsonPropertyName("keys_deleted")]

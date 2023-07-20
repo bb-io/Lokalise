@@ -1,7 +1,9 @@
-﻿namespace Apps.Lokalise.Models.Responses.Errors;
+﻿using System.Text.Json.Serialization;
+
+namespace Apps.Lokalise.Models.Responses.Errors;
 
 public class Error
 {
-    public string Message { get; set; }
-    public string Code { get; set; }
+    [JsonPropertyName("message")] public string Message { get; set; }
+    [JsonPropertyName("code")] public int Code { get; set; }
 }

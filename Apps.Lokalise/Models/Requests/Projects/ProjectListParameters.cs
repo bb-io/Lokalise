@@ -6,7 +6,7 @@ public class ProjectListParameters
 {
     
     [JsonPropertyName("filter_team_id")]
-    [Display("Filter team id")]
+    [Display("Filter team ID")]
     public string? FilterTeamId { get; set; }
     
     [JsonPropertyName("filter_names")]

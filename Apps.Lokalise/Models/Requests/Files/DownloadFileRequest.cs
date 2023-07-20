@@ -41,7 +41,7 @@ namespace Apps.Lokalise.Models.Requests.Files
         public bool? AddNewlineEof { get; set; }
 
         [JsonPropertyName("custom_translation_status_ids")]
-        [Display("Custom translation status ids")]
+        [Display("Custom translation status IDs")]
         public IEnumerable<string>? CustomTranslationStatusIds { get; set; }
 
         [JsonPropertyName("include_tags")]
@@ -73,7 +73,7 @@ namespace Apps.Lokalise.Models.Requests.Files
         public bool? IncludeDescription { get; set; }
 
         [JsonPropertyName("include_pids")]
-        [Display("Include project ids")]
+        [Display("Include Project IDs")]
         public IEnumerable<string>? IncludePids { get; set; }
 
         [JsonPropertyName("triggers")] public IEnumerable<string>? Triggers { get; set; }
@@ -138,7 +138,7 @@ namespace Apps.Lokalise.Models.Requests.Files
         public string? BundleDescription { get; set; }
 
         [JsonPropertyName("filter_task_id")]
-        [Display("Filter task id")]
+        [Display("Filter task ID")]
         public long? FilterTaskId { get; set; }
 
         [JsonPropertyName("compact")]

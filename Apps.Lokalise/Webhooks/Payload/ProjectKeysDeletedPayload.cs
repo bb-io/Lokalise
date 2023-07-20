@@ -9,7 +9,7 @@ namespace Apps.Lokalise.Webhooks.Payload
     public class Key
     {
         [JsonPropertyName("id")]
-        [Display("Key id")]
+        [Display("Key ID")]
         public int Id { get; set; }
 
         [JsonPropertyName("name")]

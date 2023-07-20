@@ -7,11 +7,11 @@ namespace Apps.Lokalise.Models.Responses.Segments;
 public class SegmentResponse
 {
     [JsonPropertyName("project_id")]
-    [Display("Project id")]
+    [Display("Project ID")]
     public string ProjectId { get; set; }
 
     [JsonPropertyName("key_id")]
-    [Display("Key id")]
+    [Display("Key ID")]
     public string KeyId { get; set; }
 
     [JsonPropertyName("language_iso")]

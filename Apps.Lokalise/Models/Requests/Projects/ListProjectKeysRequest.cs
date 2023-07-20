@@ -38,7 +38,7 @@ namespace Apps.Lokalise.Models.Requests.Projects
         public string? FilterKeys { get; set; }
         
         [JsonPropertyName("filter_key_ids")]
-        [Display("Filter key ids")]
+        [Display("Filter Key IDs")]
         public string? FilterKeyIds { get; set; }
         
         [JsonPropertyName("filter_platforms")]

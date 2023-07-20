@@ -4,7 +4,7 @@ namespace Apps.Lokalise.Models.Requests.Languages
 {
     public class DeleteLanguageFromProjectRequest
     {
-        [Display("Project id")] public string ProjectId { get; set; }
-        [Display("Language id")] public string LanguageId { get; set; }
+        [Display("Project ID")] public string ProjectId { get; set; }
+        [Display("Language ID")] public string LanguageId { get; set; }
     }
 }

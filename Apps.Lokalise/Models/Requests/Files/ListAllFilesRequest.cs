@@ -4,7 +4,7 @@ namespace Apps.Lokalise.Models.Requests.Files
 {
     public class ListAllFilesRequest
     {
-        [Display("Project id")]
+        [Display("Project ID")]
         public string ProjectId { get; set; }
         
         [Display("File name filter")]

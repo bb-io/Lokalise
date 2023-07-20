@@ -37,7 +37,7 @@ namespace Apps.Lokalise.Actions
         [Action("List all project keys", Description = "List all project keys")]
         public async Task<ListProjectKeysResponse> ListProjectKeys(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] [Display("Project id")]
+            [ActionParameter] [Display("Project ID")]
             string projectId,
             [ActionParameter] ListProjectKeysRequest input)
         {
@@ -56,7 +56,7 @@ namespace Apps.Lokalise.Actions
         [Action("Create key", Description = "Create key in project")]
         public async Task<Key> CreateKey(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] [Display("Project id")]
+            [ActionParameter] [Display("Project ID")]
             string projectId,
             [ActionParameter] CreateKeyInput input)
         {
@@ -76,7 +76,7 @@ namespace Apps.Lokalise.Actions
             return new Key { Id = key.KeyId };
         }
 
-        [Action("Get key", Description = "Get key by id")]
+        [Action("Get key", Description = "Get key by ID")]
         public async Task<KeyDto> RetrieveKey(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
             [ActionParameter] RetrieveKeyRequest input)
@@ -92,7 +92,7 @@ namespace Apps.Lokalise.Actions
             return response.Key;
         }
 
-        [Action("Delete key", Description = "Delete key by id")]
+        [Action("Delete key", Description = "Delete key by ID")]
         public Task DeleteKey(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
             [ActionParameter] DeleteKeyRequest input)
         {

@@ -8,7 +8,7 @@ namespace Apps.Lokalise.Webhooks.Payload
     public class Language
     {
         [JsonPropertyName("id")]
-        [Display("Language id")]
+        [Display("Language ID")]
         public int Id { get; set; }
 
         [JsonPropertyName("iso")]

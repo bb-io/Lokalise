@@ -11,7 +11,7 @@ namespace Apps.Lokalise.Dtos
     public class ProcessObj
     {
         [JsonPropertyName("process_id")]
-        [Display("Process id")]
+        [Display("Process ID")]
         public string ProcessId { get; set; }
 
         [JsonPropertyName("status")]

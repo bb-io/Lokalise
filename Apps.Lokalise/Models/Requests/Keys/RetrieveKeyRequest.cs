@@ -2,15 +2,8 @@
 
 namespace Apps.Lokalise.Models.Requests.Keys
 {
-    public class RetrieveKeyRequest
+    public class RetrieveKeyRequest : KeyRequest
     {
-        [Display("Key id")]
-        public int KeyId { get; set; }
-
-        [Display("Project id")]
-        public string ProjectId { get; set; }
-
-        [Display("Disable references")]
-        public bool? DisableReferences { get; set; }
+        [Display("Disable references")] public bool? DisableReferences { get; set; }
     }
 }

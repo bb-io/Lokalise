@@ -6,7 +6,7 @@ namespace Apps.Lokalise.Dtos
     public class FileInfoDto
     {
         [JsonPropertyName("file_id")]
-        [Display("File id")]
+        [Display("File ID")]
         public long FileId { get; set; }
 
         [JsonPropertyName("filename")]

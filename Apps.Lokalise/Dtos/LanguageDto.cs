@@ -6,7 +6,7 @@ namespace Apps.Lokalise.Dtos
     public class LanguageDto
     {
         [JsonPropertyName("lang_id")]
-        [Display("Language id")]
+        [Display("Language ID")]
         public long LangId { get; set; }
 
         [JsonPropertyName("lang_iso")]

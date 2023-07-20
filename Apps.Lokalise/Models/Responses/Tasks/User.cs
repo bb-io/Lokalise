@@ -6,7 +6,7 @@ namespace Apps.Lokalise.Models.Responses.Tasks;
 public class User
 {
     [JsonPropertyName("user_id")]
-    [Display("User id")]
+    [Display("User ID")]
     public int UserId { get; set; }
 
     [JsonPropertyName("email")]
