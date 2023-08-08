@@ -37,11 +37,10 @@ namespace Apps.Lokalise.Actions
         [Action("List all project keys", Description = "List all project keys")]
         public async Task<ListProjectKeysResponse> ListProjectKeys(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] [Display("Project ID")]
-            string projectId,
+            [ActionParameter] ProjectRequest project,
             [ActionParameter] ListProjectKeysRequest input)
         {
-            var baseEndpoint = $"/projects/{projectId}/keys";
+            var baseEndpoint = $"/projects/{project.ProjectId}/keys";
             var query = input.AsDictionary().AllIsNotNull();
 
             var endpointWithQuery = QueryHelpers.AddQueryString(baseEndpoint, query);
@@ -56,14 +55,13 @@ namespace Apps.Lokalise.Actions
         [Action("Create key", Description = "Create key in project")]
         public async Task<Key> CreateKey(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] [Display("Project ID")]
-            string projectId,
+            [ActionParameter] ProjectRequest project,
             [ActionParameter] CreateKeyInput input)
         {
             if (input.Platforms.Any(x => !ConstantValues.Platforms.Contains(x)))
                 throw new Exception($"Platforms can only contain {String.Join(", ", ConstantValues.Platforms)}");
 
-            var request = new LokaliseRequest($"/projects/{projectId}/keys", Method.Post,
+            var request = new LokaliseRequest($"/projects/{project.ProjectId}/keys", Method.Post,
                     authenticationCredentialsProviders)
                 .WithJsonBody(new CreateKeyRequest(input));
 

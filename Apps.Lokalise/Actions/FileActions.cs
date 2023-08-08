@@ -50,28 +50,26 @@ namespace Apps.Lokalise.Actions
         [Action("Upload file to project", Description = "Upload file to project")]
         public async Task<QueuedProcessDto> UploadFile(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] [Display("Project ID")]
-            string projectId,
+            [ActionParameter] ProjectRequest project,
             [ActionParameter] UploadFileRequest input)
         {
             var creds = authenticationCredentialsProviders.ToArray();
-            var endpoint = $"/projects/{projectId}/files/upload";
+            var endpoint = $"/projects/{project.ProjectId}/files/upload";
 
             var request = new LokaliseRequest(endpoint, Method.Post, creds).WithJsonBody(input);
             var uploadResult = await _client.ExecuteWithHandling<QueuedProcessDto>(request);
 
             return await _client
-                .PollFileImportOperation(projectId, uploadResult.Process.ProcessId, creds);
+                .PollFileImportOperation(project.ProjectId, uploadResult.Process.ProcessId, creds);
         }
 
         [Action("Download all project files", Description = "Download all project files as zip archive")]
         public async Task<DownloadProjectFilesResponse> DownloadProjectFiles(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] [Display("Project ID")]
-            string projectId,
+            [ActionParameter] ProjectRequest project,
             [ActionParameter] DownloadFileRequest input)
         {
-            var endpoint = $"/projects/{projectId}/files/download";
+            var endpoint = $"/projects/{project.ProjectId}/files/download";
             var request = new LokaliseRequest(endpoint, Method.Post, authenticationCredentialsProviders)
                 .WithJsonBody(input);
 
@@ -90,13 +88,12 @@ namespace Apps.Lokalise.Actions
         [Action("Download translated project file", Description = "Download translated project file by name")]
         public async Task<DownloadProjectFilesResponse> DownloadTranslatedFile(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] [Display("Project ID")]
-            string projectId,
+            [ActionParameter] ProjectRequest project,
             [ActionParameter] DownloadTranslatedFileRequest input)
         {
             var allFiles = await DownloadProjectFiles(
                 authenticationCredentialsProviders,
-                projectId,
+                project,
                 input);
 
             var fileData = allFiles.File.GetFileFromZip(en =>

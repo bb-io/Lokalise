@@ -72,9 +72,9 @@ public class ProjectActions
     [Action("Get project", Description = "Get the details of a project")]
     public Task<ProjectResponse> RetrieveProject(
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] [Display("Project ID")] string projectId)
+        [ActionParameter] ProjectRequest input)
     {
-        var request = new LokaliseRequest($"/projects/{projectId}", Method.Get, authenticationCredentialsProviders);
+        var request = new LokaliseRequest($"/projects/{input.ProjectId}", Method.Get, authenticationCredentialsProviders);
         
         return _client.ExecuteWithHandling<ProjectResponse>(request);
     }
@@ -82,11 +82,11 @@ public class ProjectActions
     [Action("Update project", Description = "Update a project with new information")]
     public Task<ProjectResponse> UpdateProject(
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] [Display("Project ID")] string projectId,
+        [ActionParameter] ProjectRequest input,
         [ActionParameter] ProjectUpdateRequest parameters)
     {
         var request = new 
-            LokaliseRequest($"/projects/{projectId}", Method.Put, authenticationCredentialsProviders)
+            LokaliseRequest($"/projects/{input.ProjectId}", Method.Put, authenticationCredentialsProviders)
             .WithJsonBody(parameters);
 
         return _client.ExecuteWithHandling<ProjectResponse>(request);
@@ -95,9 +95,9 @@ public class ProjectActions
     [Action("Delete project", Description = "Delete a project")]
     public Task<ProjectDeleteResponse> DeleteProject(
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] [Display("Project ID")] string projectId)
+        [ActionParameter] ProjectRequest input)
     {
-        var request = new LokaliseRequest($"/projects/{projectId}", Method.Delete, authenticationCredentialsProviders);
+        var request = new LokaliseRequest($"/projects/{input.ProjectId}", Method.Delete, authenticationCredentialsProviders);
         
         return _client.ExecuteWithHandling<ProjectDeleteResponse>(request);
     }
@@ -105,10 +105,10 @@ public class ProjectActions
     [Action("Empty project", Description = "Deletes all keys and translations from the project")]
     public Task<EmptyResponse> EmptyProject(
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] [Display("Project ID")] string projectId)
+        [ActionParameter] ProjectRequest input)
     {
         var request =
-            new LokaliseRequest($"/projects/{projectId}/empty", Method.Put, authenticationCredentialsProviders);
+            new LokaliseRequest($"/projects/{input.ProjectId}/empty", Method.Put, authenticationCredentialsProviders);
         
         return _client.ExecuteWithHandling<EmptyResponse>(request);
     }

@@ -1,5 +1,7 @@
 ﻿using System.Text.Json.Serialization;
+using Apps.Lokalise.DataSourceHandlers;
 using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.Lokalise.Models.Requests.Files
 {
@@ -14,6 +16,7 @@ namespace Apps.Lokalise.Models.Requests.Files
         
         [Display("Language code")]
         [JsonPropertyName("lang_iso")]
+        [DataSource(typeof(LanguageDataHandler))]
         public string LanguageCode { get; set; }
         
         [JsonPropertyName("convert_placeholders")]

@@ -1,12 +1,10 @@
-﻿using Blackbird.Applications.Sdk.Common;
+﻿using Apps.Lokalise.Models.Requests.Projects;
+using Blackbird.Applications.Sdk.Common;
 
 namespace Apps.Lokalise.Models.Requests.Keys;
 
-public class DeleteKeyRequest
+public class DeleteKeyRequest : ProjectRequest
 {
     [Display("Key ID")]
     public int KeyId { get; set; }
-
-    [Display("Project ID")]
-    public string ProjectId { get; set; }
 }

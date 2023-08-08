@@ -1,6 +1,7 @@
 ﻿using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Models.Requests.Languages;
+using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.Models.Responses.Languages;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
@@ -39,18 +40,17 @@ namespace Apps.Lokalise.Actions
         [Action("List all project languages", Description = "List all project languages")]
         public Task<ListLanguagesResponse> ListProjectLanguages(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] [Display("Project ID")] string projectId)
-            => ListLanguages(authenticationCredentialsProviders, $"/projects/{projectId}/languages");
+            [ActionParameter] ProjectRequest input)
+            => ListLanguages(authenticationCredentialsProviders, $"/projects/{input.ProjectId}/languages");
 
         [Action("Add language to project", Description = "Add language to project")]
         public Task AddLanguageToProject(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] [Display("Project ID")]
-            string projectId,
+            [ActionParameter] ProjectRequest project,
             [ActionParameter] AddLanguageToProjectInput input)
         {
             var request = new LokaliseRequest(
-                    $"/projects/{projectId}/languages",
+                    $"/projects/{project.ProjectId}/languages",
                     Method.Post,
                     authenticationCredentialsProviders)
                 .WithJsonBody(new AddLanguageToProjectRequest(input));

@@ -1,12 +1,10 @@
-﻿using Blackbird.Applications.Sdk.Common;
+﻿using Apps.Lokalise.Models.Requests.Projects;
+using Blackbird.Applications.Sdk.Common;
 
 namespace Apps.Lokalise.Models.Requests.Translations;
 
-public class TranslationRequest
+public class TranslationRequest : ProjectRequest
 {
-    [Display("Project ID")]
-    public string ProjectId { get; set; }
-    
     [Display("Translation ID")]
     public string TranslationId { get; set; }
 }

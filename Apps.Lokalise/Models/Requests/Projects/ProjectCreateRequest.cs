@@ -1,5 +1,8 @@
 ﻿using System.Text.Json.Serialization;
+using Apps.Lokalise.DataSourceHandlers;
+using Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.Lokalise.Models.Requests.Projects;
 
@@ -21,6 +24,7 @@ public class ProjectCreateRequest
 
     [JsonPropertyName("project_type")]
     [Display("Project type")]
+    [DataSource(typeof(ProjectTypeDataHandler))]
     public string? ProjectType { get; set; }
 
     [JsonPropertyName("is_segmentation_enabled")]

@@ -1,5 +1,7 @@
 ﻿using System.Text.Json.Serialization;
+using Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.Lokalise.Models.Requests.Tasks;
 public class TaskCreateRequest
@@ -42,6 +44,7 @@ public class TaskCreateRequest
 
     [JsonPropertyName("task_type")]
     [Display("Task type")]
+    [DataSource(typeof(TaskTypeDataHandler))]
     public string? TaskType { get; set; }
 
     [JsonPropertyName("parent_task_id")]

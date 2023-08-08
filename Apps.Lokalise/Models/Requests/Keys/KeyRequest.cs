@@ -1,9 +1,10 @@
-﻿using Blackbird.Applications.Sdk.Common;
+﻿using Apps.Lokalise.Models.Requests.Projects;
+using Blackbird.Applications.Sdk.Common;
 
 namespace Apps.Lokalise.Models.Requests.Keys;
 
-public class KeyRequest
+public class KeyRequest : ProjectRequest
 {
-    [Display("Key ID")] public long KeyId { get; set; }
-    [Display("Project ID")] public string ProjectId { get; set; }
+    [Display("Key ID")] 
+    public string KeyId { get; set; }
 }

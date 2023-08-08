@@ -1,10 +1,13 @@
-﻿using Blackbird.Applications.Sdk.Common;
+﻿using Apps.Lokalise.DataSourceHandlers;
+using Apps.Lokalise.Models.Requests.Projects;
+using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.Lokalise.Models.Requests.Languages
 {
-    public class DeleteLanguageFromProjectRequest
+    public class DeleteLanguageFromProjectRequest : ProjectRequest
     {
-        [Display("Project ID")] public string ProjectId { get; set; }
-        [Display("Language ID")] public string LanguageId { get; set; }
+        [Display("Language ID")]
+        public string LanguageId { get; set; }
     }
 }
