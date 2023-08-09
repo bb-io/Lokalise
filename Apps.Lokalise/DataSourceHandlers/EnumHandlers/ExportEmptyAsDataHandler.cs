@@ -1,4 +1,4 @@
-﻿using Apps.Lokalise.DataSourceHandlers.Base;
+﻿using Blackbird.Applications.Sdk.Utils.Sdk.DataSourceHandlers;
 
 namespace Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 

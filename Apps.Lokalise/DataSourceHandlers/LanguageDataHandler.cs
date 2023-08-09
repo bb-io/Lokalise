@@ -1,12 +1,8 @@
 ﻿using Apps.Lokalise.Actions;
-using Apps.Lokalise.Dtos;
-using Apps.Lokalise.Extensions;
-using Apps.Lokalise.RestSharp;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
-using RestSharp;
 
 namespace Apps.Lokalise.DataSourceHandlers;
 

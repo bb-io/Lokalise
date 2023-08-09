@@ -7,7 +7,7 @@ using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Authentication;
-using Microsoft.AspNetCore.WebUtilities;
+using Blackbird.Applications.Sdk.Utils.Extensions.String;
 using RestSharp;
 
 namespace Apps.Lokalise.Actions
@@ -43,7 +43,7 @@ namespace Apps.Lokalise.Actions
             var endpoint = $"/projects/{pathInput.ProjectId}/keys/{pathInput.KeyId}/segments/{pathInput.LanguageCode}";
             var query = queryInput.AsDictionary().AllIsNotNull();
 
-            var url = QueryHelpers.AddQueryString(endpoint, query);
+            var url = endpoint.WithQuery(query);
 
             var segments = await Paginator.GetAll<SegmentsWrapper, SegmentDto>(creds, url);
 

@@ -9,7 +9,7 @@ using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Authentication;
-using Microsoft.AspNetCore.WebUtilities;
+using Blackbird.Applications.Sdk.Utils.Extensions.String;
 using RestSharp;
 
 namespace Apps.Lokalise.Actions
@@ -43,7 +43,7 @@ namespace Apps.Lokalise.Actions
             var baseEndpoint = $"/projects/{project.ProjectId}/keys";
             var query = input.AsDictionary().AllIsNotNull();
 
-            var endpointWithQuery = QueryHelpers.AddQueryString(baseEndpoint, query);
+            var endpointWithQuery = baseEndpoint.WithQuery(query);
 
             var items = await Paginator.GetAll<KeysWrapper, KeyDto>(
                 authenticationCredentialsProviders.ToArray(),

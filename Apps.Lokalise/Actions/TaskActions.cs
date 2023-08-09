@@ -4,11 +4,10 @@ using Apps.Lokalise.Models.Requests.Tasks;
 using Apps.Lokalise.Models.Responses.Tasks;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
-using Apps.Lokalise.Webhooks.Payload;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Authentication;
-using Microsoft.AspNetCore.WebUtilities;
+using Blackbird.Applications.Sdk.Utils.Extensions.String;
 using RestSharp;
 
 namespace Apps.Lokalise.Actions;
@@ -42,7 +41,7 @@ public class TaskActions
         var endpoint = $"/projects/{project.ProjectId}/tasks";
 
         var query = parameters.AsDictionary().AllIsNotNull();
-        var endpointWithQuery = QueryHelpers.AddQueryString(endpoint, query);
+        var endpointWithQuery = endpoint.WithQuery(query);
 
         var items = await Paginator.GetAll<TasksWrapper, TaskResponse>(
             authenticationCredentialsProviders.ToArray(),
