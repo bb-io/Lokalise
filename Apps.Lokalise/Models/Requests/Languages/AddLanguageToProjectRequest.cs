@@ -1,10 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Requests.Languages;
 
 public class AddLanguageToProjectRequest
 {
-    [JsonPropertyName("languages")] public AddLanguageData[] Languages { get; set; }
+    [JsonProperty("languages")] public AddLanguageData[] Languages { get; set; }
 
     public AddLanguageToProjectRequest(AddLanguageToProjectInput input)
     {

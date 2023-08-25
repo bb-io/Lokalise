@@ -1,24 +1,24 @@
-﻿using System.Text.Json.Serialization;
-using Apps.Lokalise.Dtos;
+﻿using Apps.Lokalise.Dtos;
 using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Responses.Segments;
 
 public class SegmentResponse
 {
-    [JsonPropertyName("project_id")]
+    [JsonProperty("project_id")]
     [Display("Project ID")]
     public string ProjectId { get; set; }
 
-    [JsonPropertyName("key_id")]
+    [JsonProperty("key_id")]
     [Display("Key ID")]
     public string KeyId { get; set; }
 
-    [JsonPropertyName("language_iso")]
+    [JsonProperty("language_iso")]
     [Display("Language code")]
     public string LanguageIso { get; set; }
 
-    [JsonPropertyName("segment")]
+    [JsonProperty("segment")]
     public SegmentDto Segment { get; set; }
 
 }

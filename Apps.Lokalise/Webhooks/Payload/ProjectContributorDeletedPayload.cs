@@ -1,12 +1,12 @@
-using System.Text.Json.Serialization;
 using Apps.Lokalise.Webhooks.Models;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectContributorDeletedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectContributorDeletedPayload : BasePayload>(myJsonResponse);
     public class ProjectContributorDeletedPayload : BasePayload
     {
-        [JsonPropertyName("contributor")]
+        [JsonProperty("contributor")]
         public Contributor Contributor { get; set; }
 
         public override ContributerEvent Convert()

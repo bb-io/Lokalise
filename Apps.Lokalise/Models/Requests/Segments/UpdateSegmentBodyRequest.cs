@@ -1,21 +1,21 @@
-﻿using System.Text.Json.Serialization;
-using Blackbird.Applications.Sdk.Common;
+﻿using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Requests.Segments;
 
 public class UpdateSegmentBodyRequest
 {
-    [JsonPropertyName("value")] public string Value { get; set; }
+    [JsonProperty("value")] public string Value { get; set; }
 
-    [JsonPropertyName("is_fuzzy")]
+    [JsonProperty("is_fuzzy")]
     [Display("Is fuzzy")]
     public bool? IsFuzzy { get; set; }
 
-    [JsonPropertyName("is_reviewed")]
+    [JsonProperty("is_reviewed")]
     [Display("Is reviewed")]
     public bool? IsReviewed { get; set; }
 
-    [JsonPropertyName("custom_translation_status_ids")]
+    [JsonProperty("custom_translation_status_ids")]
     [Display("Custom translation status ids")]
     public IEnumerable<string>? CustomTranslationStatusIds { get; set; }
 }

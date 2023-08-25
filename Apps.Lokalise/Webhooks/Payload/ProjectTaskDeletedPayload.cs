@@ -1,12 +1,12 @@
-using System.Text.Json.Serialization;
 using Apps.Lokalise.Webhooks.Models;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectTaskDeletedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectTaskDeletedPayload : BasePayload>(myJsonResponse);
     public class ProjectTaskDeletedPayload : BasePayload
     {
-        [JsonPropertyName("task")]
+        [JsonProperty("task")]
         public Task Task { get; set; }
 
         public override TaskEvent Convert()

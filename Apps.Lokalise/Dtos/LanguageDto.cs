@@ -1,23 +1,23 @@
-﻿using System.Text.Json.Serialization;
-using Blackbird.Applications.Sdk.Common;
+﻿using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Dtos
 {
     public class LanguageDto
     {
-        [JsonPropertyName("lang_id")]
+        [JsonProperty("lang_id")]
         [Display("Language ID")]
         public long LangId { get; set; }
 
-        [JsonPropertyName("lang_iso")]
+        [JsonProperty("lang_iso")]
         [Display("Language iso")]
         public string LangIso { get; set; }
         
-        [JsonPropertyName("lang_name")]
+        [JsonProperty("lang_name")]
         [Display("Language name")]
         public string LangName { get; set; }
         
-        [JsonPropertyName("is_rtl")]
+        [JsonProperty("is_rtl")]
         [Display("Is rtl")]
         public bool IsRtl { get; set; }
 

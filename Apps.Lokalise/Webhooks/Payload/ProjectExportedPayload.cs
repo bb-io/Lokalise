@@ -1,28 +1,28 @@
-using System.Text.Json.Serialization;
 using Blackbird.Applications.Sdk.Common;
 using Apps.Lokalise.Webhooks.Models;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectExportedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectExportedPayload : BasePayload>(myJsonResponse);
     public class Export
     {
-        [JsonPropertyName("type")]
+        [JsonProperty("type")]
         [Display("Type")]
         public string Type { get; set; }
 
-        [JsonPropertyName("filename")]
+        [JsonProperty("filename")]
         [Display("Filename")]
         public string Filename { get; set; }
 
-        [JsonPropertyName("platform")]
+        [JsonProperty("platform")]
         [Display("Platform")]
         public string Platform { get; set; }
     }
 
     public class ProjectExportedPayload : BasePayload
     {
-        [JsonPropertyName("export")]
+        [JsonProperty("export")]
         [Display("Export")]
         public Export Export { get; set; }
 

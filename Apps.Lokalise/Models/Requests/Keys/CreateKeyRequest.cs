@@ -1,13 +1,13 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Requests.Keys;
 
 public class CreateKeyRequest
 {
-    [JsonPropertyName("keys")]
+    [JsonProperty("keys")]
     public CreateKeyModel[] Keys { get; set; }
 
-    [JsonPropertyName("use_automations")]
+    [JsonProperty("use_automations")]
     public bool? UseAutomations { get; set; }
     
     public CreateKeyRequest(CreateKeyInput input)

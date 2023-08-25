@@ -1,9 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Responses.Comments;
 
 public class CommentsResponse
 {
-    [JsonPropertyName("comments")]
+    [JsonProperty("comments")]
     public Comment[] Comments { get; set; }
 }

@@ -1,10 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Dtos
 {
     public class WebhookDto
     {
-        [JsonPropertyName("webhook_id")]
+        [JsonProperty("webhook_id")]
         public string WebhookId { get; set; }
         public string Url { get; set; }
         public object Branch { get; set; }

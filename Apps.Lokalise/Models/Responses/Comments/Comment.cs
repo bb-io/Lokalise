@@ -1,31 +1,31 @@
-﻿using System.Text.Json.Serialization;
-using Blackbird.Applications.Sdk.Common;
+﻿using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Responses.Comments;
 
 public class Comment
 {
-    [JsonPropertyName("comment_id")]
+    [JsonProperty("comment_id")]
     [Display("Comment ID")]
     public long CommentId { get; set; }
 
-    [JsonPropertyName("key_id")]
+    [JsonProperty("key_id")]
     [Display("Key ID")]
     public long KeyId { get; set; }
 
-    [JsonPropertyName("comment")]
+    [JsonProperty("comment")]
     [Display("Comment")]
     public string CommentText { get; set; }
 
-    [JsonPropertyName("added_by")]
+    [JsonProperty("added_by")]
     [Display("Added by")]
     public long AddedBy { get; set; }
 
-    [JsonPropertyName("added_by_email")]
+    [JsonProperty("added_by_email")]
     [Display("Added by email")]
     public string AddedByEmail { get; set; }
     
-    [JsonPropertyName("added_at_timestamp")]
+    [JsonProperty("added_at_timestamp")]
     [Display("Added at timestamp")]
     public long AddedAtTimestamp { get; set; }
 }

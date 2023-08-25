@@ -29,9 +29,7 @@ public static class Paginator
             var request = new LokaliseRequest(requestUrl, Method.Get, creds);
             
             response = await Client.ExecuteWithHandling<T>(request);
-            
             results.AddRange(response.Items);
-
         } while (response.Items.Any());
 
         return results;

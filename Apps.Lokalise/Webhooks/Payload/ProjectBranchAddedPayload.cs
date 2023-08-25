@@ -1,20 +1,20 @@
-using System.Text.Json.Serialization;
 using Blackbird.Applications.Sdk.Common;
 using Apps.Lokalise.Webhooks.Models;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectBranchAddedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectBranchAddedPayload : BasePayload>(myJsonResponse);
     public class Branch
     {
-        [JsonPropertyName("name")]
+        [JsonProperty("name")]
         [Display("Name")]
         public string Name { get; set; }
     }
 
     public class ProjectBranchAddedPayload : BasePayload
     {
-        [JsonPropertyName("branch")]
+        [JsonProperty("branch")]
         [Display("Branch")]
         public Branch Branch { get; set; }
 

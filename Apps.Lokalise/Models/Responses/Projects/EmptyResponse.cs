@@ -1,15 +1,15 @@
-﻿using System.Text.Json.Serialization;
-using Blackbird.Applications.Sdk.Common;
+﻿using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Responses.Projects;
 
 public class EmptyResponse
 {
-    [JsonPropertyName("project_id")]
+    [JsonProperty("project_id")]
     [Display("Project ID")]
     public string ProjectId { get; set; }
     
-    [JsonPropertyName("keys_deleted")]
+    [JsonProperty("keys_deleted")]
     [Display("Keys deleted")]
     public bool KeysDeleted { get; set; }
 }

@@ -1,15 +1,15 @@
-using System.Text.Json.Serialization;
 using Blackbird.Applications.Sdk.Common;
 using Apps.Lokalise.Webhooks.Models;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectTranslationUpdatedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectTranslationUpdatedPayload : BasePayload>(myJsonResponse);
     public class ProjectTranslationUpdatedPayload : BasePayload
     {
-        [JsonPropertyName("translation")] public TranslationUpdated Translation { get; set; }
-        [JsonPropertyName("key")] public KeyName Key { get; set; }
-        [JsonPropertyName("language")] public Language Language { get; set; }
+        [JsonProperty("translation")] public TranslationUpdated Translation { get; set; }
+        [JsonProperty("key")] public KeyName Key { get; set; }
+        [JsonProperty("language")] public Language Language { get; set; }
 
         public override TranslationEvent Convert()
         {
@@ -33,10 +33,10 @@ namespace Apps.Lokalise.Webhooks.Payload
 
     public class TranslationUpdated
     {
-        [JsonPropertyName("id")] public int Id { get; set; }
-        [JsonPropertyName("value")] public string Value { get; set; }
+        [JsonProperty("id")] public int Id { get; set; }
+        [JsonProperty("value")] public string Value { get; set; }
 
-        [JsonPropertyName("previous_value")]
+        [JsonProperty("previous_value")]
         [Display("Previous value")]
         public string PreviousValue { get; set; }
     }

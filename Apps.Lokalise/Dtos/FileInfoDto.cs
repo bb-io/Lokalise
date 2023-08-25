@@ -1,19 +1,19 @@
-﻿using System.Text.Json.Serialization;
-using Blackbird.Applications.Sdk.Common;
+﻿using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Dtos
 {
     public class FileInfoDto
     {
-        [JsonPropertyName("file_id")]
+        [JsonProperty("file_id")]
         [Display("File ID")]
         public long FileId { get; set; }
 
-        [JsonPropertyName("filename")]
+        [JsonProperty("filename")]
         [Display("File name")]
         public string FileName { get; set; }
 
-        [JsonPropertyName("key_count")]
+        [JsonProperty("key_count")]
         [Display("Key count")]
         public int KeyCount { get; set; }
     }

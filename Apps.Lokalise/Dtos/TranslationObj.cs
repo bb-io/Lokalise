@@ -1,57 +1,57 @@
-﻿using System.Text.Json.Serialization;
-using Apps.Lokalise.Utils.Converters;
+﻿using Apps.Lokalise.Utils.Converters;
 using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Dtos;
 
 public class TranslationObj
 {
-    [JsonPropertyName("translation_id")]
+    [JsonProperty("translation_id")]
     [Display("Translation ID")]
-    [JsonConverter(typeof(IntToStringConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(IntToStringConverter))]
     public string TranslationId { get; set; }
 
-    [JsonPropertyName("key_id")]
+    [JsonProperty("key_id")]
     [Display("Key ID")]
     public int KeyId { get; set; }
 
-    [JsonPropertyName("language_iso")]
+    [JsonProperty("language_iso")]
     [Display("Language iso")]
     public string LanguageIso { get; set; }
 
-    [JsonPropertyName("translation")] public string Translation { get; set; }
+    [JsonProperty("translation")] public string Translation { get; set; }
 
-    [JsonPropertyName("modified_by")]
+    [JsonProperty("modified_by")]
     [Display("Modified by")]
     public int ModifiedBy { get; set; }
 
-    [JsonPropertyName("modified_by_email")]
+    [JsonProperty("modified_by_email")]
     [Display("Modified by email")]
     public string ModifiedByEmail { get; set; }
 
-    [JsonPropertyName("modified_at")]
+    [JsonProperty("modified_at")]
     [Display("Modified at")]
     public string ModifiedAt { get; set; }
 
-    [JsonPropertyName("modified_at_timestamp")]
+    [JsonProperty("modified_at_timestamp")]
     [Display("Modified at timestamp")]
     public int ModifiedAtTimestamp { get; set; }
 
-    [JsonPropertyName("is_reviewed")]
+    [JsonProperty("is_reviewed")]
     [Display("Is reviewed")]
     public bool IsReviewed { get; set; }
 
-    [JsonPropertyName("is_unreviewed")]
+    [JsonProperty("is_unreviewed")]
     [Display("Is unreviewed")]
     public bool IsUnverified { get; set; }
 
-    [JsonPropertyName("reviewed_by")]
+    [JsonProperty("reviewed_by")]
     [Display("Reviewed by")]
     public int ReviewedBy { get; set; }
 
-    [JsonPropertyName("words")] public int Words { get; set; }
+    [JsonProperty("words")] public int Words { get; set; }
 
-    [JsonPropertyName("task_id")]
+    [JsonProperty("task_id")]
     [Display("Task ID")]
     public int? TaskId { get; set; }
 }

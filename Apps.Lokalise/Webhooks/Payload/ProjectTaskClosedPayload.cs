@@ -1,12 +1,12 @@
-using System.Text.Json.Serialization;
 using Apps.Lokalise.Webhooks.Models;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectTaskClosedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectTaskClosedPayload : BasePayload>(myJsonResponse);
     public class ProjectTaskClosedPayload : BasePayload
     {
-        [JsonPropertyName("task")] public Task Task { get; set; }
+        [JsonProperty("task")] public Task Task { get; set; }
 
         public override TaskEvent Convert()
         {
@@ -26,16 +26,16 @@ namespace Apps.Lokalise.Webhooks.Payload
 
     public class Task
     {
-        [JsonPropertyName("id")] public int Id { get; set; }
+        [JsonProperty("id")] public int Id { get; set; }
 
-        [JsonPropertyName("type")] public string Type { get; set; }
+        [JsonProperty("type")] public string Type { get; set; }
 
-        [JsonPropertyName("title")] public string Title { get; set; }
+        [JsonProperty("title")] public string Title { get; set; }
 
-        // [JsonPropertyName("due_date")]
+        // [JsonProperty("due_date")]
         // [Display("Due date")]
         // public DateTime DueDate { get; set; }
 
-        [JsonPropertyName("description")] public string Description { get; set; }
+        [JsonProperty("description")] public string Description { get; set; }
     }
 }

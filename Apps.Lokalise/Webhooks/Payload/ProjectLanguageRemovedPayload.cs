@@ -1,26 +1,26 @@
-using System.Text.Json.Serialization;
 using Apps.Lokalise.Webhooks.Models;
 using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectLanguageRemovedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectLanguageRemovedPayload : BasePayload>(myJsonResponse);
     public class Language
     {
-        [JsonPropertyName("id")]
+        [JsonProperty("id")]
         [Display("Language ID")]
         public int Id { get; set; }
 
-        [JsonPropertyName("iso")]
+        [JsonProperty("iso")]
         [Display("ISO code")]
         public string Iso { get; set; }
 
-        [JsonPropertyName("name")] public string Name { get; set; }
+        [JsonProperty("name")] public string Name { get; set; }
     }
 
     public class ProjectLanguageRemovedPayload : BasePayload
     {
-        [JsonPropertyName("language")] public Language Language { get; set; }
+        [JsonProperty("language")] public Language Language { get; set; }
 
         public override LanguageEvent Convert()
         {
