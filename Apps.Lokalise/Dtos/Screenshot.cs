@@ -1,18 +1,18 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Dtos;
 
 public class Screenshot
 {
-    [JsonPropertyName("title")]
+    [JsonProperty("title")]
     public string Title { get; set; }
     
-    [JsonPropertyName("description")]
+    [JsonProperty("description")]
     public string Description { get; set; }
     
-    [JsonPropertyName("screenshot_tags")]
+    [JsonProperty("screenshot_tags")]
     public IEnumerable<string> ScreenshotTags { get; set; }
     
-    [JsonPropertyName("data")]
+    [JsonProperty("data")]
     public string Data { get; set; }
 }

@@ -1,44 +1,44 @@
-using System.Text.Json.Serialization;
 using Blackbird.Applications.Sdk.Common;
 using Apps.Lokalise.Webhooks.Models;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectKeyCommentAddedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectKeyCommentAddedPayload : BasePayload>(myJsonResponse);
     public class Comment
     {
-        [JsonPropertyName("value")] public string Value { get; set; }
+        [JsonProperty("value")] public string Value { get; set; }
     }
 
     public class Filenames
     {
-        [JsonPropertyName("ios")] public string Ios { get; set; }
-        [JsonPropertyName("android")] public string Android { get; set; }
-        [JsonPropertyName("web")] public string Web { get; set; }
-        [JsonPropertyName("other")] public string Other { get; set; }
+        [JsonProperty("ios")] public string Ios { get; set; }
+        [JsonProperty("android")] public string Android { get; set; }
+        [JsonProperty("web")] public string Web { get; set; }
+        [JsonProperty("other")] public string Other { get; set; }
     }
 
     public class KeyCommentAdded
     {
-        [JsonPropertyName("id")]
+        [JsonProperty("id")]
         public int Id { get; set; }
 
-        [JsonPropertyName("name")]
+        [JsonProperty("name")]
         [Display("Name")]
         public string Name { get; set; }
 
-        [JsonPropertyName("filenames")]
+        [JsonProperty("filenames")]
         [Display("Filenames")]
         public Filenames Filenames { get; set; }
     }
 
     public class ProjectKeyCommentAddedPayload : BasePayload
     {
-        [JsonPropertyName("key")]
+        [JsonProperty("key")]
         [Display("Key")]
         public KeyCommentAdded Key { get; set; }
 
-        [JsonPropertyName("comment")]
+        [JsonProperty("comment")]
         [Display("Comment")]
         public Comment Comment { get; set; }
 

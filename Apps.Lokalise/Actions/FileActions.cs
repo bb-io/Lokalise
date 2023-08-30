@@ -4,11 +4,12 @@ using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using RestSharp;
-using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Models.Requests.Files;
 using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
+using Blackbird.Applications.Sdk.Utils.Extensions.Files;
+using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 
 namespace Apps.Lokalise.Actions
 {
@@ -51,12 +52,12 @@ namespace Apps.Lokalise.Actions
         public async Task<QueuedProcessDto> UploadFile(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
             [ActionParameter] ProjectRequest project,
-            [ActionParameter] UploadFileRequest input)
+            [ActionParameter] UploadFileInput input)
         {
             var creds = authenticationCredentialsProviders.ToArray();
             var endpoint = $"/projects/{project.ProjectId}/files/upload";
 
-            var request = new LokaliseRequest(endpoint, Method.Post, creds).WithJsonBody(input);
+            var request = new LokaliseRequest(endpoint, Method.Post, creds).WithJsonBody(new UploadFileRequest(input));
             var uploadResult = await _client.ExecuteWithHandling<QueuedProcessDto>(request);
 
             return await _client
@@ -80,8 +81,12 @@ namespace Apps.Lokalise.Actions
 
             return new()
             {
-                FileName = fileUri.Segments.Last(),
-                File = dataResponse.RawBytes!
+                File = new(dataResponse.RawBytes!)
+                {
+                    Name = fileUri.Segments.Last(),
+                    ContentType = dataResponse.Headers?
+                        .FirstOrDefault(x => x.Name == "Content-Type")?.Value?.ToString() ?? string.Empty
+                }
             };
         }
 
@@ -96,13 +101,12 @@ namespace Apps.Lokalise.Actions
                 project,
                 input);
 
-            var fileData = allFiles.File.GetFileFromZip(en =>
+            var fileData = await allFiles.File.Bytes.GetFileFromZip(en =>
                 en.FullName.Split('/').First() == input.LanguageCode.Replace("-", "_") &&
                 en.Name == input.FileName);
 
             return new()
             {
-                FileName = input.FileName,
                 File = fileData
             };
         }

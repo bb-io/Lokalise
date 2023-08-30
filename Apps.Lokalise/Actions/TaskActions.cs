@@ -1,4 +1,5 @@
-﻿using Apps.Lokalise.Extensions;
+﻿using Apps.Lokalise.Constants;
+using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.Models.Requests.Tasks;
 using Apps.Lokalise.Models.Responses.Tasks;
@@ -7,7 +8,9 @@ using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.Sdk.Utils.Extensions.String;
+using Blackbird.Applications.Sdk.Utils.Extensions.System;
 using RestSharp;
 
 namespace Apps.Lokalise.Actions;
@@ -40,7 +43,7 @@ public class TaskActions
     {
         var endpoint = $"/projects/{project.ProjectId}/tasks";
 
-        var query = parameters.AsDictionary().AllIsNotNull();
+        var query = parameters.AsLokaliseDictionary().AllIsNotNull();
         var endpointWithQuery = endpoint.WithQuery(query);
 
         var items = await Paginator.GetAll<TasksWrapper, TaskResponse>(
@@ -50,18 +53,34 @@ public class TaskActions
         return new(items);
     }
 
+    [Action("Create task with multiple languages", Description = "Create a new task with multiple languages")]
+    public async Task<TaskResponse> CreateTaskWithMultLanguages(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] ProjectRequest project,
+        [ActionParameter] TaskCreateWithMultLangsRequest parameters)
+    {
+        if (parameters.Keys is null && parameters.ParentTaskId is null)
+            throw new("One of the inputs must be specified: Parent task ID or Keys");
+        
+        var request = new LokaliseRequest($"/projects/{project.ProjectId}/tasks", Method.Post,
+                authenticationCredentialsProviders)
+            .WithJsonBody(parameters, JsonConfig.Settings);
+
+        var response = await _client.ExecuteWithHandling<TaskRetriveResponse>(request);
+        return response.Task;
+    }
+    
     [Action("Create task", Description = "Create a new task")]
-    public async Task<TaskResponse> CreateTask(
+    public Task<TaskResponse> CreateTask(
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
         [ActionParameter] ProjectRequest project,
         [ActionParameter] TaskCreateRequest parameters)
     {
-        var request = new LokaliseRequest($"/projects/{project.ProjectId}/tasks", Method.Post,
-                authenticationCredentialsProviders)
-            .WithJsonBody(parameters);
+        if (parameters.Users is null && parameters.Groups is null)
+            throw new("One of the inputs must be specified: Users or Groups");
 
-        var response = await _client.ExecuteWithHandling<TaskRetriveResponse>(request);
-        return response.Task;
+        var request = new TaskCreateWithMultLangsRequest(parameters);
+        return CreateTaskWithMultLanguages(authenticationCredentialsProviders, project, request);
     }
 
     [Action("Get task", Description = "Get information about a specific task")]

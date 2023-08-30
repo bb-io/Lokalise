@@ -1,5 +1,5 @@
-using System.Text.Json.Serialization;
 using Apps.Lokalise.Webhooks.Models;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
@@ -7,7 +7,7 @@ namespace Apps.Lokalise.Webhooks.Payload
 
     public class ProjectKeysAddedPayload : BasePayload
     {
-        [JsonPropertyName("keys")]
+        [JsonProperty("keys")]
         public List<KeyWithTags> Keys { get; set; }
 
         public override KeysEvent Convert()

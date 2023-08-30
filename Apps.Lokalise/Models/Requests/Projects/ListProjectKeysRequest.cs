@@ -1,59 +1,59 @@
-﻿using System.Text.Json.Serialization;
-using Blackbird.Applications.Sdk.Common;
+﻿using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Requests.Projects
 {
     public class ListProjectKeysRequest
     {
-        [JsonPropertyName("disable_references")]
+        [JsonProperty("disable_references")]
         [Display("Disable references")]
         public bool? DisableReferences { get; set; }
         
-        [JsonPropertyName("include_comments")]
+        [JsonProperty("include_comments")]
         [Display("Include comments")]
         public bool? IncludeComments { get; set; }
         
-        [JsonPropertyName("include_screenshots")]
+        [JsonProperty("include_screenshots")]
         [Display("Include screenshots")]
         public bool? IncludeScreenshots { get; set; }
         
-        [JsonPropertyName("include_translations")]
+        [JsonProperty("include_translations")]
         [Display("Include translations")]
         public bool? IncludeTranslations { get; set; }
         
-        [JsonPropertyName("filter_translation_lang_ids")]
+        [JsonProperty("filter_translation_lang_ids")]
         [Display("Filter translation lang ids")]
         public string? FilterTranslationLangIds { get; set; }
         
-        [JsonPropertyName("filter_tags")]
+        [JsonProperty("filter_tags")]
         [Display("Filter tags")]
         public string? FilterTags { get; set; }
         
-        [JsonPropertyName("filter_filenames")]
+        [JsonProperty("filter_filenames")]
         [Display("Filter filenames")]
         public string? FilterFilenames { get; set; }
         
-        [JsonPropertyName("filter_keys")]
+        [JsonProperty("filter_keys")]
         [Display("Filter keys")]
         public string? FilterKeys { get; set; }
         
-        [JsonPropertyName("filter_key_ids")]
+        [JsonProperty("filter_key_ids")]
         [Display("Filter Key IDs")]
         public string? FilterKeyIds { get; set; }
         
-        [JsonPropertyName("filter_platforms")]
+        [JsonProperty("filter_platforms")]
         [Display("Filter platforms")]
         public string? FilterPlatforms { get; set; }
         
-        [JsonPropertyName("filter_untranslated")]
+        [JsonProperty("filter_untranslated")]
         [Display("Filter untranslated")]
         public bool? FilterUntranslated { get; set; }
         
-        [JsonPropertyName("filter_qa_issues")]
+        [JsonProperty("filter_qa_issues")]
         [Display("Filter qa issues")]
         public string? FilterQaIssues { get; set; }
         
-        [JsonPropertyName("filter_archived")]
+        [JsonProperty("filter_archived")]
         [Display("Filter archived")]
         public string? FilterArchived { get; set; }
     }

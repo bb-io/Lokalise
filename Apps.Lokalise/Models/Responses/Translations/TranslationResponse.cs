@@ -1,9 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Responses.Translations;
 
 public class TranslationResponse
 {
-    [JsonPropertyName("translation")]
+    [JsonProperty("translation")]
     public Translation Translation { get; set; }
 }

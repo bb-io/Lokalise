@@ -1,19 +1,19 @@
-﻿using System.Text.Json.Serialization;
-using Blackbird.Applications.Sdk.Common;
+﻿using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Requests.Tasks;
 public class TaskLanguage
 {
-    [JsonPropertyName("language_iso")]
+    [JsonProperty("language_iso")]
     [Display("Language code")]
     public string LanguageIso { get; set; }
 
-    [JsonPropertyName("users")]
+    [JsonProperty("users")]
     [Display("Users")]
-    public string[] Users { get; set; }
+    public IEnumerable<string>? Users { get; set; }
 
-    [JsonPropertyName("groups")]
+    [JsonProperty("groups")]
     [Display("Groups")]
-    public string[] Groups { get; set; }
+    public IEnumerable<string>? Groups { get; set; }
 
 }

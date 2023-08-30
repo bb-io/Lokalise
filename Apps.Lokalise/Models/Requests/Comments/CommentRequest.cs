@@ -1,10 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Requests.Comments;
 
 public class CommentRequest
 {
-    [JsonPropertyName("comment")] public string Comment { get; set; }
+    [JsonProperty("comment")] public string Comment { get; set; }
 
     public CommentRequest(string text)
     {

@@ -5,6 +5,8 @@ using Apps.Lokalise.RestSharp;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Blackbird.Applications.Sdk.Utils.Extensions.Http;
+using Blackbird.Applications.Sdk.Utils.Extensions.System;
 using RestSharp;
 
 namespace Apps.Lokalise.Actions;
@@ -35,7 +37,7 @@ public class ProjectActions
         [ActionParameter] ProjectListParameters parameters)
     {
         var request = new LokaliseRequest("/projects", Method.Get, authenticationCredentialsProviders);
-        request.AddParameters(parameters.AsDictionary().AllIsNotNull());
+        request.AddParameters(parameters.AsLokaliseDictionary().AllIsNotNull());
 
         return _client.ExecuteWithHandling<ProjectsResponse>(request);
     }

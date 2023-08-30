@@ -1,5 +1,4 @@
 ﻿using Apps.Lokalise.Dtos;
-using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Models.Requests.Languages;
 using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.Models.Responses.Languages;
@@ -8,6 +7,7 @@ using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using RestSharp;
 
 namespace Apps.Lokalise.Actions

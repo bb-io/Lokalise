@@ -7,7 +7,9 @@ using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.Sdk.Utils.Extensions.String;
+using Blackbird.Applications.Sdk.Utils.Extensions.System;
 using RestSharp;
 
 namespace Apps.Lokalise.Actions
@@ -41,7 +43,7 @@ namespace Apps.Lokalise.Actions
             var creds = authenticationCredentialsProviders.ToArray();
 
             var endpoint = $"/projects/{pathInput.ProjectId}/keys/{pathInput.KeyId}/segments/{pathInput.LanguageCode}";
-            var query = queryInput.AsDictionary().AllIsNotNull();
+            var query = queryInput.AsLokaliseDictionary().AllIsNotNull();
 
             var url = endpoint.WithQuery(query);
 

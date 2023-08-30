@@ -1,32 +1,32 @@
-using System.Text.Json.Serialization;
 using Blackbird.Applications.Sdk.Common;
 using Apps.Lokalise.Webhooks.Models;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectBranchMergedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectBranchMergedPayload : BasePayload>(myJsonResponse);
     public class AffectedKeys
     {
-        [JsonPropertyName("inserted_count")]
+        [JsonProperty("inserted_count")]
         [Display("Inserted count")]
         public int InsertedCount { get; set; }
 
-        [JsonPropertyName("updated_count")]
+        [JsonProperty("updated_count")]
         [Display("Updated count")]
         public int UpdatedCount { get; set; }
     }
 
     public class ProjectBranchMergedPayload : BasePayload
     {
-        [JsonPropertyName("target_branch")]
+        [JsonProperty("target_branch")]
         [Display("Target branch")]
         public TargetBranch TargetBranch { get; set; }
 
-        [JsonPropertyName("branch")]
+        [JsonProperty("branch")]
         [Display("Branch")]
         public Branch Branch { get; set; }
 
-        [JsonPropertyName("affected_keys")]
+        [JsonProperty("affected_keys")]
         [Display("Affected keys")]
         public AffectedKeys AffectedKeys { get; set; }
 
@@ -48,7 +48,7 @@ namespace Apps.Lokalise.Webhooks.Payload
 
     public class TargetBranch
     {
-        [JsonPropertyName("name")]
+        [JsonProperty("name")]
         [Display("Name")]
         public string Name { get; set; }
     }

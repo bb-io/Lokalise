@@ -1,21 +1,21 @@
-using System.Text.Json.Serialization;
 using Blackbird.Applications.Sdk.Common;
 using Apps.Lokalise.Webhooks.Models;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectTranslationProofreadPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectTranslationProofreadPayload : BasePayload>(myJsonResponse);
     public class KeyName
     {
-        [JsonPropertyName("id")] public int Id { get; set; }
-        [JsonPropertyName("name")] public string Name { get; set; }
+        [JsonProperty("id")] public int Id { get; set; }
+        [JsonProperty("name")] public string Name { get; set; }
     }
 
     public class ProjectTranslationProofreadPayload : BasePayload
     {
-        [JsonPropertyName("translation")] public Translation Translation { get; set; }
-        [JsonPropertyName("key")] public KeyName Key { get; set; }
-        [JsonPropertyName("language")] public Language Language { get; set; }
+        [JsonProperty("translation")] public Translation Translation { get; set; }
+        [JsonProperty("key")] public KeyName Key { get; set; }
+        [JsonProperty("language")] public Language Language { get; set; }
 
         public override ProofreadEvent Convert()
         {
@@ -39,10 +39,10 @@ namespace Apps.Lokalise.Webhooks.Payload
 
     public class Translation
     {
-        [JsonPropertyName("id")] public int Id { get; set; }
-        [JsonPropertyName("value")] public string Value { get; set; }
+        [JsonProperty("id")] public int Id { get; set; }
+        [JsonProperty("value")] public string Value { get; set; }
 
-        [JsonPropertyName("is_proofread")]
+        [JsonProperty("is_proofread")]
         [Display("Is proofread")]
         public bool IsProofread { get; set; }
     }

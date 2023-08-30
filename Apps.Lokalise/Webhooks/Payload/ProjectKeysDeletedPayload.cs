@@ -1,6 +1,6 @@
-using System.Text.Json.Serialization;
 using Apps.Lokalise.Webhooks.Models;
 using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
@@ -8,22 +8,22 @@ namespace Apps.Lokalise.Webhooks.Payload
 
     public class Key
     {
-        [JsonPropertyName("id")]
+        [JsonProperty("id")]
         [Display("Key ID")]
         public int Id { get; set; }
 
-        [JsonPropertyName("name")]
+        [JsonProperty("name")]
         [Display("Key name")]
         public string Name { get; set; }
 
-        [JsonPropertyName("filenames")]
+        [JsonProperty("filenames")]
         [Display("Filenames")]
         public Filenames Filenames { get; set; }
     }
 
     public class ProjectKeysDeletedPayload : BasePayload
     {
-        [JsonPropertyName("keys")]
+        [JsonProperty("keys")]
         public List<Key> Keys { get; set; }
 
         public override KeysDeletedEvent Convert()

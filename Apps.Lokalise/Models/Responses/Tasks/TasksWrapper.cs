@@ -1,9 +1,9 @@
-﻿using System.Text.Json.Serialization;
-using Apps.Lokalise.Models.Responses.Base;
+﻿using Apps.Lokalise.Models.Responses.Base;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Responses.Tasks;
 public class TasksWrapper : PaginationResponse<TaskResponse>
 {
-    [JsonPropertyName("tasks")]
+    [JsonProperty("tasks")]
     public override IEnumerable<TaskResponse> Items { get; set; }
 }

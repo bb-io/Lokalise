@@ -1,5 +1,5 @@
-using System.Text.Json.Serialization;
 using Apps.Lokalise.Webhooks.Models;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
@@ -7,10 +7,10 @@ namespace Apps.Lokalise.Webhooks.Payload
 
     public class ProjectTaskLanguageClosedPayload : BasePayload
     {
-        [JsonPropertyName("task")]
+        [JsonProperty("task")]
         public Task Task { get; set; }
         
-        [JsonPropertyName("language")]
+        [JsonProperty("language")]
         public Language Language { get; set; }
 
         public override TaskLanguageEvent Convert()

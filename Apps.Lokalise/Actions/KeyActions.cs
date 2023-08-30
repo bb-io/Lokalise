@@ -9,8 +9,10 @@ using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.Sdk.Utils.Extensions.String;
 using RestSharp;
+using Blackbird.Applications.Sdk.Utils.Extensions.System;
 
 namespace Apps.Lokalise.Actions
 {
@@ -41,7 +43,7 @@ namespace Apps.Lokalise.Actions
             [ActionParameter] ListProjectKeysRequest input)
         {
             var baseEndpoint = $"/projects/{project.ProjectId}/keys";
-            var query = input.AsDictionary().AllIsNotNull();
+            var query = input.AsLokaliseDictionary().AllIsNotNull();
 
             var endpointWithQuery = baseEndpoint.WithQuery(query);
 

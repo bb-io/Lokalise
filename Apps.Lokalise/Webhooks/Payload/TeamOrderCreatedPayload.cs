@@ -1,20 +1,20 @@
-using System.Text.Json.Serialization;
 using Apps.Lokalise.Webhooks.Models;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // TeamOrderCreatedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<TeamOrderCreatedPayload : BasePayload>(myJsonResponse);
     public class Order
     {
-        [JsonPropertyName("id")] public string Id { get; set; }
-        [JsonPropertyName("provider")] public string Provider { get; set; }
-        [JsonPropertyName("currency")] public string Currency { get; set; }
-        [JsonPropertyName("total")] public double Total { get; set; }
+        [JsonProperty("id")] public string Id { get; set; }
+        [JsonProperty("provider")] public string Provider { get; set; }
+        [JsonProperty("currency")] public string Currency { get; set; }
+        [JsonProperty("total")] public double Total { get; set; }
     }
 
     public class TeamOrderCreatedPayload : BasePayload
     {
-        [JsonPropertyName("order")] public Order Order { get; set; }
+        [JsonProperty("order")] public Order Order { get; set; }
 
         public override OrderEvent Convert()
         {

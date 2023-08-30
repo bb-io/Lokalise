@@ -1,9 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Responses.Tasks;
 
 public class TaskRetriveResponse
 {
-    [JsonPropertyName("task")]
+    [JsonProperty("task")]
     public TaskResponse Task { get; set; }
 }

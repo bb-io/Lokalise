@@ -1,11 +1,11 @@
-﻿using Apps.Lokalise.Extensions;
-using Apps.Lokalise.Models.Requests.Comments;
+﻿using Apps.Lokalise.Models.Requests.Comments;
 using Apps.Lokalise.Models.Requests.Keys;
 using Apps.Lokalise.Models.Responses.Comments;
 using Apps.Lokalise.RestSharp;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using RestSharp;
 
 namespace Apps.Lokalise.Actions;

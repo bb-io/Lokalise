@@ -1,19 +1,19 @@
-﻿using System.Text.Json.Serialization;
-using Blackbird.Applications.Sdk.Common;
+﻿using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Responses.Tasks;
 
 public class User
 {
-    [JsonPropertyName("user_id")]
+    [JsonProperty("user_id")]
     [Display("User ID")]
     public int UserId { get; set; }
 
-    [JsonPropertyName("email")]
+    [JsonProperty("email")]
     [Display("Email")]
     public string Email { get; set; }
 
-    [JsonPropertyName("fullname")]
+    [JsonProperty("fullname")]
     [Display("Full name")]
     public string Fullname { get; set; }
 }

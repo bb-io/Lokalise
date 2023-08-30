@@ -1,23 +1,23 @@
-﻿using System.Text.Json.Serialization;
-using Blackbird.Applications.Sdk.Common;
+﻿using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Requests.Projects;
 public class ProjectListParameters
 {
     
-    [JsonPropertyName("filter_team_id")]
+    [JsonProperty("filter_team_id")]
     [Display("Filter team ID")]
     public string? FilterTeamId { get; set; }
     
-    [JsonPropertyName("filter_names")]
+    [JsonProperty("filter_names")]
     [Display("Filter names")]
     public string? FilterNames { get; set; }
     
-    [JsonPropertyName("include_statistics")]
+    [JsonProperty("include_statistics")]
     [Display("Include statistics")]
     public bool? IncludeStatistics { get; set; }
     
-    [JsonPropertyName("include_settings")]
+    [JsonProperty("include_settings")]
     [Display("Include settings")]
     public bool? IncludeSettings { get; set; }
 }

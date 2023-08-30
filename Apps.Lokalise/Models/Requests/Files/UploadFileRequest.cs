@@ -1,104 +1,87 @@
-﻿using System.Text.Json.Serialization;
-using Apps.Lokalise.DataSourceHandlers;
-using Blackbird.Applications.Sdk.Common;
-using Blackbird.Applications.Sdk.Common.Dynamic;
+﻿using Newtonsoft.Json;
 
-namespace Apps.Lokalise.Models.Requests.Files
+namespace Apps.Lokalise.Models.Requests.Files;
+
+public class UploadFileRequest
 {
-    public class UploadFileRequest
-    {
-        [Display("File name")]
-        [JsonPropertyName("filename")]
-        public string FileName { get; set; }
+    [JsonProperty("filename")] public string FileName { get; set; }
 
-        [JsonPropertyName("data")]
-        public byte[] File { get; set; }
-        
-        [Display("Language code")]
-        [JsonPropertyName("lang_iso")]
-        [DataSource(typeof(LanguageDataHandler))]
-        public string LanguageCode { get; set; }
-        
-        [JsonPropertyName("convert_placeholders")]
-        [Display("Convert placeholders")]
-        public bool? ConvertPlaceHolders { get; set; }
-        
-        [JsonPropertyName("detect_icu_plurals")]
-        [Display("Detect icu plurals")]
-        public bool? DetectIcuPlurals { get; set; }
-        
-        [JsonPropertyName("tags")]
-        public IEnumerable<string>? Tags { get; set; }
-        
-        [JsonPropertyName("tag_inserted_keys")]
-        [Display("Tag inserted keys")]
-        public bool? TagInsertedKeys { get; set; }
-        
-        [JsonPropertyName("tag_updated_keys")]
-        [Display("Tag updated keys")]
-        public bool? TagUpdatedKeys { get; set; }
-        
-        [JsonPropertyName("tag_skipped_keys")]
-        [Display("Tag skipped keys")]
-        public bool? TagSkippedKeys { get; set; }
-        
-        [JsonPropertyName("replace_modified")]
-        [Display("Replace modified?")]
-        public bool? ReplaceModified { get; set; }
-        
-        [JsonPropertyName("slashn_to_linebreak")]
-        [Display("Slashn to linebreak")]
-        public bool? SlashnToLinebreak { get; set; }
-        
-        [JsonPropertyName("keys_to_values")]
-        [Display("Keys to values")]
-        public bool? KeysToValues { get; set; }
-        
-        [JsonPropertyName("distinguish_by_file")]
-        [Display("Distinguish by file")]
-        public bool? DistinguishByFile { get; set; }
-        
-        [JsonPropertyName("apply_tm")]
-        [Display("Apply TM")]
-        public bool? ApplyTM { get; set; }
-        
-        [JsonPropertyName("use_automations")]
-        [Display("Use automations")]
-        public bool? UseAutomations { get; set; }
-        
-        [JsonPropertyName("hidden_from_contributors")]
-        [Display("Hidden from contributors")]
-        public bool? HiddenFromContributors { get; set; }
-        
-        [JsonPropertyName("cleanup_mode")]
-        [Display("Cleanup mode")]
-        public bool? CleanupMode { get; set; }
-        
-        [JsonPropertyName("custom_translation_status_ids")]
-        [Display("Custom translation status IDs")]
-        public IEnumerable<string>? CustomTranslationStatusIds { get; set; }
-        
-        [JsonPropertyName("custom_translation_status_inserted_keys")]
-        [Display("Custom translation status inserted keys")]
-        public bool? CustomTranslationStatusInsertedKeys { get; set; }
-        
-        [JsonPropertyName("custom_translation_status_updated_keys")]
-        [Display("Custom translation status updated keys")]
-        public bool? CustomTranslationStatusUpdatedKeys { get; set; }
-        
-        [JsonPropertyName("custom_translation_status_skipped_keys")]
-        [Display("Custom translation status skipped keys")]
-        public bool? CustomTranslationStatusSkippedKeys { get; set; }
-        
-        [JsonPropertyName("skip_detect_lang_iso")]
-        [Display("Skip detection of language by file name")]
-        public bool? SkipDetectLangIso { get; set; }
-        
-        [JsonPropertyName("format")]
-        public string? Format { get; set; }
-        
-        [JsonPropertyName("filter_task_id")]
-        [Display("Filter task ID")]
-        public long? FilterTaskId { get; set; }
+    [JsonProperty("data")] public byte[] File { get; set; }
+
+    [JsonProperty("lang_iso")] public string LanguageCode { get; set; }
+
+    [JsonProperty("convert_placeholders")] public bool? ConvertPlaceHolders { get; set; }
+
+    [JsonProperty("detect_icu_plurals")] public bool? DetectIcuPlurals { get; set; }
+
+    [JsonProperty("tags")] public IEnumerable<string>? Tags { get; set; }
+
+    [JsonProperty("tag_inserted_keys")] public bool? TagInsertedKeys { get; set; }
+
+    [JsonProperty("tag_updated_keys")] public bool? TagUpdatedKeys { get; set; }
+
+    [JsonProperty("tag_skipped_keys")] public bool? TagSkippedKeys { get; set; }
+
+    [JsonProperty("replace_modified")] public bool? ReplaceModified { get; set; }
+
+    [JsonProperty("slashn_to_linebreak")] public bool? SlashnToLinebreak { get; set; }
+
+    [JsonProperty("keys_to_values")] public bool? KeysToValues { get; set; }
+
+    [JsonProperty("distinguish_by_file")] public bool? DistinguishByFile { get; set; }
+
+    [JsonProperty("apply_tm")] public bool? ApplyTM { get; set; }
+
+    [JsonProperty("use_automations")] public bool? UseAutomations { get; set; }
+
+    [JsonProperty("hidden_from_contributors")]
+    public bool? HiddenFromContributors { get; set; }
+
+    [JsonProperty("cleanup_mode")] public bool? CleanupMode { get; set; }
+
+    [JsonProperty("custom_translation_status_ids")]
+    public IEnumerable<string>? CustomTranslationStatusIds { get; set; }
+
+    [JsonProperty("custom_translation_status_inserted_keys")]
+    public bool? CustomTranslationStatusInsertedKeys { get; set; }
+
+    [JsonProperty("custom_translation_status_updated_keys")]
+    public bool? CustomTranslationStatusUpdatedKeys { get; set; }
+
+    [JsonProperty("custom_translation_status_skipped_keys")]
+    public bool? CustomTranslationStatusSkippedKeys { get; set; }
+
+    [JsonProperty("skip_detect_lang_iso")] public bool? SkipDetectLangIso { get; set; }
+
+    [JsonProperty("format")] public string? Format { get; set; }
+
+    [JsonProperty("filter_task_id")] public long? FilterTaskId { get; set; }
+
+    public UploadFileRequest(UploadFileInput input)
+    {
+        FileName = input.FileName ?? input.File.Name;
+        File = input.File.Bytes;
+        LanguageCode = input.LanguageCode;
+        ConvertPlaceHolders = input.ConvertPlaceHolders;
+        DetectIcuPlurals = input.DetectIcuPlurals;
+        Tags = input.Tags;
+        TagInsertedKeys = input.TagInsertedKeys;
+        TagUpdatedKeys = input.TagUpdatedKeys;
+        TagSkippedKeys = input.TagSkippedKeys;
+        ReplaceModified = input.ReplaceModified;
+        SlashnToLinebreak = input.SlashnToLinebreak;
+        KeysToValues = input.KeysToValues;
+        DistinguishByFile = input.DistinguishByFile;
+        ApplyTM = input.ApplyTM;
+        UseAutomations = input.UseAutomations;
+        HiddenFromContributors = input.HiddenFromContributors;
+        CleanupMode = input.CleanupMode;
+        CustomTranslationStatusIds = input.CustomTranslationStatusIds;
+        CustomTranslationStatusInsertedKeys = input.CustomTranslationStatusInsertedKeys;
+        CustomTranslationStatusUpdatedKeys = input.CustomTranslationStatusUpdatedKeys;
+        CustomTranslationStatusSkippedKeys = input.CustomTranslationStatusSkippedKeys;
+        SkipDetectLangIso = input.SkipDetectLangIso;
+        Format = input.Format;
+        FilterTaskId = input.FilterTaskId;
     }
 }

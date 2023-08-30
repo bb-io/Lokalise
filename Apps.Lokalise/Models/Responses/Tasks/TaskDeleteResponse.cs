@@ -1,14 +1,14 @@
-﻿using System.Text.Json.Serialization;
-using Blackbird.Applications.Sdk.Common;
+﻿using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Responses.Tasks;
 public class TaskDeleteResponse
 {
-    [JsonPropertyName("project_id")]
+    [JsonProperty("project_id")]
     [Display("Project ID")]
     public string ProjectId { get; set; }
 
-    [JsonPropertyName("task_deleted")]
+    [JsonProperty("task_deleted")]
     [Display("Task deleted")]
     public bool TaskDeleted { get; set; }
 }

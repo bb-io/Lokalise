@@ -1,9 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Responses.Errors;
 
 public class Error
 {
-    [JsonPropertyName("message")] public string Message { get; set; }
-    [JsonPropertyName("code")] public int Code { get; set; }
+    [JsonProperty("message")] public string Message { get; set; }
+    [JsonProperty("code")] public int Code { get; set; }
 }

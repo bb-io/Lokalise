@@ -1,7 +1,7 @@
-﻿using System.Text.Json;
-using Apps.Lokalise.Dtos;
+﻿using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Models.Responses.Errors;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Newtonsoft.Json;
 using RestSharp;
 
 namespace Apps.Lokalise.RestSharp
@@ -20,12 +20,8 @@ namespace Apps.Lokalise.RestSharp
 
         public async Task<T> ExecuteWithHandling<T>(RestRequest request)
         {
-            var response = await this.ExecuteAsync<T>(request);
-
-            if (response.IsSuccessStatusCode)
-                return response.Data;
-
-            throw ConfigureRequestException(response.Content);
+            var response = await ExecuteWithHandling(request);
+            return JsonConvert.DeserializeObject<T>(response.Content);
         }
 
         public async Task<RestResponse> ExecuteWithHandling(RestRequest request)
@@ -40,7 +36,7 @@ namespace Apps.Lokalise.RestSharp
 
         private Exception ConfigureRequestException(string content)
         {
-            var error = JsonSerializer.Deserialize<ErrorResponse>(content);
+            var error = JsonConvert.DeserializeObject<ErrorResponse>(content);
             return new($"{error.Error.Message}; Code: {error.Error.Code}");
         }
 

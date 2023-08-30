@@ -1,10 +1,10 @@
-﻿using System.Text.Json.Serialization;
-using Apps.Lokalise.Dtos;
+﻿using Apps.Lokalise.Dtos;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Responses.Keys;
 
 public class KeyResponse
 {
-    [JsonPropertyName("key")]
+    [JsonProperty("key")]
     public KeyDto Key { get; set; }
 }

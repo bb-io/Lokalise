@@ -1,12 +1,12 @@
-using System.Text.Json.Serialization;
 using Apps.Lokalise.Webhooks.Models;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectLanguageSettings_changedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectLanguageSettings_changedPayload : BasePayload>(myJsonResponse);
     public class ProjectLanguageSettingsChangedPayload : BasePayload
     {
-        [JsonPropertyName("language")]
+        [JsonProperty("language")]
         public Language Language { get; set; }
 
         public override LanguageEvent Convert()

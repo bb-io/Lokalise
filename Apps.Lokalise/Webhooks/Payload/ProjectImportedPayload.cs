@@ -1,36 +1,36 @@
-using System.Text.Json.Serialization;
 using Blackbird.Applications.Sdk.Common;
 using Apps.Lokalise.Webhooks.Models;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Payload
 {
     // ProjectImportedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectImportedPayload : BasePayload>(myJsonResponse);
     public class Import
     {
-        [JsonPropertyName("filename")]
+        [JsonProperty("filename")]
         [Display("Filename")]
         public string Filename { get; set; }
 
-        [JsonPropertyName("format")]
+        [JsonProperty("format")]
         [Display("Format")]
         public string Format { get; set; }
 
-        [JsonPropertyName("inserted")]
+        [JsonProperty("inserted")]
         [Display("Inserted")]
         public int Inserted { get; set; }
 
-        [JsonPropertyName("updated")]
+        [JsonProperty("updated")]
         [Display("Updated")]
         public int Updated { get; set; }
 
-        [JsonPropertyName("skipped")]
+        [JsonProperty("skipped")]
         [Display("Skipped")]
         public int Skipped { get; set; }
     }
 
     public class ProjectImportedPayload : BasePayload
     {
-        [JsonPropertyName("import")]
+        [JsonProperty("import")]
         [Display("Import")]
         public Import Import { get; set; }
 
