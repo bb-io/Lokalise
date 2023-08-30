@@ -3,40 +3,73 @@ using System.Text.Json;
 using Apps.Lokalise.Webhooks.Handlers;
 using Apps.Lokalise.Webhooks.Models;
 using Apps.Lokalise.Webhooks.Payload;
+using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Webhooks;
 using Task = System.Threading.Tasks.Task;
 
 namespace Apps.Lokalise.Webhooks
 {
     [WebhookList]
-    public class WebhookList
+    public class WebhookList : BaseInvocable
     {
         const string LokalisePingRequestBody = "[\"ping\"]";
+
+        public WebhookList(InvocationContext invocationContext) : base(invocationContext)
+        {
+        }
 
         private WebhookResponse<T1> HandlePreflightAndMap<T1, T2>(WebhookRequest webhookRequest, WebhookInput input)
             where T2 : BasePayload where T1 : BaseEvent
         {
+            InvocationContext.Logger.LogInformation(InvocationContext.Bird.Id.ToString(), 
+                new object[]{
+                    new { time = DateTime.UtcNow.ToString() },
+                    new { status = "triggered" },
+                    new { body = webhookRequest.Body.ToString() },
+                });
             if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
+            {
+                InvocationContext.Logger.LogInformation(InvocationContext.Bird.Id.ToString(),
+                new object[]{
+                    new { time = DateTime.UtcNow.ToString() },
+                    new { status = "ping request" },
+                });
                 return new()
                 {
                     HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
                     Result = null,
                     ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
+            }
+                
             
             var data = JsonSerializer.Deserialize<T2>(webhookRequest.Body.ToString()!);
+            InvocationContext.Logger.LogInformation(InvocationContext.Bird.Id.ToString(),
+                new object[]{
+                    new { time = DateTime.UtcNow.ToString() },
+                    new { status = "deserialized" },
+                    data,
+                });
 
             if (data is null)
                 throw new InvalidCastException(nameof(webhookRequest.Body));
 
             if (data.Project.Id != input.ProjectId)
+            {
+                InvocationContext.Logger.LogInformation(InvocationContext.Bird.Id.ToString(),
+                new object[]{
+                    new { time = DateTime.UtcNow.ToString() },
+                    new { status = "project ids don't match" },
+                    data,
+                });
                 return new()
                 {
                     HttpResponseMessage = null,
                     Result = null,
                     ReceivedWebhookRequestType = WebhookRequestType.Preflight
                 };
-
+            }
             return new()
             {
                 HttpResponseMessage = null,

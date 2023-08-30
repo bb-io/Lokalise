@@ -30,7 +30,7 @@ namespace Apps.Lokalise.Webhooks.Handlers
 
         #region Subscriptions
 
-        public System.Threading.Tasks.Task SubscribeAsync(
+        public async System.Threading.Tasks.Task SubscribeAsync(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider,
             Dictionary<string, string> values)
         {
@@ -38,15 +38,23 @@ namespace Apps.Lokalise.Webhooks.Handlers
             var request = new LokaliseRequest(endpoint, Method.Post, authenticationCredentialsProvider)
                 .WithJsonBody(new
                 {
-                    url = values["payloadUrl"],
+                    url = values["payloadUrl"].Replace("https://localhost:44390", "https://25e9-178-211-106-141.ngrok-free.app"),
                     events = new[] { _subscriptionEvent }
                 });
+            await _client.ExecuteWithHandling(request);
+            //return System.Threading.Tasks.Task.Run(async () =>
+            //{
+            //    await System.Threading.Tasks.Task.Delay(1000);
+            //    await _client.ExecuteWithHandling(request);
+            //});
 
-            return System.Threading.Tasks.Task.Run(async () =>
-            {
-                await System.Threading.Tasks.Task.Delay(1000);
-                await _client.ExecuteWithHandling(request);
-            });
+            //var client = new RestClient();
+            //var request = new RestRequest("https://webhook.site/065e88df-c57c-4934-b191-3861290680cd", Method.Post);
+            //request.AddJsonBody(new
+            //{
+            //    url = values["payloadUrl"]
+            //});
+            //await client.ExecuteAsync(request);
         }
 
         public async System.Threading.Tasks.Task UnsubscribeAsync(
