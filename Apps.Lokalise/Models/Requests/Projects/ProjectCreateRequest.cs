@@ -15,7 +15,7 @@ public class ProjectCreateRequest
 
     [JsonProperty("description")] public string? Description { get; set; }
 
-    [JsonProperty("languages")] public ProjectLanguage[]? Languages { get; set; }
+    [JsonProperty("languages")] public IEnumerable<ProjectLanguage>? Languages { get; set; }
 
     [JsonProperty("base_lang_iso")]
     [Display("Base project language")]

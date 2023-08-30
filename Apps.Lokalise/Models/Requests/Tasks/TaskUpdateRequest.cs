@@ -19,7 +19,7 @@ public class TaskUpdateRequest
 
     [JsonProperty("languages")]
     [Display("Languages")]
-    public TaskLanguage[]? Languages { get; set; }
+    public IEnumerable<TaskLanguage>? Languages { get; set; }
 
     [JsonProperty("auto_close_languages")]
     [Display("Auto close languages")]
@@ -39,7 +39,7 @@ public class TaskUpdateRequest
 
     [JsonProperty("closing_tags")]
     [Display("Closing tags")]
-    public string[]? ClosingTags { get; set; }
+    public IEnumerable<string>? ClosingTags { get; set; }
 
     [JsonProperty("do_lock_translations")]
     [Display("Do lock translations")]

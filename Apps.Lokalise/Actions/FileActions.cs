@@ -1,15 +1,15 @@
-﻿using System.Net.Mime;
-using Apps.Lokalise.Dtos;
+﻿using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Models.Responses.Files;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using RestSharp;
-using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Models.Requests.Files;
 using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
+using Blackbird.Applications.Sdk.Utils.Extensions.Files;
+using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 
 namespace Apps.Lokalise.Actions
 {
@@ -101,17 +101,13 @@ namespace Apps.Lokalise.Actions
                 project,
                 input);
 
-            var fileData = allFiles.File.Bytes.GetFileFromZip(en =>
+            var fileData = await allFiles.File.Bytes.GetFileFromZip(en =>
                 en.FullName.Split('/').First() == input.LanguageCode.Replace("-", "_") &&
                 en.Name == input.FileName);
 
             return new()
             {
-                File = new(fileData)
-                {
-                    Name = input.FileName,
-                    ContentType = MediaTypeNames.Application.Octet
-                }
+                File = fileData
             };
         }
 

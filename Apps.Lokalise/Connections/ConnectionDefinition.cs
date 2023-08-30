@@ -5,7 +5,6 @@ namespace Apps.Lokalise.Connections
 {
     public class ConnectionDefinition : IConnectionDefinition
     {
-
         public IEnumerable<ConnectionPropertyGroup> ConnectionPropertyGroups => new List<ConnectionPropertyGroup>
         {
             new()
@@ -15,12 +14,13 @@ namespace Apps.Lokalise.Connections
                 ConnectionUsage = ConnectionUsage.Actions,
                 ConnectionProperties = new List<ConnectionProperty>
                 {
-                    new("apiToken"),
+                    new("apiToken") { DisplayName = "API Token" },
                 }
-            }            
+            }
         };
 
-        public IEnumerable<AuthenticationCredentialsProvider> CreateAuthorizationCredentialsProviders(Dictionary<string, string> values)
+        public IEnumerable<AuthenticationCredentialsProvider> CreateAuthorizationCredentialsProviders(
+            Dictionary<string, string> values)
         {
             var apiToken = values.First(v => v.Key == "apiToken");
             yield return new AuthenticationCredentialsProvider(

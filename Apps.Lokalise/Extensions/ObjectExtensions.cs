@@ -5,7 +5,7 @@ namespace Apps.Lokalise.Extensions;
 
 public static class ObjectExtensions
 {
-    public static Dictionary<string, string> AsDictionary(this object obj)
+    public static Dictionary<string, string> AsLokaliseDictionary(this object obj)
     {
         var json = JsonSerializer.Serialize(obj, new JsonSerializerOptions()
         {

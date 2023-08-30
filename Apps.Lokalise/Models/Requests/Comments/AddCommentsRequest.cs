@@ -4,7 +4,7 @@ namespace Apps.Lokalise.Models.Requests.Comments;
 
 public class AddCommentsRequest
 {
-    [JsonProperty("comments")] public CommentRequest[] Comments { get; set; }
+    [JsonProperty("comments")] public IEnumerable<CommentRequest> Comments { get; set; }
 
     public AddCommentsRequest(string text)
     {

@@ -5,7 +5,7 @@ namespace Apps.Lokalise.Models.Requests.Keys;
 public class CreateKeyRequest
 {
     [JsonProperty("keys")]
-    public CreateKeyModel[] Keys { get; set; }
+    public IEnumerable<CreateKeyModel> Keys { get; set; }
 
     [JsonProperty("use_automations")]
     public bool? UseAutomations { get; set; }

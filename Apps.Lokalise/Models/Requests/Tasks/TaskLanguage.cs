@@ -10,10 +10,10 @@ public class TaskLanguage
 
     [JsonProperty("users")]
     [Display("Users")]
-    public string[] Users { get; set; }
+    public IEnumerable<string>? Users { get; set; }
 
     [JsonProperty("groups")]
     [Display("Groups")]
-    public string[] Groups { get; set; }
+    public IEnumerable<string>? Groups { get; set; }
 
 }
