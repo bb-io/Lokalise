@@ -7,7 +7,7 @@ namespace Apps.Lokalise.Webhooks
     public class WebhookInput
     {
         [Display("Project")]
-        //[DataSource(typeof(ProjectDataHandler))]
+        [DataSource(typeof(ProjectDataHandler))]
         public string ProjectId { get; set; }
     }
 }
