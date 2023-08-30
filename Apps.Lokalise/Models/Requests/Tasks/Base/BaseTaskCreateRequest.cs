@@ -12,7 +12,7 @@ public class BaseTaskCreateRequest
     [JsonProperty("task_type")]
     [Display("Task type")]
     [DataSource(typeof(TaskTypeDataHandler))]
-    public string Type { get; set; }
+    public string LokaliseTaskType { get; set; }
     
     [Display("Description")] public string? Description { get; set; }
 
