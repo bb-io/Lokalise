@@ -1,6 +1,7 @@
 ﻿using Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Requests.Tasks.Base;
 
@@ -8,9 +9,10 @@ public class BaseTaskCreateRequest
 {
     [Display("Title")] public string Title { get; set; }
     
+    [JsonProperty("task_type")]
     [Display("Task type")]
     [DataSource(typeof(TaskTypeDataHandler))]
-    public string TaskType { get; set; }
+    public string LokaliseTaskType { get; set; }
     
     [Display("Description")] public string? Description { get; set; }
 
