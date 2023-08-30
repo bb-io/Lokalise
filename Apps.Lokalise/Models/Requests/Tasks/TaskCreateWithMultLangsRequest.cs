@@ -31,7 +31,7 @@ public class TaskCreateWithMultLangsRequest : BaseTaskCreateRequest
         AutoCloseLanguages = input.AutoCloseLanguages;
         AutoCloseTask = input.AutoCloseTask;
         AutoCloseItems = input.AutoCloseItems;
-        TaskType = input.TaskType;
+        Type = input.Type;
         ParentTaskId = input.ParentTaskId;
         ClosingTags = input.ClosingTags;
         DoLockTranslations = input.DoLockTranslations;
