@@ -1,6 +1,5 @@
 ﻿using Apps.Lokalise.Models.Requests.Tasks.Base;
 using Blackbird.Applications.Sdk.Common;
-using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Requests.Tasks;
 
