@@ -7,11 +7,11 @@ public class Translation
 {
     [JsonProperty("translation_id")]
     [Display("Translation ID")]
-    public int TranslationId { get; set; }
+    public string TranslationId { get; set; }
 
     [JsonProperty("key_id")]
     [Display("Key ID")]
-    public int KeyId { get; set; }
+    public string KeyId { get; set; }
 
     [JsonProperty("language_iso")]
     [Display("Language ISO")]
@@ -55,7 +55,7 @@ public class Translation
 
     [JsonProperty("task_id")]
     [Display("Task ID")]
-    public int? TaskId { get; set; }
+    public string? TaskId { get; set; }
 
     [JsonProperty("segment_number")]
     [Display("Segment number")]
