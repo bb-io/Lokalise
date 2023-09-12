@@ -116,4 +116,13 @@ public class TaskResponse
     [JsonProperty("custom_translation_status_ids")]
     [Display("Custom translation status ids")]
     public string[] CustomTranslationStatusIds { get; set; }
+
+
+    [Display("Language codes")]
+    public List<string> LanguageCodes { get; set; }
+
+    public void FillLanguageCodesArray()
+    {
+        LanguageCodes = Languages.Select(l => l.LanguageIso).ToList();
+    }
 }

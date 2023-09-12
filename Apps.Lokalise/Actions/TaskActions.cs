@@ -49,7 +49,7 @@ public class TaskActions
         var items = await Paginator.GetAll<TasksWrapper, TaskResponse>(
             authenticationCredentialsProviders.ToArray(),
             endpointWithQuery);
-
+        items.ForEach(i => i.FillLanguageCodesArray());
         return new(items);
     }
 
@@ -67,6 +67,7 @@ public class TaskActions
             .WithJsonBody(parameters, JsonConfig.Settings);
 
         var response = await _client.ExecuteWithHandling<TaskRetriveResponse>(request);
+        response.Task.FillLanguageCodesArray();
         return response.Task;
     }
     
@@ -93,6 +94,7 @@ public class TaskActions
             authenticationCredentialsProviders);
 
         var response = await _client.ExecuteWithHandling<TaskRetriveResponse>(request);
+        response.Task.FillLanguageCodesArray();
         return response.Task;
     }
 
@@ -108,6 +110,7 @@ public class TaskActions
             .WithJsonBody(taskUpdateRequest);
 
         var response = await _client.ExecuteWithHandling<TaskRetriveResponse>(request);
+        response.Task.FillLanguageCodesArray();
         return response.Task;
     }
 

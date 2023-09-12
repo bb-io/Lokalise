@@ -19,7 +19,7 @@ public class Translation
 
     [JsonProperty("modified_at")]
     [Display("Modified at")]
-    public DateTime ModifiedAt { get; set; }
+    public string ModifiedAt { get; set; }
 
     [JsonProperty("modified_at_timestamp")]
     [Display("Modified at timestamp")]
