@@ -1,10 +1,9 @@
 ﻿using Blackbird.Applications.Sdk.Common;
 
-namespace Apps.Lokalise.Webhooks.Models
+namespace Apps.Lokalise.Webhooks.Models;
+
+public class ContributerEvent : BaseEvent
 {
-    public class ContributerEvent : BaseEvent
-    {
-        [Display("Contributer email")]
-        public string Email { get; set; }
-    }
+    [Display("Contributer email")]
+    public string Email { get; set; }
 }

@@ -2,11 +2,10 @@
 using Apps.Lokalise.Models.Responses.Base;
 using Newtonsoft.Json;
 
-namespace Apps.Lokalise.Models.Responses.Segments
+namespace Apps.Lokalise.Models.Responses.Segments;
+
+public class SegmentsWrapper : PaginationResponse<SegmentDto>
 {
-    public class SegmentsWrapper : PaginationResponse<SegmentDto>
-    {
-        [JsonProperty("segments")]
-        public override IEnumerable<SegmentDto> Items { get; set; }
-    }
+    [JsonProperty("segments")]
+    public override IEnumerable<SegmentDto> Items { get; set; }
 }

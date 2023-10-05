@@ -1,11 +1,10 @@
 using Blackbird.Applications.Sdk.Common.Webhooks;
 
-namespace Apps.Lokalise.Webhooks.Handlers
-{
-    public class ProjectKeyAddedHandler : BaseWebhookHandler
-    {
-        const string SubscriptionEvent = "project.key.added";
+namespace Apps.Lokalise.Webhooks.Handlers;
 
-        public ProjectKeyAddedHandler([WebhookParameter] WebhookInput input) : base(SubscriptionEvent, input) { }
-    }
+public class ProjectKeyAddedHandler : BaseWebhookHandler
+{
+    const string SubscriptionEvent = "project.key.added";
+
+    public ProjectKeyAddedHandler([WebhookParameter] WebhookInput input) : base(SubscriptionEvent, input) { }
 }

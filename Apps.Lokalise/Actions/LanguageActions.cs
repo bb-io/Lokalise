@@ -10,80 +10,79 @@ using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using RestSharp;
 
-namespace Apps.Lokalise.Actions
+namespace Apps.Lokalise.Actions;
+
+[ActionList]
+public class LanguageActions
 {
-    [ActionList]
-    public class LanguageActions
+    #region Fields
+
+    private readonly LokaliseClient _client;
+
+    #endregion
+
+    #region Constructors
+
+    public LanguageActions()
     {
-        #region Fields
-
-        private readonly LokaliseClient _client;
-
-        #endregion
-
-        #region Constructors
-
-        public LanguageActions()
-        {
-            _client = new();
-        }
-
-        #endregion
-
-        #region Actions
-
-        [Action("List all system languages", Description = "List all system languages")]
-        public Task<ListLanguagesResponse> ListSystemLanguages(
-            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders)
-            => ListLanguages(authenticationCredentialsProviders, "/system/languages");
-
-        [Action("List all project languages", Description = "List all project languages")]
-        public Task<ListLanguagesResponse> ListProjectLanguages(
-            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] ProjectRequest input)
-            => ListLanguages(authenticationCredentialsProviders, $"/projects/{input.ProjectId}/languages");
-
-        [Action("Add language to project", Description = "Add language to project")]
-        public Task AddLanguageToProject(
-            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] ProjectRequest project,
-            [ActionParameter] AddLanguageToProjectInput input)
-        {
-            var request = new LokaliseRequest(
-                    $"/projects/{project.ProjectId}/languages",
-                    Method.Post,
-                    authenticationCredentialsProviders)
-                .WithJsonBody(new AddLanguageToProjectRequest(input));
-
-            return _client.ExecuteWithHandling(request);
-        }
-
-        [Action("Delete language from project", Description = "Delete language from project")]
-        public Task DeleteLanguageFromProject(
-            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] DeleteLanguageFromProjectRequest input)
-        {
-            var request = new LokaliseRequest($"/projects/{input.ProjectId}/languages/{input.LanguageId}",
-                Method.Delete, authenticationCredentialsProviders);
-
-            return _client.ExecuteWithHandling(request);
-        }
-
-        #endregion
-
-        #region Utils
-
-        private async Task<ListLanguagesResponse> ListLanguages(
-            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            string endpoint)
-        {
-            var items = await Paginator.GetAll<LanguagesWrapper, LanguageDto>(
-                authenticationCredentialsProviders.ToArray(),
-                endpoint);
-
-            return new(items);
-        }
-
-        #endregion
+        _client = new();
     }
+
+    #endregion
+
+    #region Actions
+
+    [Action("List all system languages", Description = "List all system languages")]
+    public Task<ListLanguagesResponse> ListSystemLanguages(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders)
+        => ListLanguages(authenticationCredentialsProviders, "/system/languages");
+
+    [Action("List all project languages", Description = "List all project languages")]
+    public Task<ListLanguagesResponse> ListProjectLanguages(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] ProjectRequest input)
+        => ListLanguages(authenticationCredentialsProviders, $"/projects/{input.ProjectId}/languages");
+
+    [Action("Add language to project", Description = "Add language to project")]
+    public Task AddLanguageToProject(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] ProjectRequest project,
+        [ActionParameter] AddLanguageToProjectInput input)
+    {
+        var request = new LokaliseRequest(
+                $"/projects/{project.ProjectId}/languages",
+                Method.Post,
+                authenticationCredentialsProviders)
+            .WithJsonBody(new AddLanguageToProjectRequest(input));
+
+        return _client.ExecuteWithHandling(request);
+    }
+
+    [Action("Delete language from project", Description = "Delete language from project")]
+    public Task DeleteLanguageFromProject(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] DeleteLanguageFromProjectRequest input)
+    {
+        var request = new LokaliseRequest($"/projects/{input.ProjectId}/languages/{input.LanguageId}",
+            Method.Delete, authenticationCredentialsProviders);
+
+        return _client.ExecuteWithHandling(request);
+    }
+
+    #endregion
+
+    #region Utils
+
+    private async Task<ListLanguagesResponse> ListLanguages(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        string endpoint)
+    {
+        var items = await Paginator.GetAll<LanguagesWrapper, LanguageDto>(
+            authenticationCredentialsProviders.ToArray(),
+            endpoint);
+
+        return new(items);
+    }
+
+    #endregion
 }

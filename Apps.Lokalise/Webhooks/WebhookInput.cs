@@ -2,12 +2,11 @@
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 
-namespace Apps.Lokalise.Webhooks
+namespace Apps.Lokalise.Webhooks;
+
+public class WebhookInput
 {
-    public class WebhookInput
-    {
-        [Display("Project")]
-        [DataSource(typeof(ProjectDataHandler))]
-        public string ProjectId { get; set; }
-    }
+    [Display("Project")]
+    [DataSource(typeof(ProjectDataHandler))]
+    public string ProjectId { get; set; }
 }

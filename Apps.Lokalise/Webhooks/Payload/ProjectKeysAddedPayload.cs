@@ -1,27 +1,23 @@
 using Apps.Lokalise.Webhooks.Models;
 using Newtonsoft.Json;
 
-namespace Apps.Lokalise.Webhooks.Payload
+namespace Apps.Lokalise.Webhooks.Payload;
+// ProjectKeysAddedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectKeysAddedPayload : BasePayload>(myJsonResponse);
+
+public class ProjectKeysAddedPayload : BasePayload
 {
-    // ProjectKeysAddedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectKeysAddedPayload : BasePayload>(myJsonResponse);
+    [JsonProperty("keys")]
+    public List<KeyWithTags> Keys { get; set; }
 
-    public class ProjectKeysAddedPayload : BasePayload
+    public override KeysEvent Convert()
     {
-        [JsonProperty("keys")]
-        public List<KeyWithTags> Keys { get; set; }
-
-        public override KeysEvent Convert()
+        return new KeysEvent
         {
-            return new KeysEvent
-            {
-                ProjectId = Project.Id,
-                ProjectName = Project.Name,
-                UserEmail = User.Email,
-                UserName = User.Email,
-                Keys = Keys
-            };
-        }
+            ProjectId = Project.Id,
+            ProjectName = Project.Name,
+            UserEmail = User.Email,
+            UserName = User.Email,
+            Keys = Keys
+        };
     }
-
-
 }

@@ -2,11 +2,10 @@
 using Apps.Lokalise.Models.Responses.Base;
 using Newtonsoft.Json;
 
-namespace Apps.Lokalise.Models.Responses.Files
+namespace Apps.Lokalise.Models.Responses.Files;
+
+public class FilesWrapper : PaginationResponse<FileInfoDto>
 {
-    public class FilesWrapper : PaginationResponse<FileInfoDto>
-    {
-        [JsonProperty("files")]
-        public override IEnumerable<FileInfoDto> Items { get; set; }
-    }
+    [JsonProperty("files")]
+    public override IEnumerable<FileInfoDto> Items { get; set; }
 }
