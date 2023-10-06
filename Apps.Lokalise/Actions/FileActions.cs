@@ -87,7 +87,7 @@ public class FileActions
         var files = await zipResponse.RawBytes!.GetFilesFromZip();
 
         var createZipTasks = files
-            .Where(x => input.FilterLangs is null || input.FilterLangs.Any(y => x.Path.StartsWith(y)))
+            .Where(x => input.FilterLangs is null || input.FilterLangs.Any(y => x.Path.StartsWith(y) || x.File.Name.StartsWith($"{y}.")))
             .Select(x => zipArchive.AddFileToZip(x.Path, x.File.Bytes));
 
         await Task.WhenAll(createZipTasks);
