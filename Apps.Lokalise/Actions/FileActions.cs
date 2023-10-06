@@ -1,4 +1,6 @@
-﻿using Apps.Lokalise.Dtos;
+﻿using System.IO.Compression;
+using System.Net.Mime;
+using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Models.Responses.Files;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
@@ -77,16 +79,26 @@ public class FileActions
         var exportResult = await _client.ExecuteWithHandling<ExportFilesDto>(request);
 
         var fileUri = new Uri(exportResult.BundleUrl);
-        var dataResponse = await _client.ExecuteWithHandling(new(fileUri));
+        var zipResponse = await _client.ExecuteWithHandling(new(fileUri));
 
-        var ffff = await dataResponse.RawBytes.GetFilesFromZip();
+        await using var zipStream = new MemoryStream();
+        var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, false);
+
+        var files = await zipResponse.RawBytes!.GetFilesFromZip();
+
+        var createZipTasks = files
+            .Where(x => input.FilterLangs is null || input.FilterLangs.Any(y => x.Path.StartsWith(y)))
+            .Select(x => zipArchive.AddFileToZip(x.Path, x.File.Bytes));
+
+        await Task.WhenAll(createZipTasks);
+        zipArchive.Dispose();
+
         return new()
         {
-            File = new(dataResponse.RawBytes!)
+            File = new(zipStream.ToArray())
             {
                 Name = fileUri.Segments.Last(),
-                ContentType = dataResponse.Headers?
-                    .FirstOrDefault(x => x.Name == "Content-Type")?.Value?.ToString() ?? string.Empty
+                ContentType = zipResponse.ContentType ?? MediaTypeNames.Application.Octet
             }
         };
     }
