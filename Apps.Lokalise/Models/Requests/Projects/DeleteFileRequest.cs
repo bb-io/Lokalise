@@ -1,10 +1,9 @@
 ﻿using Blackbird.Applications.Sdk.Common;
 
-namespace Apps.Lokalise.Models.Requests.Projects
+namespace Apps.Lokalise.Models.Requests.Projects;
+
+public class DeleteFileRequest : ProjectRequest
 {
-    public class DeleteFileRequest : ProjectRequest
-    {
-        [Display("File ID")]
-        public string FileId { get; set; }
-    }
+    [Display("File ID")]
+    public string FileId { get; set; }
 }

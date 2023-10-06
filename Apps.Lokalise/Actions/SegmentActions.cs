@@ -12,78 +12,77 @@ using Blackbird.Applications.Sdk.Utils.Extensions.String;
 using Blackbird.Applications.Sdk.Utils.Extensions.System;
 using RestSharp;
 
-namespace Apps.Lokalise.Actions
+namespace Apps.Lokalise.Actions;
+
+[ActionList]
+public class SegmentActions
 {
-    [ActionList]
-    public class SegmentActions
+    #region Fields
+
+    private readonly LokaliseClient _client;
+
+    #endregion
+
+    #region Constructors
+
+    public SegmentActions()
     {
-        #region Fields
-
-        private readonly LokaliseClient _client;
-
-        #endregion
-
-        #region Constructors
-
-        public SegmentActions()
-        {
-            _client = new();
-        }
-
-        #endregion
-
-        #region Actions
-
-        [Action("List all segments", Description = "List all key segments")]
-        public async Task<ListAllSegmentsResponse> ListAllSegments(
-            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] ListAllSegmentsPathRequest pathInput,
-            [ActionParameter] ListAllSegmentsQueryRequest queryInput)
-        {
-            var creds = authenticationCredentialsProviders.ToArray();
-
-            var endpoint = $"/projects/{pathInput.ProjectId}/keys/{pathInput.KeyId}/segments/{pathInput.LanguageCode}";
-            var query = queryInput.AsLokaliseDictionary().AllIsNotNull();
-
-            var url = endpoint.WithQuery(query);
-
-            var segments = await Paginator.GetAll<SegmentsWrapper, SegmentDto>(creds, url);
-
-            return new ListAllSegmentsResponse
-            {
-                Segments = segments
-            };
-        }
-
-        [Action("Get segment", Description = "Get segment by number")]
-        public Task<SegmentResponse> GetSegment(
-            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] GetSegmentRequest input)
-        {
-            var endpoint =
-                $"/projects/{input.ProjectId}/keys/{input.KeyId}/segments/{input.LanguageCode}/{input.SegmentNumber}";
-
-            if (input.DisableReferences is not null)
-                endpoint += $"?disable_references={input.DisableReferences.AsLokaliseQuery()}";
-
-            var request = new LokaliseRequest(endpoint, Method.Get, authenticationCredentialsProviders);
-            return _client.ExecuteWithHandling<SegmentResponse>(request);
-        }
-
-        [Action("Update segment", Description = "Update segment by number")]
-        public Task<SegmentResponse> UpdateSegment(
-            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] UpdateSegmentPathRequest pathInput,
-            [ActionParameter] UpdateSegmentBodyRequest body)
-        {
-            var endpoint =
-                $"/projects/{pathInput.ProjectId}/keys/{pathInput.KeyId}/segments/{pathInput.LanguageCode}/{pathInput.SegmentNumber}";
-            var request = new LokaliseRequest(endpoint, Method.Put, authenticationCredentialsProviders)
-                .WithJsonBody(body);
-            
-            return _client.ExecuteWithHandling<SegmentResponse>(request);
-        }
-
-        #endregion
+        _client = new();
     }
+
+    #endregion
+
+    #region Actions
+
+    [Action("List all segments", Description = "List all key segments")]
+    public async Task<ListAllSegmentsResponse> ListAllSegments(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] ListAllSegmentsPathRequest pathInput,
+        [ActionParameter] ListAllSegmentsQueryRequest queryInput)
+    {
+        var creds = authenticationCredentialsProviders.ToArray();
+
+        var endpoint = $"/projects/{pathInput.ProjectId}/keys/{pathInput.KeyId}/segments/{pathInput.LanguageCode}";
+        var query = queryInput.AsLokaliseDictionary().AllIsNotNull();
+
+        var url = endpoint.WithQuery(query);
+
+        var segments = await Paginator.GetAll<SegmentsWrapper, SegmentDto>(creds, url);
+
+        return new ListAllSegmentsResponse
+        {
+            Segments = segments
+        };
+    }
+
+    [Action("Get segment", Description = "Get segment by number")]
+    public Task<SegmentResponse> GetSegment(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] GetSegmentRequest input)
+    {
+        var endpoint =
+            $"/projects/{input.ProjectId}/keys/{input.KeyId}/segments/{input.LanguageCode}/{input.SegmentNumber}";
+
+        if (input.DisableReferences is not null)
+            endpoint += $"?disable_references={input.DisableReferences.AsLokaliseQuery()}";
+
+        var request = new LokaliseRequest(endpoint, Method.Get, authenticationCredentialsProviders);
+        return _client.ExecuteWithHandling<SegmentResponse>(request);
+    }
+
+    [Action("Update segment", Description = "Update segment by number")]
+    public Task<SegmentResponse> UpdateSegment(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] UpdateSegmentPathRequest pathInput,
+        [ActionParameter] UpdateSegmentBodyRequest body)
+    {
+        var endpoint =
+            $"/projects/{pathInput.ProjectId}/keys/{pathInput.KeyId}/segments/{pathInput.LanguageCode}/{pathInput.SegmentNumber}";
+        var request = new LokaliseRequest(endpoint, Method.Put, authenticationCredentialsProviders)
+            .WithJsonBody(body);
+            
+        return _client.ExecuteWithHandling<SegmentResponse>(request);
+    }
+
+    #endregion
 }

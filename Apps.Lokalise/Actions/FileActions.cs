@@ -1,4 +1,6 @@
-﻿using Apps.Lokalise.Dtos;
+﻿using System.IO.Compression;
+using System.Net.Mime;
+using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Models.Responses.Files;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
@@ -11,113 +13,146 @@ using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 
-namespace Apps.Lokalise.Actions
+namespace Apps.Lokalise.Actions;
+
+[ActionList]
+public class FileActions
 {
-    [ActionList]
-    public class FileActions
+    #region Fields
+
+    private readonly LokaliseClient _client;
+
+    #endregion
+
+    #region Constructors
+
+    public FileActions()
     {
-        #region Fields
+        _client = new();
+    }
 
-        private readonly LokaliseClient _client;
+    #endregion
 
-        #endregion
+    #region Actions
 
-        #region Constructors
+    [Action("List all project files", Description = "List all project files")]
+    public async Task<ListAllFilesResponse> ListAllFiles(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] ListAllFilesRequest input)
+    {
+        var endpoint =
+            $"/projects/{input.ProjectId}/files?filter_filename={input.FilterFileName}";
 
-        public FileActions()
+        var items = await Paginator.GetAll<FilesWrapper, FileInfoDto>(
+            authenticationCredentialsProviders.ToArray(),
+            endpoint);
+
+        return new(items);
+    }
+
+    [Action("Upload file to project", Description = "Upload file to project")]
+    public async Task<QueuedProcessDto> UploadFile(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] ProjectRequest project,
+        [ActionParameter] UploadFileInput input)
+    {
+        var creds = authenticationCredentialsProviders.ToArray();
+        var endpoint = $"/projects/{project.ProjectId}/files/upload";
+
+        var request = new LokaliseRequest(endpoint, Method.Post, creds).WithJsonBody(new UploadFileRequest(input));
+        var uploadResult = await _client.ExecuteWithHandling<QueuedProcessDto>(request);
+
+        return await _client
+            .PollFileImportOperation(project.ProjectId, uploadResult.Process.ProcessId, creds);
+    }
+
+    [Action("Download all project files as ZIP", Description = "Download all project files as ZIP archive")]
+    public async Task<DownloadProjectFilesAsZipResponse> DownloadProjectFilesAsZip(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] ProjectRequest project,
+        [ActionParameter] DownloadFileRequest input)
+    {
+        var endpoint = $"/projects/{project.ProjectId}/files/download";
+        var request = new LokaliseRequest(endpoint, Method.Post, authenticationCredentialsProviders)
+            .WithJsonBody(input);
+
+        var exportResult = await _client.ExecuteWithHandling<ExportFilesDto>(request);
+
+        var fileUri = new Uri(exportResult.BundleUrl);
+        var zipResponse = await _client.ExecuteWithHandling(new(fileUri));
+
+        await using var zipStream = new MemoryStream();
+        var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, false);
+
+        var files = await zipResponse.RawBytes!.GetFilesFromZip();
+
+        var createZipTasks = files
+            .Where(x => input.FilterLangs is null || input.FilterLangs.Any(y => x.Path.StartsWith(y) || x.File.Name.StartsWith($"{y}.")))
+            .Select(x => zipArchive.AddFileToZip(x.Path, x.File.Bytes));
+
+        await Task.WhenAll(createZipTasks);
+        zipArchive.Dispose();
+
+        return new()
         {
-            _client = new();
-        }
-
-        #endregion
-
-        #region Actions
-
-        [Action("List all project files", Description = "List all project files")]
-        public async Task<ListAllFilesResponse> ListAllFiles(
-            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] ListAllFilesRequest input)
-        {
-            var endpoint =
-                $"/projects/{input.ProjectId}/files?filter_filename={input.FilterFileName}";
-
-            var items = await Paginator.GetAll<FilesWrapper, FileInfoDto>(
-                authenticationCredentialsProviders.ToArray(),
-                endpoint);
-
-            return new(items);
-        }
-
-        [Action("Upload file to project", Description = "Upload file to project")]
-        public async Task<QueuedProcessDto> UploadFile(
-            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] ProjectRequest project,
-            [ActionParameter] UploadFileInput input)
-        {
-            var creds = authenticationCredentialsProviders.ToArray();
-            var endpoint = $"/projects/{project.ProjectId}/files/upload";
-
-            var request = new LokaliseRequest(endpoint, Method.Post, creds).WithJsonBody(new UploadFileRequest(input));
-            var uploadResult = await _client.ExecuteWithHandling<QueuedProcessDto>(request);
-
-            return await _client
-                .PollFileImportOperation(project.ProjectId, uploadResult.Process.ProcessId, creds);
-        }
-
-        [Action("Download all project files", Description = "Download all project files as zip archive")]
-        public async Task<DownloadProjectFilesResponse> DownloadProjectFiles(
-            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] ProjectRequest project,
-            [ActionParameter] DownloadFileRequest input)
-        {
-            var endpoint = $"/projects/{project.ProjectId}/files/download";
-            var request = new LokaliseRequest(endpoint, Method.Post, authenticationCredentialsProviders)
-                .WithJsonBody(input);
-
-            var exportResult = await _client.ExecuteWithHandling<ExportFilesDto>(request);
-
-            var fileUri = new Uri(exportResult.BundleUrl);
-            var dataResponse = await _client.ExecuteWithHandling(new(fileUri));
-
-            return new()
+            File = new(zipStream.ToArray())
             {
-                File = new(dataResponse.RawBytes!)
-                {
-                    Name = fileUri.Segments.Last(),
-                    ContentType = dataResponse.Headers?
-                        .FirstOrDefault(x => x.Name == "Content-Type")?.Value?.ToString() ?? string.Empty
-                }
-            };
-        }
+                Name = fileUri.Segments.Last(),
+                ContentType = zipResponse.ContentType ?? MediaTypeNames.Application.Octet
+            }
+        };
+    }
 
-        [Action("Download translated project file", Description = "Download translated project file by name")]
-        public async Task<DownloadProjectFilesResponse> DownloadTranslatedFile(
-            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] ProjectRequest project,
-            [ActionParameter] DownloadTranslatedFileRequest input)
+    [Action("Download project source files", Description = "Download all project source files")]
+    public async Task<DownloadSourceFilesResponse> DownloadProjectSourceFiles(
+        IEnumerable<AuthenticationCredentialsProvider> creds,
+        [ActionParameter] ProjectRequest project,
+        [ActionParameter] DownloadSourceFilesRequest input)
+    {
+        var projectData = await new ProjectActions().RetrieveProject(creds, project);
+        var archive = await DownloadProjectFilesAsZip(creds, project, new()
         {
-            var allFiles = await DownloadProjectFiles(
-                authenticationCredentialsProviders,
-                project,
-                input);
+            Format = input.Format
+        });
 
-            var fileData = await allFiles.File.Bytes.GetFileFromZip(en =>
-                en.FullName.Split('/').First() == input.LanguageCode.Replace("-", "_") &&
-                en.Name == input.FileName);
+        var files = await archive.File.Bytes.GetFilesFromZip();
 
-            return new()
-            {
-                File = fileData
-            };
-        }
+        var sourceFiles = files
+            .Where(x => x.Path.StartsWith(projectData.BaseLanguageIso) && x.File.Bytes.Any())
+            .Select(x => x.File)
+            .ToArray();
+
+        return new(sourceFiles);
+    }
+
+    [Action("Download translated project file", Description = "Download translated project file by name")]
+    public async Task<DownloadProjectFilesAsZipResponse> DownloadTranslatedFile(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] ProjectRequest project,
+        [ActionParameter] DownloadTranslatedFileRequest input)
+    {
+        var allFiles = await DownloadProjectFilesAsZip(
+            authenticationCredentialsProviders,
+            project,
+            input);
+
+        var fileData = await allFiles.File.Bytes.GetFileFromZip(en =>
+            en.FullName.Split('/').First() == input.LanguageCode.Replace("-", "_") &&
+            en.Name == input.FileName);
+
+        return new()
+        {
+            File = fileData.File
+        };
+    }
 
         [Action("Download XLIFF for task", Description = "Download XLIFF file for task")]
-        public async Task<DownloadProjectFilesResponse> DownloadXLIFF(
+        public async Task<DownloadProjectFilesAsZipResponse> DownloadXLIFF(
             IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
             [ActionParameter] ProjectRequest project,
             [ActionParameter] DownloadTaskXLIFFFileRequest input)
         {
-            var allFiles = await DownloadProjectFiles(
+            var allFiles = await DownloadProjectFilesAsZip(
                 authenticationCredentialsProviders,
                 project,
                 new DownloadFileRequest(input) { 
@@ -129,7 +164,7 @@ namespace Apps.Lokalise.Actions
             var fileData = await allFiles.File.Bytes.GetFileFromZip(en => en.Name == $"{input.LanguageCode.Replace("_", "-")}.xliff");
             return new()
             {
-                File = fileData
+                File = fileData.File
             };
         }
 
@@ -139,7 +174,7 @@ namespace Apps.Lokalise.Actions
             [ActionParameter] ProjectRequest project,
             [ActionParameter] DownloadXLIFFFileRequest input)
         {
-            var allFiles = await DownloadProjectFiles(
+            var allFiles = await DownloadProjectFilesAsZip(
                 authenticationCredentialsProviders,
                 project,
                 new DownloadFileRequest(input)
@@ -148,10 +183,10 @@ namespace Apps.Lokalise.Actions
                     AllPlatforms = input.AllPlatforms ?? true
                 });
 
-            var files = allFiles.File.Bytes.GetFilesFromZip();
+            var files = await allFiles.File.Bytes.GetFilesFromZip();
             return new()
             {
-                Files = files.ToBlockingEnumerable().Where(f => f.Bytes.Length > 0).ToList()
+                Files = files.Where(f => f.File.Bytes.Length > 0).Select(f => f.File).ToList()
             };
         }
 
@@ -164,9 +199,8 @@ namespace Apps.Lokalise.Actions
                 Method.Delete,
                 authenticationCredentialsProviders);
 
-            return _client.ExecuteWithHandling(request);
-        }
-
-        #endregion
+        return _client.ExecuteWithHandling(request);
     }
+
+    #endregion
 }

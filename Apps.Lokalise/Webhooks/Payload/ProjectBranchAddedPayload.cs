@@ -2,34 +2,31 @@ using Blackbird.Applications.Sdk.Common;
 using Apps.Lokalise.Webhooks.Models;
 using Newtonsoft.Json;
 
-namespace Apps.Lokalise.Webhooks.Payload
+namespace Apps.Lokalise.Webhooks.Payload;
+
+// ProjectBranchAddedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectBranchAddedPayload : BasePayload>(myJsonResponse);
+public class Branch
 {
-    // ProjectBranchAddedPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectBranchAddedPayload : BasePayload>(myJsonResponse);
-    public class Branch
-    {
-        [JsonProperty("name")]
-        [Display("Name")]
-        public string Name { get; set; }
-    }
+    [JsonProperty("name")]
+    [Display("Name")]
+    public string Name { get; set; }
+}
 
-    public class ProjectBranchAddedPayload : BasePayload
-    {
-        [JsonProperty("branch")]
-        [Display("Branch")]
-        public Branch Branch { get; set; }
+public class ProjectBranchAddedPayload : BasePayload
+{
+    [JsonProperty("branch")]
+    [Display("Branch")]
+    public Branch Branch { get; set; }
 
-        public override BranchEvent Convert()
+    public override BranchEvent Convert()
+    {
+        return new BranchEvent
         {
-            return new BranchEvent
-            {
-                ProjectId = Project.Id,
-                ProjectName = Project.Name,
-                UserEmail = User.Email,
-                UserName = User.Email,
-                Name = Branch.Name,
-            };
-        }
+            ProjectId = Project.Id,
+            ProjectName = Project.Name,
+            UserEmail = User.Email,
+            UserName = User.Email,
+            Name = Branch.Name,
+        };
     }
-
-
 }
