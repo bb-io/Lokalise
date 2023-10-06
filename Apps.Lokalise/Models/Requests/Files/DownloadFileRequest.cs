@@ -158,7 +158,7 @@ public class DownloadFileRequest
     [JsonProperty("compact")]
     public bool? Compact { get; set; }
 
-    public DownloadFileRequest(DownloadXLIFFFileRequest request)
+    public DownloadFileRequest(DownloadAllXLIFFFilesRequest request)
     {
         OriginalFilenames = request.OriginalFilenames;
         BundleStructure = request.BundleStructure;

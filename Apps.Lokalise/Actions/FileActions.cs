@@ -146,58 +146,81 @@ public class FileActions
         };
     }
 
-        [Action("Download XLIFF for task", Description = "Download XLIFF file for task")]
-        public async Task<DownloadProjectFilesAsZipResponse> DownloadXLIFF(
-            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] ProjectRequest project,
-            [ActionParameter] DownloadTaskXLIFFFileRequest input)
-        {
-            var allFiles = await DownloadProjectFilesAsZip(
-                authenticationCredentialsProviders,
-                project,
-                new DownloadFileRequest(input) { 
-                    Format = "offline_xliff", 
-                    AllPlatforms = input.AllPlatforms ?? true,
-                    FilterTaskId = input.FilterTaskId
-                });
-
-            var fileData = await allFiles.File.Bytes.GetFileFromZip(en => en.Name == $"{input.LanguageCode.Replace("_", "-")}.xliff");
-            return new()
+    [Action("Download XLIFF file", Description = "Download XLIFF file")]
+    public async Task<DownloadProjectFilesAsZipResponse> DownloadXLIFF(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] ProjectRequest project,
+        [ActionParameter] DownloadXLIFFFileRequest input)
+    {
+        var allFiles = await DownloadProjectFilesAsZip(
+            authenticationCredentialsProviders,
+            project,
+            new DownloadFileRequest(input)
             {
-                File = fileData.File
-            };
-        }
+                Format = "offline_xliff",
+                AllPlatforms = input.AllPlatforms ?? true,
+                FilterTaskId = input.FilterTaskId
+            });
 
-        [Action("Download all XLIFF files", Description = "Download all XLIFF files")]
-        public async Task<DownloadXLIFFAllResponse> DownloadXLIFFAll(
-            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] ProjectRequest project,
-            [ActionParameter] DownloadXLIFFFileRequest input)
+        var fileData = await allFiles.File.Bytes.GetFileFromZip(en => en.Name == $"{input.LanguageCode.Replace("_", "-")}.xliff");
+        return new()
         {
-            var allFiles = await DownloadProjectFilesAsZip(
-                authenticationCredentialsProviders,
-                project,
-                new DownloadFileRequest(input)
-                {
-                    Format = "offline_xliff",
-                    AllPlatforms = input.AllPlatforms ?? true
-                });
+            File = fileData.File
+        };
+    }
 
-            var files = await allFiles.File.Bytes.GetFilesFromZip();
-            return new()
+    [Action("Download XLIFF files from task", Description = "Download XLIFF files from task")]
+    public async Task<DownloadXLIFFAllResponse> DownloadXLIFFFromTask(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] ProjectRequest project,
+        [ActionParameter] DownloadTaskXLIFFFileRequest input)
+    {
+        var allFiles = await DownloadProjectFilesAsZip(
+            authenticationCredentialsProviders,
+            project,
+            new DownloadFileRequest(input)
             {
-                Files = files.Where(f => f.File.Bytes.Length > 0).Select(f => f.File).ToList()
-            };
-        }
-
-        [Action("Delete file", Description = "Delete file from project")]
-        public Task DeleteFile(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-            [ActionParameter] DeleteFileRequest input)
+                Format = "offline_xliff",
+                AllPlatforms = input.AllPlatforms ?? true,
+                FilterTaskId = input.FilterTaskId
+            });
+        var files = await allFiles.File.Bytes.GetFilesFromZip();
+        return new()
         {
-            var request = new LokaliseRequest(
-                $"/projects/{input.ProjectId}/files/{input.FileId}",
-                Method.Delete,
-                authenticationCredentialsProviders);
+            Files = files.Where(f => f.File.Bytes.Length > 0).Select(f => f.File).ToList()
+        };
+    }
+
+    [Action("Download all XLIFF files from project", Description = "Download all XLIFF files from project")]
+    public async Task<DownloadXLIFFAllResponse> DownloadXLIFFAll(
+        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] ProjectRequest project,
+        [ActionParameter] DownloadAllXLIFFFilesRequest input)
+    {
+        var allFiles = await DownloadProjectFilesAsZip(
+            authenticationCredentialsProviders,
+            project,
+            new DownloadFileRequest(input)
+            {
+                Format = "offline_xliff",
+                AllPlatforms = input.AllPlatforms ?? true
+            });
+
+        var files = await allFiles.File.Bytes.GetFilesFromZip();
+        return new()
+        {
+            Files = files.Where(f => f.File.Bytes.Length > 0).Select(f => f.File).ToList()
+        };
+    }
+
+    [Action("Delete file", Description = "Delete file from project")]
+    public Task DeleteFile(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+        [ActionParameter] DeleteFileRequest input)
+    {
+        var request = new LokaliseRequest(
+            $"/projects/{input.ProjectId}/files/{input.FileId}",
+            Method.Delete,
+            authenticationCredentialsProviders);
 
         return _client.ExecuteWithHandling(request);
     }

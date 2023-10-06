@@ -10,14 +10,10 @@ using System.Threading.Tasks;
 
 namespace Apps.Lokalise.Models.Requests.Files
 {
-    public class DownloadTaskXLIFFFileRequest : DownloadXLIFFFileRequest
+    public class DownloadTaskXLIFFFileRequest : DownloadAllXLIFFFilesRequest
     {
         [JsonProperty("filter_task_id")]
         [Display("Filter task ID")]
         public string FilterTaskId { get; set; }
-
-        [Display("Language code")]
-        [DataSource(typeof(LanguageDataHandler))]
-        public string LanguageCode { get; set; }
     }
 }
