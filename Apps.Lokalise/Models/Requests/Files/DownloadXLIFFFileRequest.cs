@@ -1,17 +1,19 @@
-﻿using Apps.Lokalise.DataSourceHandlers.EnumHandlers;
+﻿using Apps.Lokalise.DataSourceHandlers;
+using Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 using Apps.Lokalise.Models.Responses.Files;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Apps.Lokalise.Models.Requests.Files
 {
-    public class DownloadFileRequest
+    public class DownloadXLIFFFileRequest
     {
-        [JsonProperty("format")]
-        [DataSource(typeof(FileFormatDataHandler))]
-        public string Format { get; set; }
-
         [JsonProperty("original_filenames")]
         [Display("Original filenames")]
         public bool? OriginalFilenames { get; set; }
@@ -151,53 +153,7 @@ namespace Apps.Lokalise.Models.Requests.Files
         [Display("Bundle description")]
         public string? BundleDescription { get; set; }
 
-        [JsonProperty("filter_task_id")]
-        [Display("Filter task ID")]
-        public string? FilterTaskId { get; set; }
-
         [JsonProperty("compact")]
         public bool? Compact { get; set; }
-
-        public DownloadFileRequest(DownloadXLIFFFileRequest request)
-        {
-            OriginalFilenames = request.OriginalFilenames;
-            BundleStructure = request.BundleStructure;
-            DirectoryPrefix = request.DirectoryPrefix;
-            AllPlatforms = request.AllPlatforms;
-            FilterLangs = request.FilterLangs;
-            FilterData = request.FilterData;
-            FilterFilenames = request.FilterFilenames;
-            AddNewlineEof = request.AddNewlineEof;
-            CustomTranslationStatusIds = request.CustomTranslationStatusIds;
-            IncludeTags = request.IncludeTags;
-            ExcludeTags = request.ExcludeTags;
-            ExportSort = request.ExportSort;
-            ExportEmptyAs = request.ExportEmptyAs;
-            ExportNullAs = request.ExportNullAs;
-            IncludeComments = request.IncludeComments;
-            IncludeDescription = request.IncludeDescription;
-            IncludePids = request.IncludePids;
-            Triggers = request.Triggers;
-            FilterRepositories = request.FilterRepositories;
-            ReplaceBreaks = request.ReplaceBreaks;
-            DisableReferences = request.DisableReferences;
-            PluralFormat = request.PluralFormat;
-            PlaceholderFormat = request.PlaceholderFormat;
-            WebhookUrl = request.WebhookUrl;
-            LanguageMapping = request.LanguageMapping;
-            IcuNumeric = request.IcuNumeric;
-            EscapePercent = request.EscapePercent;
-            Indentation = request.Indentation;
-            YamlIncludeRoot = request.YamlIncludeRoot;
-            JsonUnescapedSlashes = request.JsonUnescapedSlashes;
-            JavaPropertiesEncoding = request.JavaPropertiesEncoding;
-            JavaPropertiesSeparator = request.JavaPropertiesSeparator;
-            BundleDescription = request.BundleDescription;
-            Compact = request.Compact;
-        }
-
-        public DownloadFileRequest()
-        {
-        }
     }
 }

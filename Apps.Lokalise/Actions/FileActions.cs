@@ -111,6 +111,50 @@ namespace Apps.Lokalise.Actions
             };
         }
 
+        [Action("Download XLIFF for task", Description = "Download XLIFF file for task")]
+        public async Task<DownloadProjectFilesResponse> DownloadXLIFF(
+            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+            [ActionParameter] ProjectRequest project,
+            [ActionParameter] DownloadTaskXLIFFFileRequest input)
+        {
+            var allFiles = await DownloadProjectFiles(
+                authenticationCredentialsProviders,
+                project,
+                new DownloadFileRequest(input) { 
+                    Format = "offline_xliff", 
+                    AllPlatforms = input.AllPlatforms ?? true,
+                    FilterTaskId = input.FilterTaskId
+                });
+
+            var fileData = await allFiles.File.Bytes.GetFileFromZip(en => en.Name == $"{input.LanguageCode.Replace("_", "-")}.xliff");
+            return new()
+            {
+                File = fileData
+            };
+        }
+
+        [Action("Download all XLIFF files", Description = "Download all XLIFF files")]
+        public async Task<DownloadXLIFFAllResponse> DownloadXLIFFAll(
+            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
+            [ActionParameter] ProjectRequest project,
+            [ActionParameter] DownloadXLIFFFileRequest input)
+        {
+            var allFiles = await DownloadProjectFiles(
+                authenticationCredentialsProviders,
+                project,
+                new DownloadFileRequest(input)
+                {
+                    Format = "offline_xliff",
+                    AllPlatforms = input.AllPlatforms ?? true
+                });
+
+            var files = allFiles.File.Bytes.GetFilesFromZip();
+            return new()
+            {
+                Files = files.ToBlockingEnumerable().Where(f => f.Bytes.Length > 0).ToList()
+            };
+        }
+
         [Action("Delete file", Description = "Delete file from project")]
         public Task DeleteFile(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
             [ActionParameter] DeleteFileRequest input)
