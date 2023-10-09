@@ -1,5 +1,7 @@
-﻿using Blackbird.Applications.Sdk.Common;
+﻿using Apps.Lokalise.Dtos;
+using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace Apps.Lokalise.Models.Responses.Projects;
 
@@ -46,4 +48,18 @@ public class ProjectResponse
     [JsonProperty("base_language_iso")]
     [Display("Base language iso")]
     public string BaseLanguageIso { get; set; }
+
+    [Display("Target languages")]
+    public List<string> TargetLanguages { get; set; }
+
+    [JsonProperty("statistics")]
+    [Display("Statistics")]
+    public ProjectStatisticsDto Statistics { get; set; }
+
+
+    [OnDeserialized]
+    internal void OnDeserializedMethod(StreamingContext context)
+    {
+        TargetLanguages = Statistics.Languages.Where(l => l.LanguageIso != BaseLanguageIso).Select(l => l.LanguageIso).ToList();
+    }
 }
