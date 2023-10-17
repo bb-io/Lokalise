@@ -31,6 +31,12 @@ public class LokaliseClient : RestClient
         if (response.IsSuccessStatusCode)
             return response;
 
+        if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        {
+            await Task.Delay(1000);
+            return await ExecuteWithHandling(request);
+        }
+
         throw ConfigureRequestException(response.Content);
     }
 
