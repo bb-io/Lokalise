@@ -81,6 +81,10 @@ public class TaskResponse
     [Display("Languages")]
     public Language[] Languages { get; set; }
 
+    [Display("User IDs")]
+    public IEnumerable<int> UserIds
+        => Languages.SelectMany(x => x.Users.Select(x => x.UserId)).Distinct();
+
     [JsonProperty("source_language_iso")]
     [Display("Source language code")]
     public string SourceLanguageIso { get; set; }
@@ -118,8 +122,7 @@ public class TaskResponse
     public string[] CustomTranslationStatusIds { get; set; }
 
 
-    [Display("Language codes")]
-    public List<string> LanguageCodes { get; set; }
+    [Display("Language codes")] public List<string> LanguageCodes { get; set; }
 
     public void FillLanguageCodesArray()
     {

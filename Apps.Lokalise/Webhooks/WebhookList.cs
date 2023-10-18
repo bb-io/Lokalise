@@ -22,28 +22,27 @@ public class WebhookList : BaseInvocable
     private WebhookResponse<T1> HandlePreflightAndMap<T1, T2>(WebhookRequest webhookRequest, WebhookInput input)
         where T2 : BasePayload where T1 : BaseEvent
     {
-        if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
+        var preflightResponse = new WebhookResponse<T1>()
         {
-            return new()
-            {
-                HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                Result = null,
-                ReceivedWebhookRequestType = WebhookRequestType.Preflight
-            };
-        }
+            HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
+            Result = null,
+            ReceivedWebhookRequestType = WebhookRequestType.Preflight
+        };
+
+        if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
+            return preflightResponse;
+
         var data = JsonConvert.DeserializeObject<T2>(webhookRequest.Body.ToString()!);
+
         if (data is null)
             throw new InvalidCastException(nameof(webhookRequest.Body));
 
         if (data.Project.Id != input.ProjectId)
-        {
-            return new()
-            {
-                HttpResponseMessage = null,
-                Result = null,
-                ReceivedWebhookRequestType = WebhookRequestType.Preflight
-            };
-        }
+            return preflightResponse;
+
+        if (input.UserEmail != null && data.User.Email != input.UserEmail)
+            return preflightResponse;
+
         return new()
         {
             HttpResponseMessage = null,

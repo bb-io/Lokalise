@@ -9,4 +9,7 @@ public class WebhookInput
     [Display("Project")]
     [DataSource(typeof(ProjectDataHandler))]
     public string ProjectId { get; set; }
+    
+    [Display("User email")]
+    public string? UserEmail { get; set; }
 }
