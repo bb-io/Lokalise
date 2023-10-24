@@ -14,6 +14,7 @@ public class KeyDto
     public string CreatedAt { get; set; }
 
     [JsonProperty("description")] public string Description { get; set; }
+    [JsonProperty("tags")] public IEnumerable<string> Tags { get; set; }
     [JsonProperty("key_name")] public KeyName KeyName { get; set; }
     [JsonProperty("filenames")] public Filenames Filenames { get; set; }
 
