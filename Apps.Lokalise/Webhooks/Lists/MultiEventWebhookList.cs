@@ -43,12 +43,11 @@ public class MultiEventWebhookList : WebhookList
 
         var data = JsonConvert.DeserializeObject<BasePayload>(payload)!;
 
-        if (data.Project.Id != input.ProjectId)
+        if (!input.Projects.Contains(data.Project.Id))
             return preflightResponse;
 
         AssigneeKeyModifiedEvent result;
-
-        var endpoint = $"/projects/{input.ProjectId}/tasks";
+        var endpoint = $"/projects/{data.Project.Id}/tasks";
         var allTasks = await Paginator.GetAll<TasksWrapper, TaskResponse>(
             InvocationContext.AuthenticationCredentialsProviders.ToArray(),
             endpoint);
@@ -114,7 +113,7 @@ public class MultiEventWebhookList : WebhookList
             var client = new LokaliseClient();
             var taskCreatedPayload = JsonConvert.DeserializeObject<ProjectTaskCreatedPayload>(payload)!.Convert();
 
-            var request = new LokaliseRequest($"/projects/{input.ProjectId}/tasks/{taskCreatedPayload.TaskId}",
+            var request = new LokaliseRequest($"/projects/{taskCreatedPayload.ProjectId}/tasks/{taskCreatedPayload.TaskId}",
                 Method.Get,
                 InvocationContext.AuthenticationCredentialsProviders);
 
@@ -128,7 +127,7 @@ public class MultiEventWebhookList : WebhookList
                 .Distinct()
                 .Select(async x =>
                 {
-                    var endpoint = $"/projects/{input.ProjectId}/keys/{x}";
+                    var endpoint = $"/projects/{taskCreatedPayload.ProjectId}/keys/{x}";
                     var request = new LokaliseRequest(endpoint, Method.Get,
                         InvocationContext.AuthenticationCredentialsProviders);
                     var response = await client.ExecuteWithHandling<KeyResponse>(request);

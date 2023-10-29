@@ -12,10 +12,10 @@ using Task = System.Threading.Tasks.Task;
 namespace Apps.Lokalise.Webhooks.Lists;
 
 [WebhookList]
-public class SignleEventWebhookList : WebhookList
+public class SingleEventWebhookList : WebhookList
 {
     
-    public SignleEventWebhookList(InvocationContext invocationContext) : base(invocationContext)
+    public SingleEventWebhookList(InvocationContext invocationContext) : base(invocationContext)
     {
     }
     private WebhookResponse<T1> HandlePreflightAndMap<T1, T2>(WebhookRequest webhookRequest, WebhookInput input)
@@ -36,7 +36,7 @@ public class SignleEventWebhookList : WebhookList
         if (data is null)
             throw new InvalidCastException(nameof(webhookRequest.Body));
 
-        if (data.Project.Id != input.ProjectId)
+        if (!input.Projects.Contains(data.Project.Id))
             return preflightResponse;
 
         if (input.UserEmail != null && data.User.Email != input.UserEmail)

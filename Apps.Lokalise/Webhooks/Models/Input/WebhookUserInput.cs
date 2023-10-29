@@ -6,9 +6,9 @@ namespace Apps.Lokalise.Webhooks.Models.Input;
 
 public class WebhookUserInput
 {
-    [Display("Project")]
+    [Display("Projects")]
     [DataSource(typeof(ProjectDataHandler))]
-    public string ProjectId { get; set; }
+    public List<string> Projects { get; set; }
 
     [Display("User email")] public string UserEmail { get; set; }
 }

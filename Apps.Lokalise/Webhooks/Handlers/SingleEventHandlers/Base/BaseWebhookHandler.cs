@@ -35,27 +35,17 @@ public class BaseWebhookHandler : IWebhookEventHandler<WebhookInput>
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider,
         Dictionary<string, string> values)
     {
-        var endpoint = $"/projects/{_webhookInput.ProjectId}/webhooks";
-        var request = new LokaliseRequest(endpoint, Method.Post, authenticationCredentialsProvider)
-            .WithJsonBody(new
-            {
-                url = values["payloadUrl"].Replace("https://localhost:44390", "https://25e9-178-211-106-141.ngrok-free.app"),
-                events = new[] { _subscriptionEvent }
-            });
-        await _client.ExecuteWithHandling(request);
-        //return System.Threading.Tasks.Task.Run(async () =>
-        //{
-        //    await System.Threading.Tasks.Task.Delay(1000);
-        //    await _client.ExecuteWithHandling(request);
-        //});
-
-        //var client = new RestClient();
-        //var request = new RestRequest("https://webhook.site/065e88df-c57c-4934-b191-3861290680cd", Method.Post);
-        //request.AddJsonBody(new
-        //{
-        //    url = values["payloadUrl"]
-        //});
-        //await client.ExecuteAsync(request);
+        foreach(var project in _webhookInput.Projects) 
+        {
+            var endpoint = $"/projects/{project}/webhooks";
+            var request = new LokaliseRequest(endpoint, Method.Post, authenticationCredentialsProvider)
+                .WithJsonBody(new
+                {
+                    url = values["payloadUrl"].Replace("https://localhost:44390", "https://25e9-178-211-106-141.ngrok-free.app"),
+                    events = new[] { _subscriptionEvent }
+                });
+            await _client.ExecuteWithHandling(request);
+        }
     }
 
     public async Task UnsubscribeAsync(
@@ -64,12 +54,15 @@ public class BaseWebhookHandler : IWebhookEventHandler<WebhookInput>
     {
         var creds = authenticationCredentialsProvider.ToArray();
 
-        var webhook = await GetWebhook(creds, _webhookInput.ProjectId, values);
+        foreach(var project in _webhookInput.Projects)
+        {
+            var webhook = await GetWebhook(creds, project, values);
 
-        if (webhook is null)
-            return;
+            if (webhook is null)
+                return;
 
-        await DeleteWebhook(creds, values, webhook.WebhookId, _webhookInput.ProjectId);
+            await DeleteWebhook(creds, values, webhook.WebhookId, project);
+        }        
     }
 
     #endregion
