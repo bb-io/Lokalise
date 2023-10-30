@@ -8,7 +8,7 @@ public class WebhookUserInput
 {
     [Display("Projects")]
     [DataSource(typeof(ProjectDataHandler))]
-    public List<string> Projects { get; set; }
+    public IEnumerable<string> Projects { get; set; }
 
     [Display("User email")] public string UserEmail { get; set; }
 }
