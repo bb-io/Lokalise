@@ -30,19 +30,22 @@ public abstract class MultipleEventHandler : IWebhookEventHandler<WebhookInput>
 
     #region Subscriptions
 
-    public Task SubscribeAsync(
+    public async Task SubscribeAsync(
         IEnumerable<AuthenticationCredentialsProvider> creds,
         Dictionary<string, string> values)
     {
-        var endpoint = $"/projects/{_webhookInput.ProjectId}/webhooks";
-        var request = new LokaliseRequest(endpoint, Method.Post, creds)
-            .WithJsonBody(new
-            {
-                url = values["payloadUrl"],
-                events = SubscriptionEvents
-            });
+        foreach(var project in _webhookInput.Projects)
+        {
+            var endpoint = $"/projects/{project}/webhooks";
+            var request = new LokaliseRequest(endpoint, Method.Post, creds)
+                .WithJsonBody(new
+                {
+                    url = values["payloadUrl"],
+                    events = SubscriptionEvents
+                });
 
-        return _client.ExecuteWithHandling(request);
+            await _client.ExecuteWithHandling(request);
+        }        
     }
 
     public async Task UnsubscribeAsync(
@@ -50,15 +53,18 @@ public abstract class MultipleEventHandler : IWebhookEventHandler<WebhookInput>
         Dictionary<string, string> values)
     {
         var authCreds = creds.ToArray();
-        var allWebhooks = await GetAllWebhooks(authCreds, _webhookInput.ProjectId, values);
+        foreach(var project in _webhookInput.Projects)
+        {
+            var allWebhooks = await GetAllWebhooks(authCreds, project, values);
 
-        var webhookToDelete = allWebhooks.Webhooks
-            .FirstOrDefault(x => x.Url == values["payloadUrl"]);
+            var webhookToDelete = allWebhooks.Webhooks
+                .FirstOrDefault(x => x.Url == values["payloadUrl"]);
 
-        if (webhookToDelete is null)
-            return;
+            if (webhookToDelete is null)
+                return;
 
-        await DeleteWebhook(authCreds, values, webhookToDelete.WebhookId, _webhookInput.ProjectId);
+            await DeleteWebhook(authCreds, values, webhookToDelete.WebhookId, project);
+        }        
     }
 
     #endregion
