@@ -8,6 +8,9 @@ public class AddLanguageToProjectRequest
 
     public AddLanguageToProjectRequest(AddLanguageToProjectInput input)
     {
-        Languages = new[] { new AddLanguageData(input) };
+        Languages = input.LanguageCodes.Select(x => new AddLanguageData()
+        {
+            LanguageCode = x
+        });
     }
 }
