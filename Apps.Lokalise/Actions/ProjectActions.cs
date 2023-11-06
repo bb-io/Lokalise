@@ -62,11 +62,11 @@ public class ProjectActions
     [Action("Create project", Description = "Create a new project")]
     public Task<ProjectResponse> CreateProject(
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] ProjectCreateRequest parameters)
+        [ActionParameter] ProjectCreateInput parameters)
     {
         var request = new
                 LokaliseRequest("/projects", Method.Post, authenticationCredentialsProviders)
-            .WithJsonBody(parameters);
+            .WithJsonBody(new ProjectCreateRequest(parameters));
 
         return _client.ExecuteWithHandling<ProjectResponse>(request);
     }

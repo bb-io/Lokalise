@@ -6,16 +6,16 @@ namespace Apps.Lokalise.Models.Requests.Languages;
 
 public class AddLanguageToProjectInput
 {
-    [Display("Language code")]
+    [Display("Language codes")]
     [DataSource(typeof(LanguageDataHandler))]
-    public string LanguageCode { get; set; }        
+    public IEnumerable<string> LanguageCodes { get; set; }        
         
-    [Display("Custom language code")]
-    public string? CustomIso { get; set; }      
-        
-    [Display("Custom name")]
-    public string? CustomName { get; set; }
-        
-    [Display("Custom plural forms")]
-    public IEnumerable<string>? CustomPluralForms { get; set; }
+    // [Display("Custom language code")]
+    // public string? CustomIso { get; set; }      
+    //     
+    // [Display("Custom name")]
+    // public string? CustomName { get; set; }
+    //     
+    // [Display("Custom plural forms")]
+    // public IEnumerable<string>? CustomPluralForms { get; set; }
 }
