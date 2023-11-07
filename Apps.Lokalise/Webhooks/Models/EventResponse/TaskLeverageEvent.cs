@@ -6,7 +6,7 @@ namespace Apps.Lokalise.Webhooks.Models.EventResponse;
 public class TaskLeverageEvent : BaseEvent
 {
     [Display("Task ID")]
-    public int TaskId { get; set; }
+    public string TaskId { get; set; }
 
     [Display("Task title")]
     public string Title { get; set; }

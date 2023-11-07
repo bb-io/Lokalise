@@ -155,8 +155,11 @@ public class DownloadFileRequest
     [Display("Filter task ID")]
     public string? FilterTaskId { get; set; }
 
-    [JsonProperty("compact")]
-    public bool? Compact { get; set; }
+    [JsonProperty("compact")] public bool? Compact { get; set; }
+
+    public DownloadFileRequest()
+    {
+    }
 
     public DownloadFileRequest(DownloadAllXLIFFFilesRequest request)
     {
@@ -194,9 +197,5 @@ public class DownloadFileRequest
         JavaPropertiesSeparator = request.JavaPropertiesSeparator;
         BundleDescription = request.BundleDescription;
         Compact = request.Compact;
-    }
-
-    public DownloadFileRequest()
-    {
     }
 }

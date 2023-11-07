@@ -7,7 +7,7 @@ namespace Apps.Lokalise.Webhooks.Models.Payload;
 // ProjectTranslationProofreadPayload : BasePayload myDeserializedClass = JsonSerializer.Deserialize<ProjectTranslationProofreadPayload : BasePayload>(myJsonResponse);
 public class KeyName
 {
-    [JsonProperty("id")] public int Id { get; set; }
+    [JsonProperty("id")] public string Id { get; set; }
     [JsonProperty("name")] public string Name { get; set; }
 }
 
@@ -39,7 +39,7 @@ public class ProjectTranslationProofreadPayload : BasePayload
 
 public class Translation
 {
-    [JsonProperty("id")] public int Id { get; set; }
+    [JsonProperty("id")] public string Id { get; set; }
     [JsonProperty("value")] public string Value { get; set; }
 
     [JsonProperty("is_proofread")]

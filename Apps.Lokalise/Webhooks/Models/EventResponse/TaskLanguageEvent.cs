@@ -5,7 +5,7 @@ namespace Apps.Lokalise.Webhooks.Models.EventResponse;
 public class TaskLanguageEvent : BaseEvent
 {
     [Display("Task ID")]
-    public int TaskId { get; set; }
+    public string TaskId { get; set; }
 
     [Display("Task type")]
     public string Type { get; set; }
@@ -20,7 +20,7 @@ public class TaskLanguageEvent : BaseEvent
     public string Description { get; set; }
 
     [Display("Language ID")]
-    public int LanguageId { get; set; }
+    public string LanguageId { get; set; }
 
     [Display("Language ISO code")]
     public string Iso { get; set; }

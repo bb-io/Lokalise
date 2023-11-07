@@ -5,5 +5,5 @@ namespace Apps.Lokalise.Models.Responses.Keys;
 public class Key
 {
     [Display("ID")]
-    public int Id { get; set; }
+    public string Id { get; set; }
 }

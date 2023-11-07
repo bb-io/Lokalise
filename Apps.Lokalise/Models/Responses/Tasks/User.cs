@@ -7,7 +7,7 @@ public class User
 {
     [JsonProperty("user_id")]
     [Display("User ID")]
-    public int UserId { get; set; }
+    public string UserId { get; set; }
 
     [JsonProperty("email")]
     [Display("Email")]

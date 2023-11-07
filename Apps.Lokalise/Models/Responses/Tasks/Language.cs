@@ -18,7 +18,7 @@ public class Language
 
     [JsonProperty("keys")]
     [Display("Keys")]
-    public List<int> Keys { get; set; }
+    public List<string> Keys { get; set; }
 
     [JsonProperty("status")]
     [Display("Status")]

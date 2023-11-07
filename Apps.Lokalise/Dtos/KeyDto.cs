@@ -7,7 +7,7 @@ public class KeyDto
 {
     [JsonProperty("key_id")]
     [Display("Key ID")]
-    public int KeyId { get; set; }
+    public string KeyId { get; set; }
 
     [JsonProperty("created_at")]
     [Display("Created at")]

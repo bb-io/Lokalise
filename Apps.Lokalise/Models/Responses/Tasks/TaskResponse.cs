@@ -7,7 +7,7 @@ public class TaskResponse
 {
     [JsonProperty("task_id")]
     [Display("Task ID")]
-    public int TaskId { get; set; }
+    public string TaskId { get; set; }
 
     [JsonProperty("title")]
     [Display("Title")]
@@ -82,7 +82,7 @@ public class TaskResponse
     public Language[] Languages { get; set; }
 
     [Display("User IDs")]
-    public IEnumerable<int> UserIds
+    public IEnumerable<string> UserIds
         => Languages.SelectMany(x => x.Users.Select(x => x.UserId)).Distinct();
 
     [JsonProperty("source_language_iso")]

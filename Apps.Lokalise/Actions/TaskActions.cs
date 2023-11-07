@@ -1,5 +1,6 @@
 ﻿using Apps.Lokalise.Constants;
 using Apps.Lokalise.Extensions;
+using Apps.Lokalise.Invocables;
 using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.Models.Requests.Tasks;
 using Apps.Lokalise.Models.Responses.Tasks;
@@ -7,7 +8,7 @@ using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
-using Blackbird.Applications.Sdk.Common.Authentication;
+using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.Sdk.Utils.Extensions.String;
 using Blackbird.Applications.Sdk.Utils.Extensions.System;
@@ -16,29 +17,16 @@ using RestSharp;
 namespace Apps.Lokalise.Actions;
 
 [ActionList]
-public class TaskActions
+public class TaskActions : LokaliseInvocable
 {
-    #region Fields
-
-    private readonly LokaliseClient _client;
-
-    #endregion
-
-    #region Constructors
-
-    public TaskActions()
+    public TaskActions(InvocationContext invocationContext) : base(invocationContext)
     {
-        _client = new();
     }
-
-    #endregion
 
     #region Actions
 
     [Action("List tasks", Description = "Get all tasks of a certain project")]
-    public async Task<ListTasksResponse> ListAllTasks(
-        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] ProjectRequest project,
+    public async Task<ListTasksResponse> ListAllTasks([ActionParameter] ProjectRequest project,
         [ActionParameter] TaskListParameters parameters)
     {
         var endpoint = $"/projects/{project.ProjectId}/tasks";
@@ -46,84 +34,70 @@ public class TaskActions
         var query = parameters.AsLokaliseDictionary().AllIsNotNull();
         var endpointWithQuery = endpoint.WithQuery(query);
 
-        var items = await Paginator.GetAll<TasksWrapper, TaskResponse>(
-            authenticationCredentialsProviders.ToArray(),
-            endpointWithQuery);
+        var items = await Paginator.GetAll<TasksWrapper, TaskResponse>(Creds, endpointWithQuery);
         items.ForEach(i => i.FillLanguageCodesArray());
+
         return new(items);
     }
 
-    [Action("Create task with multiple languages", Description = "Create a new task with multiple languages")]
-    public async Task<TaskResponse> CreateTaskWithMultLanguages(
-        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] ProjectRequest project,
-        [ActionParameter] TaskCreateWithMultLangsRequest parameters)
+    [Action("Create task", Description = "Create a new task")]
+    public async Task<TaskResponse> CreateTaskWithMultLanguages([ActionParameter] ProjectRequest project,
+        [ActionParameter] TaskCreateRequest parameters)
     {
         if (parameters.Keys is null && parameters.ParentTaskId is null)
             throw new("One of the inputs must be specified: Parent task ID or Keys");
-        
-        var request = new LokaliseRequest($"/projects/{project.ProjectId}/tasks", Method.Post,
-                authenticationCredentialsProviders)
-            .WithJsonBody(parameters, JsonConfig.Settings);
 
-        var response = await _client.ExecuteWithHandling<TaskRetriveResponse>(request);
-        response.Task.FillLanguageCodesArray();
-        return response.Task;
-    }
-    
-    [Action("Create task", Description = "Create a new task")]
-    public Task<TaskResponse> CreateTask(
-        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] ProjectRequest project,
-        [ActionParameter] TaskCreateRequest parameters)
-    {
         if (parameters.Users is null && parameters.Groups is null)
             throw new("One of the inputs must be specified: Users or Groups");
 
-        var request = new TaskCreateWithMultLangsRequest(parameters);
-        return CreateTaskWithMultLanguages(authenticationCredentialsProviders, project, request);
+        var endpoint = $"/projects/{project.ProjectId}/tasks";
+
+        var payload = new TaskCreateWithMultLangsRequest(parameters);
+        var request = new LokaliseRequest(endpoint, Method.Post, Creds)
+            .WithJsonBody(payload, JsonConfig.Settings);
+
+        var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
+        response.Task.FillLanguageCodesArray();
+
+        return response.Task;
     }
 
     [Action("Get task", Description = "Get information about a specific task")]
-    public async Task<TaskResponse> RetrieveTask(
-        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] ProjectRequest project,
+    public async Task<TaskResponse> RetrieveTask([ActionParameter] ProjectRequest project,
         [ActionParameter] [Display("Task ID")] string taskId)
     {
-        var request = new LokaliseRequest($"/projects/{project.ProjectId}/tasks/{taskId}", Method.Get,
-            authenticationCredentialsProviders);
+        var endpoint = $"/projects/{project.ProjectId}/tasks/{taskId}";
+        var request = new LokaliseRequest(endpoint, Method.Get, Creds);
 
-        var response = await _client.ExecuteWithHandling<TaskRetriveResponse>(request);
+        var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
         response.Task.FillLanguageCodesArray();
+
         return response.Task;
     }
 
     [Action("Update task", Description = "Update information on a specific task")]
-    public async Task<TaskResponse> UpdateTask(
-        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] ProjectRequest input,
+    public async Task<TaskResponse> UpdateTask([ActionParameter] ProjectRequest project,
         [ActionParameter] [Display("Task ID")] string taskId,
-        [ActionParameter] TaskUpdateRequest taskUpdateRequest)
+        [ActionParameter] TaskUpdateInput input)
     {
-        var endpoint = $"/projects/{input.ProjectId}/tasks/{taskId}";
-        var request = new LokaliseRequest(endpoint, Method.Put, authenticationCredentialsProviders)
-            .WithJsonBody(taskUpdateRequest);
+        var endpoint = $"/projects/{project.ProjectId}/tasks/{taskId}";
+        var request = new LokaliseRequest(endpoint, Method.Put, Creds)
+            .WithJsonBody(new TaskUpdateRequest(input));
 
-        var response = await _client.ExecuteWithHandling<TaskRetriveResponse>(request);
+        var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
         response.Task.FillLanguageCodesArray();
+
         return response.Task;
     }
 
     [Action("Delete task", Description = "Delete a specific task")]
-    public Task<TaskDeleteResponse> DeleteTask(
-        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] ProjectRequest input,
+    public Task<TaskDeleteResponse> DeleteTask([ActionParameter] ProjectRequest input,
         [ActionParameter] [Display("Task ID")] string taskId)
     {
         var endpoint = $"/projects/{input.ProjectId}/tasks/{taskId}";
-        var request = new LokaliseRequest(endpoint, Method.Delete, authenticationCredentialsProviders);
-        
-        return _client.ExecuteWithHandling<TaskDeleteResponse>(request);
+        var request = new LokaliseRequest(endpoint, Method.Delete, Creds);
+
+        return Client.ExecuteWithHandling<TaskDeleteResponse>(request);
     }
 
     #endregion

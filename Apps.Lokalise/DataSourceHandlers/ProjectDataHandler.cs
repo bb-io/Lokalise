@@ -1,16 +1,17 @@
 ﻿using Apps.Lokalise.Actions;
+using Apps.Lokalise.Invocables;
+using Apps.Lokalise.Models.Responses.Projects;
+using Apps.Lokalise.RestSharp;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
+using RestSharp;
 
 namespace Apps.Lokalise.DataSourceHandlers;
 
-public class ProjectDataHandler : BaseInvocable, IAsyncDataSourceHandler
+public class ProjectDataHandler : LokaliseInvocable, IAsyncDataSourceHandler
 {
-    private IEnumerable<AuthenticationCredentialsProvider> Creds =>
-        InvocationContext.AuthenticationCredentialsProviders;
-
     public ProjectDataHandler(InvocationContext invocationContext) : base(invocationContext)
     {
     }
@@ -19,8 +20,8 @@ public class ProjectDataHandler : BaseInvocable, IAsyncDataSourceHandler
         DataSourceContext context,
         CancellationToken cancellationToken)
     {
-        var actions = new ProjectActions();
-        var projects = await actions.ListAllProjects(Creds, new());
+        var request = new LokaliseRequest("/projects", Method.Get, Creds);
+        var projects = await Client.ExecuteWithHandling<ProjectsResponse>(request);
 
         return projects.Projects
             .Where(x => context.SearchString == null ||

@@ -39,11 +39,11 @@ public class ProjectResponse
     
     [JsonProperty("team_id")]
     [Display("Team ID")]
-    public int TeamId { get; set; }
+    public string TeamId { get; set; }
     
     [JsonProperty("base_language_id")]
     [Display("Base language ID")]
-    public int BaseLanguageId { get; set; }
+    public string BaseLanguageId { get; set; }
     
     [JsonProperty("base_language_iso")]
     [Display("Base language iso")]
