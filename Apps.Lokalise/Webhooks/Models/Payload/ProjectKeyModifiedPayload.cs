@@ -8,7 +8,7 @@ namespace Apps.Lokalise.Webhooks.Models.Payload;
 public class KeyModified
 {
     [JsonProperty("id")]
-    public int Id { get; set; }
+    public string Id { get; set; }
 
     [JsonProperty("name")]
     [Display("Key name")]

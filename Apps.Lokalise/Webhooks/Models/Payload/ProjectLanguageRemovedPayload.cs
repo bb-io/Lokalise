@@ -9,7 +9,7 @@ public class Language
 {
     [JsonProperty("id")]
     [Display("Language ID")]
-    public int Id { get; set; }
+    public string Id { get; set; }
 
     [JsonProperty("iso")]
     [Display("ISO code")]

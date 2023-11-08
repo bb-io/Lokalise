@@ -1,18 +1,21 @@
 ﻿using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Apps.Lokalise.Extensions;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Utils.Converters;
 
-public class StringValueConverter : JsonConverter<object>
+public class StringValueConverter : JsonConverter
 {
-    public override object Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override bool CanRead => false;
+
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
         throw new NotImplementedException();
     }
 
-    public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
+    public override bool CanConvert(Type objectType) => true;
+
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         var properties = value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
@@ -21,7 +24,18 @@ public class StringValueConverter : JsonConverter<object>
         foreach (var property in properties)
         {
             var propertyValue = property.GetValue(value);
-            writer.WriteString(GetJsonPropertyName(property), propertyValue?.AsLokaliseQuery() ?? string.Empty);
+            var propertyName = GetJsonPropertyName(property);
+
+            writer.WritePropertyName(propertyName);
+
+            if (propertyValue != null)
+            {
+                writer.WriteValue(propertyValue.AsLokaliseQuery());
+            }
+            else
+            {
+                writer.WriteNull();
+            }
         }
 
         writer.WriteEndObject();
@@ -29,7 +43,7 @@ public class StringValueConverter : JsonConverter<object>
 
     private string GetJsonPropertyName(PropertyInfo property)
     {
-        var jsonPropertyName = property.GetCustomAttribute<JsonPropertyNameAttribute>();
-        return jsonPropertyName?.Name ?? property.Name;
+        var jsonPropertyAttribute = property.GetCustomAttribute<JsonPropertyAttribute>();
+        return jsonPropertyAttribute?.PropertyName ?? property.Name;
     }
 }

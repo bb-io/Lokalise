@@ -5,7 +5,7 @@ namespace Apps.Lokalise.Webhooks.Models.EventResponse;
 public class Translation
 {
     [Display("Translation ID")]
-    public int TranslationId { get; set; }
+    public string TranslationId { get; set; }
 
     [Display("Translation")]
     public string TranslationValue { get; set; }
@@ -14,7 +14,7 @@ public class Translation
     public string PreviousTranslationValue { get; set; }
 
     [Display("Language ID")]
-    public int LanguageId { get; set; }
+    public string LanguageId { get; set; }
 
     [Display("Language ISO code")]
     public string Iso { get; set; }
@@ -23,7 +23,7 @@ public class Translation
     public string LanguageName { get; set; }
 
     [Display("Key ID")]
-    public int KeyId { get; set; }
+    public string KeyId { get; set; }
 
     [Display("Key name")]
     public string KeyName { get; set; }

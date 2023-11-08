@@ -6,8 +6,8 @@ public class AddCommentsRequest
 {
     [JsonProperty("comments")] public IEnumerable<CommentRequest> Comments { get; set; }
 
-    public AddCommentsRequest(string text)
+    public AddCommentsRequest(IEnumerable<string> comments)
     {
-        Comments = new[] { new CommentRequest(text) };
+        Comments = comments.Select(x => new CommentRequest(x));
     }
 }

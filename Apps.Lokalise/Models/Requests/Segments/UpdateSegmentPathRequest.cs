@@ -7,7 +7,7 @@ namespace Apps.Lokalise.Models.Requests.Segments;
 
 public class UpdateSegmentPathRequest : ProjectRequest
 {
-    [Display("Key ID")] public long KeyId { get; set; }
+    [Display("Key ID")] public string KeyId { get; set; }
         
     [Display("Language code")] 
     [DataSource(typeof(LanguageDataHandler))]

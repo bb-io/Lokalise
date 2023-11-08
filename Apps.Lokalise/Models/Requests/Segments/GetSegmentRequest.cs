@@ -9,7 +9,7 @@ namespace Apps.Lokalise.Models.Requests.Segments;
 public class GetSegmentRequest : ProjectRequest
 {
     [Display("Key ID")]
-    public long KeyId { get; set; }
+    public string KeyId { get; set; }
         
     [Display("Language code")]
     [DataSource(typeof(LanguageDataHandler))]

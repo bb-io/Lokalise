@@ -21,7 +21,7 @@ public class Filenames
 public class KeyCommentAdded
 {
     [JsonProperty("id")]
-    public int Id { get; set; }
+    public string Id { get; set; }
 
     [JsonProperty("name")]
     [Display("Name")]

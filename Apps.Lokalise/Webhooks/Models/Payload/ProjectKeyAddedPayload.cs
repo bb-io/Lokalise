@@ -9,7 +9,7 @@ public class KeyWithTags
 {
     [JsonProperty("id")]
     [Display("Key ID")]
-    public int Id { get; set; }
+    public string Id { get; set; }
 
     [JsonProperty("name")]
     [Display("Key name")]

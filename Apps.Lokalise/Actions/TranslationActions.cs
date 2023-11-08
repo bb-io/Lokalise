@@ -1,46 +1,33 @@
-﻿using Apps.Lokalise.Models.Requests.Translations;
+﻿using Apps.Lokalise.Invocables;
+using Apps.Lokalise.Models.Requests.Translations;
 using Apps.Lokalise.Models.Responses.Translations;
 using Apps.Lokalise.RestSharp;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
-using Blackbird.Applications.Sdk.Common.Authentication;
+using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using RestSharp;
 
 namespace Apps.Lokalise.Actions;
 
 [ActionList]
-public class TranslationActions
+public class TranslationActions : LokaliseInvocable
 {
-    #region Fields
-
-    private readonly LokaliseClient _client;
-
-    #endregion
-
-    #region Constructors
-
-    public TranslationActions()
+    public TranslationActions(InvocationContext invocationContext) : base(invocationContext)
     {
-        _client = new();
     }
-
-    #endregion
 
     #region Actions
 
     [Action("Update translation", Description = "Update specific translation")]
-    public async Task<Translation> UpdateTranslation(
-        IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
-        [ActionParameter] TranslationRequest pathData,
+    public async Task<Translation> UpdateTranslation([ActionParameter] TranslationRequest pathData,
         [ActionParameter] UpdateTranslationRequest bodyParams)
     {
         var endpoint = $"/projects/{pathData.ProjectId}/translations/{pathData.TranslationId}";
-        var request = new LokaliseRequest(endpoint, Method.Put,
-                authenticationCredentialsProviders)
+        var request = new LokaliseRequest(endpoint, Method.Put, Creds)
             .WithJsonBody(bodyParams);
 
-        var response = await _client.ExecuteWithHandling<TranslationResponse>(request);
+        var response = await Client.ExecuteWithHandling<TranslationResponse>(request);
         return response.Translation;
     }
 

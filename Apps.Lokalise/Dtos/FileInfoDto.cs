@@ -7,7 +7,7 @@ public class FileInfoDto
 {
     [JsonProperty("file_id")]
     [Display("File ID")]
-    public long FileId { get; set; }
+    public string FileId { get; set; }
 
     [JsonProperty("filename")]
     [Display("File name")]

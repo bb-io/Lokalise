@@ -8,12 +8,12 @@ public class TranslationObj
 {
     [JsonProperty("translation_id")]
     [Display("Translation ID")]
-    [System.Text.Json.Serialization.JsonConverter(typeof(IntToStringConverter))]
+    [JsonConverter(typeof(IntToStringConverter))]
     public string TranslationId { get; set; }
 
     [JsonProperty("key_id")]
     [Display("Key ID")]
-    public int KeyId { get; set; }
+    public string KeyId { get; set; }
 
     [JsonProperty("language_iso")]
     [Display("Language iso")]

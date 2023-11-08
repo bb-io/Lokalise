@@ -34,7 +34,7 @@ public class ProjectTranslationsUpdatedPayload : BasePayload
 
 public class TranslationsUpdated
 {
-    [JsonProperty("id")] public int Id { get; set; }
+    [JsonProperty("id")] public string Id { get; set; }
     [JsonProperty("value")] public string Value { get; set; }
 
     [JsonProperty("previous_value")]

@@ -5,8 +5,7 @@ namespace Apps.Lokalise.Models.Requests.Tasks;
 
 public class TaskCreateWithMultLangsRequest : BaseTaskCreateRequest
 {
-    [Display("Languages")]
-    public IEnumerable<TaskLanguage> Languages { get; set; }
+    [Display("Languages")] public IEnumerable<TaskLanguage> Languages { get; set; }
 
     public TaskCreateWithMultLangsRequest()
     {
@@ -18,15 +17,12 @@ public class TaskCreateWithMultLangsRequest : BaseTaskCreateRequest
         Description = input.Description;
         DueDate = input.DueDate;
         Keys = input.Keys;
-        Languages = new[]
+        Languages = input.Languages.Select(x => new TaskLanguage()
         {
-            new TaskLanguage()
-            {
-                LanguageIso = input.LanguageIso,
-                Users = input.Users,
-                Groups = input.Groups
-            }
-        };
+            LanguageIso = x,
+            Users = input.Users,
+            Groups = input.Groups
+        });
         SourceLanguageIso = input.SourceLanguageIso;
         AutoCloseLanguages = input.AutoCloseLanguages;
         AutoCloseTask = input.AutoCloseTask;

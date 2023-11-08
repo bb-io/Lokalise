@@ -5,7 +5,7 @@ namespace Apps.Lokalise.Webhooks.Models.EventResponse;
 public class LanguageEvent : BaseEvent
 {
     [Display("Language ID")]
-    public int Id { get; set; }
+    public string Id { get; set; }
 
     [Display("Language ISO code")]
     public string Iso { get; set; }
