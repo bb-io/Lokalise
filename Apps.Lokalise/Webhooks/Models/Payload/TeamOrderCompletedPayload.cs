@@ -1,4 +1,5 @@
 using Apps.Lokalise.Webhooks.Models.EventResponse;
+using Apps.Lokalise.Webhooks.Models.Payload.Base;
 using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Models.Payload;
@@ -26,7 +27,7 @@ public class TeamOrderCompletedPayload : BasePayload
             UserEmail = User.Email,
             UserName = User.Email,
             Id = Order.Id,
-            Provider = Order.Provider,
+            Provider = Order.Provider
         };
     }
 }

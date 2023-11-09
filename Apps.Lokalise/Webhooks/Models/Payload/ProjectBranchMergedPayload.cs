@@ -1,4 +1,5 @@
 using Apps.Lokalise.Webhooks.Models.EventResponse;
+using Apps.Lokalise.Webhooks.Models.Payload.Base;
 using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 
@@ -41,7 +42,7 @@ public class ProjectBranchMergedPayload : BasePayload
             SourceBranchName = Branch.Name,
             TargetBranchName = TargetBranch.Name,
             InsertedCount = AffectedKeys.InsertedCount,
-            UpdatedCount = AffectedKeys.UpdatedCount,
+            UpdatedCount = AffectedKeys.UpdatedCount
         };
     }
 }

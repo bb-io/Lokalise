@@ -4,9 +4,9 @@ using Blackbird.Applications.Sdk.Common.Webhooks;
 
 namespace Apps.Lokalise.Webhooks.Handlers.SingleEventHandlers.Impl;
 
-public class ProjectTaskClosedHandler : BaseWebhookHandler
+public class ProjectTaskClosedHandler : TaskWebhookHandler
 {
     const string SubscriptionEvent = "project.task.closed";
 
-    public ProjectTaskClosedHandler([WebhookParameter] WebhookInput input) : base(SubscriptionEvent, input) { }
+    public ProjectTaskClosedHandler([WebhookParameter] TaskWebhookInput input) : base(SubscriptionEvent, input) { }
 }

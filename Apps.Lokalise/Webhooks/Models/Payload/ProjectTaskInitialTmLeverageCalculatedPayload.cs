@@ -1,4 +1,5 @@
 using Apps.Lokalise.Webhooks.Models.EventResponse;
+using Apps.Lokalise.Webhooks.Models.Payload.Base;
 using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 
@@ -86,7 +87,7 @@ public class ProjectTaskInitialTmLeverageCalculatedPayload : BasePayload
             TaskId = Task.Id,
             Title = Task.Title,
             Leverage = Task.InitialTmLeverage,
-            Description = Task.Description,
+            Description = Task.Description
         };
     }
 }

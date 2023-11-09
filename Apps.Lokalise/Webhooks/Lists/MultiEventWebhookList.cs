@@ -8,6 +8,7 @@ using Apps.Lokalise.Webhooks.Lists.Base;
 using Apps.Lokalise.Webhooks.Models.EventResponse;
 using Apps.Lokalise.Webhooks.Models.Input;
 using Apps.Lokalise.Webhooks.Models.Payload;
+using Apps.Lokalise.Webhooks.Models.Payload.Base;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Webhooks;
 using Newtonsoft.Json;
@@ -111,7 +112,7 @@ public class MultiEventWebhookList : WebhookList
         else
         {
             var client = new LokaliseClient();
-            var taskCreatedPayload = JsonConvert.DeserializeObject<ProjectTaskCreatedPayload>(payload)!.Convert();
+            var taskCreatedPayload = JsonConvert.DeserializeObject<TaskPayload>(payload)!.Convert();
 
             var request = new LokaliseRequest($"/projects/{taskCreatedPayload.ProjectId}/tasks/{taskCreatedPayload.TaskId}",
                 Method.Get,

@@ -41,15 +41,27 @@ public class TaskActions : LokaliseInvocable
     }
 
     [Action("Create task", Description = "Create a new task")]
-    public async Task<TaskResponse> CreateTaskWithMultLanguages([ActionParameter] ProjectRequest project,
+    public async Task<TaskResponse> CreateTask([ActionParameter] ProjectRequest project,
         [ActionParameter] TaskCreateRequest parameters)
     {
-        if (parameters.Keys is null && parameters.ParentTaskId is null)
-            throw new("One of the inputs must be specified: Parent task ID or Keys");
+        if (parameters.FilterKeys is null && parameters.Keys is null && parameters.ParentTaskId is null)
+            throw new("One of the inputs must be specified: Parent task ID or Keys or Filter keys");
 
         if (parameters.Users is null && parameters.Groups is null)
             throw new("One of the inputs must be specified: Users or Groups");
 
+        if (parameters.FilterKeys is not null && parameters.Keys is not null)
+            throw new("You should chose only one: either specify key IDs or use Filter keys");
+
+        if (parameters.FilterKeys is not null)
+        {
+            parameters.Keys = parameters.FilterKeys switch
+            {
+                LokaliseConstants.UntranslatedFilter => await GetUntranslatedKeys(project, parameters.Languages),
+                LokaliseConstants.UnverifiedFilter => await GetUnverifiedKeys(project, parameters.Languages),
+                _ => throw new InvalidOperationException("Wrong filter keys parameter")
+            };
+        }
         var endpoint = $"/projects/{project.ProjectId}/tasks";
 
         var payload = new TaskCreateWithMultLangsRequest(parameters);
@@ -98,6 +110,40 @@ public class TaskActions : LokaliseInvocable
         var request = new LokaliseRequest(endpoint, Method.Delete, Creds);
 
         return Client.ExecuteWithHandling<TaskDeleteResponse>(request);
+    }
+
+    #endregion
+
+    #region Utils
+
+    private async Task<IEnumerable<string>> GetUntranslatedKeys(ProjectRequest project, IEnumerable<string> langs)
+    {
+        var keys = await new KeyActions(InvocationContext).ListProjectKeys(project, new()
+        {
+            IncludeTranslations = true,
+            FilterUntranslated = true
+        });
+
+        return keys.Keys.Where(x =>
+                x.Translations?.Any(y =>
+                    langs.Contains(y.LanguageIso) && string.IsNullOrWhiteSpace(y.Translation)) is true ||
+                (langs.Contains(x.SourceTranslation?.LanguageIso) &&
+                 string.IsNullOrWhiteSpace(x.SourceTranslation?.Translation)))
+            .Select(x => x.KeyId);
+    }
+
+    private async Task<IEnumerable<string>> GetUnverifiedKeys(ProjectRequest project, IEnumerable<string> langs)
+    {
+        var keys = await new KeyActions(InvocationContext).ListProjectKeys(project, new()
+        {
+            IncludeTranslations = true
+        });
+
+        return keys.Keys.Where(x =>
+                x.Translations?.Any(y =>
+                    langs.Contains(y.LanguageIso) && y.IsUnverified) is true ||
+                (langs.Contains(x.SourceTranslation?.LanguageIso) && x.SourceTranslation?.IsUnverified is true))
+            .Select(x => x.KeyId);
     }
 
     #endregion

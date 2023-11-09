@@ -41,7 +41,7 @@ public class TranslationObj
     [Display("Is reviewed")]
     public bool IsReviewed { get; set; }
 
-    [JsonProperty("is_unreviewed")]
+    [JsonProperty("is_unverified")]
     [Display("Is unreviewed")]
     public bool IsUnverified { get; set; }
 

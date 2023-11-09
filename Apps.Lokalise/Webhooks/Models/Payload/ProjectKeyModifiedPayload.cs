@@ -1,4 +1,5 @@
 using Apps.Lokalise.Webhooks.Models.EventResponse;
+using Apps.Lokalise.Webhooks.Models.Payload.Base;
 using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 
@@ -42,7 +43,7 @@ public class ProjectKeyModifiedPayload : BasePayload
             IOS = Key.Filenames.Ios,
             Android= Key.Filenames.Android,
             Web = Key.Filenames.Web,
-            Other= Key.Filenames.Other,
+            Other= Key.Filenames.Other
         };
     }
 }

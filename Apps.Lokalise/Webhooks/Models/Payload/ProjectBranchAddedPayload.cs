@@ -1,4 +1,5 @@
 using Apps.Lokalise.Webhooks.Models.EventResponse;
+using Apps.Lokalise.Webhooks.Models.Payload.Base;
 using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 
@@ -26,7 +27,7 @@ public class ProjectBranchAddedPayload : BasePayload
             ProjectName = Project.Name,
             UserEmail = User.Email,
             UserName = User.Email,
-            Name = Branch.Name,
+            Name = Branch.Name
         };
     }
 }

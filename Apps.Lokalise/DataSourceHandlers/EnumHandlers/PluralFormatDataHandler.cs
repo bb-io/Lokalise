@@ -12,6 +12,6 @@ public class PluralFormatDataHandler : EnumDataHandler
         { "generic", "Generic" },
         { "symfony", "Symfony" },
         { "i18next", "I18Next" },
-        { "i18next_v4", "I18Next V4" },
+        { "i18next_v4", "I18Next V4" }
     };
 }
