@@ -1,8 +1,11 @@
 ﻿using Apps.Lokalise.Constants;
+using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Invocables;
 using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.Models.Requests.Tasks;
+using Apps.Lokalise.Models.Requests.Tasks.Base;
+using Apps.Lokalise.Models.Responses.Keys;
 using Apps.Lokalise.Models.Responses.Tasks;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
@@ -42,26 +45,14 @@ public class TaskActions : LokaliseInvocable
 
     [Action("Create task", Description = "Create a new task")]
     public async Task<TaskResponse> CreateTask([ActionParameter] ProjectRequest project,
-        [ActionParameter] TaskCreateRequest parameters)
+        [ActionParameter] TaskCreateRequest parameters,
+        [ActionParameter] ListProjectKeysBaseRequest keysRequest)
     {
-        if (parameters.FilterKeys is null && parameters.Keys is null && parameters.ParentTaskId is null)
-            throw new("One of the inputs must be specified: Parent task ID or Keys or Filter keys");
-
         if (parameters.Users is null && parameters.Groups is null)
             throw new("One of the inputs must be specified: Users or Groups");
 
-        if (parameters.FilterKeys is not null && parameters.Keys is not null)
-            throw new("You should chose only one: either specify key IDs or use Filter keys");
-
-        if (parameters.FilterKeys is not null)
-        {
-            parameters.Keys = parameters.FilterKeys switch
-            {
-                LokaliseConstants.UntranslatedFilter => await GetUntranslatedKeys(project, parameters.Languages),
-                LokaliseConstants.UnverifiedFilter => await GetUnverifiedKeys(project, parameters.Languages),
-                _ => throw new InvalidOperationException("Wrong filter keys parameter")
-            };
-        }
+        parameters.Keys ??= await ListKeysForTask(project, keysRequest);
+        
         var endpoint = $"/projects/{project.ProjectId}/tasks";
 
         var payload = new TaskCreateWithMultLangsRequest(parameters);
@@ -116,34 +107,15 @@ public class TaskActions : LokaliseInvocable
 
     #region Utils
 
-    private async Task<IEnumerable<string>> GetUntranslatedKeys(ProjectRequest project, IEnumerable<string> langs)
+    private async Task<IEnumerable<string>> ListKeysForTask(ProjectRequest project, ListProjectKeysBaseRequest input)
     {
-        var keys = await new KeyActions(InvocationContext).ListProjectKeys(project, new()
-        {
-            IncludeTranslations = true,
-            FilterUntranslated = true
-        });
+        var baseEndpoint = $"/projects/{project.ProjectId}/keys";
+        var query = input.AsLokaliseDictionary().AllIsNotNull();
 
-        return keys.Keys.Where(x =>
-                x.Translations?.Any(y =>
-                    langs.Contains(y.LanguageIso) && string.IsNullOrWhiteSpace(y.Translation)) is true ||
-                (langs.Contains(x.SourceTranslation?.LanguageIso) &&
-                 string.IsNullOrWhiteSpace(x.SourceTranslation?.Translation)))
-            .Select(x => x.KeyId);
-    }
+        var endpointWithQuery = baseEndpoint.WithQuery(query);
+        var items = await Paginator.GetAll<KeysWrapper, KeyDto>(Creds, endpointWithQuery);
 
-    private async Task<IEnumerable<string>> GetUnverifiedKeys(ProjectRequest project, IEnumerable<string> langs)
-    {
-        var keys = await new KeyActions(InvocationContext).ListProjectKeys(project, new()
-        {
-            IncludeTranslations = true
-        });
-
-        return keys.Keys.Where(x =>
-                x.Translations?.Any(y =>
-                    langs.Contains(y.LanguageIso) && y.IsUnverified) is true ||
-                (langs.Contains(x.SourceTranslation?.LanguageIso) && x.SourceTranslation?.IsUnverified is true))
-            .Select(x => x.KeyId);
+        return items.Select(x => x.KeyId);
     }
 
     #endregion

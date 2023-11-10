@@ -18,9 +18,4 @@ public class TaskCreateRequest : BaseTaskCreateRequest
 
     [Display("Groups")]
     public IEnumerable<string>? Groups { get; set; }
-    
-    [JsonIgnore]
-    [Display("Filter keys")]
-    [DataSource(typeof(FilterKeysDataHandler))]
-    public string? FilterKeys { get; set; }
 }
