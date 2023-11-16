@@ -15,6 +15,6 @@ public class IndentationDataHandler : EnumDataHandler
         { "6sp", "6sp" },
         { "7sp", "7sp" },
         { "8sp", "8sp" },
-        { "tab", "Tab" },
+        { "tab", "Tab" }
     };
 }

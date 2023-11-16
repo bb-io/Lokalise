@@ -7,6 +7,6 @@ public class JavaPropertiesSeparatorDataHandler : EnumDataHandler
     protected override Dictionary<string, string> EnumValues => new()
     {
         { "=", "=" },
-        { ":", ":" },
+        { ":", ":" }
     };
 }

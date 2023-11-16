@@ -10,6 +10,6 @@ public class PlaceholderFormatDataHandler : EnumDataHandler
         { "ios", "IOS" },
         { "icu", "ICU" },
         { "net", "Net" },
-        { "symfony", "Symfony" },
+        { "symfony", "Symfony" }
     };
 }

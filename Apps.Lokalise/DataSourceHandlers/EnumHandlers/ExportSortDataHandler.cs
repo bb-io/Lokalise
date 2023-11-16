@@ -10,6 +10,6 @@ public class ExportSortDataHandler : EnumDataHandler
         { "last_added", "Last added" },
         { "last_updated", "Last updated" },
         { "a_z", "A-Z" },
-        { "z_a", "Z-A" },
+        { "z_a", "Z-A" }
     };
 }

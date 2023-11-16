@@ -2,7 +2,7 @@ using Apps.Lokalise.Webhooks.Models.EventResponse;
 using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 
-namespace Apps.Lokalise.Webhooks.Models.Payload;
+namespace Apps.Lokalise.Webhooks.Models.Payload.Base;
 
 public class BasePayload
 {
@@ -32,7 +32,7 @@ public class BasePayload
             ProjectId = Project.Id,
             ProjectName = Project.Name,
             UserEmail = User.Email,
-            UserName = User.Email,
+            UserName = User.Email
         };
     }
 }

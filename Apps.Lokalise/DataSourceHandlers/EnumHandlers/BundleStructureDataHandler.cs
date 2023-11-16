@@ -9,6 +9,6 @@ public class BundleStructureDataHandler : EnumDataHandler
         {"%LANG_ISO%", "Language ISO"},
         {"%LANG_NAME%", "Language name"},
         {"%FORMAT%", "Format"},
-        {"%PROJECT_NAME%", "Project name"},
+        {"%PROJECT_NAME%", "Project name"}
     };
 }

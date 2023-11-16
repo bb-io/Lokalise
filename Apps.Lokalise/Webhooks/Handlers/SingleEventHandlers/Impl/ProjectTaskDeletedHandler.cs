@@ -4,9 +4,9 @@ using Blackbird.Applications.Sdk.Common.Webhooks;
 
 namespace Apps.Lokalise.Webhooks.Handlers.SingleEventHandlers.Impl;
 
-public class ProjectTaskDeletedHandler : BaseWebhookHandler
+public class ProjectTaskDeletedHandler : TaskWebhookHandler
 {
     const string SubscriptionEvent = "project.task.deleted";
 
-    public ProjectTaskDeletedHandler([WebhookParameter] WebhookInput input) : base(SubscriptionEvent, input) { }
+    public ProjectTaskDeletedHandler([WebhookParameter] TaskWebhookInput input) : base(SubscriptionEvent, input) { }
 }

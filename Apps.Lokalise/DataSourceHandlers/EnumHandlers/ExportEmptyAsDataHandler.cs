@@ -9,6 +9,6 @@ public class ExportEmptyAsDataHandler : EnumDataHandler
         { "empty", "Empty" },
         { "base", "Base" },
         { "null", "Null" },
-        { "skip", "Skip" },
+        { "skip", "Skip" }
     };
 }

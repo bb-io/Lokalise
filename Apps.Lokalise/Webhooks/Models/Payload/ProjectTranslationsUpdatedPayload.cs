@@ -1,4 +1,5 @@
 using Apps.Lokalise.Webhooks.Models.EventResponse;
+using Apps.Lokalise.Webhooks.Models.Payload.Base;
 using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 
@@ -27,7 +28,7 @@ public class ProjectTranslationsUpdatedPayload : BasePayload
                 TranslationId = x.Id,
                 TranslationValue = x.Value,
                 PreviousTranslationValue = x.PreviousValue
-            }).ToList(),
+            }).ToList()
         };
     }
 }

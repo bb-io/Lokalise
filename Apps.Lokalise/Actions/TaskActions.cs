@@ -1,8 +1,11 @@
 ﻿using Apps.Lokalise.Constants;
+using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Invocables;
 using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.Models.Requests.Tasks;
+using Apps.Lokalise.Models.Requests.Tasks.Base;
+using Apps.Lokalise.Models.Responses.Keys;
 using Apps.Lokalise.Models.Responses.Tasks;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
@@ -41,15 +44,15 @@ public class TaskActions : LokaliseInvocable
     }
 
     [Action("Create task", Description = "Create a new task")]
-    public async Task<TaskResponse> CreateTaskWithMultLanguages([ActionParameter] ProjectRequest project,
-        [ActionParameter] TaskCreateRequest parameters)
+    public async Task<TaskResponse> CreateTask([ActionParameter] ProjectRequest project,
+        [ActionParameter] TaskCreateRequest parameters,
+        [ActionParameter] ListProjectKeysBaseRequest keysRequest)
     {
-        if (parameters.Keys is null && parameters.ParentTaskId is null)
-            throw new("One of the inputs must be specified: Parent task ID or Keys");
-
         if (parameters.Users is null && parameters.Groups is null)
             throw new("One of the inputs must be specified: Users or Groups");
 
+        parameters.Keys ??= await ListKeysForTask(project, keysRequest);
+        
         var endpoint = $"/projects/{project.ProjectId}/tasks";
 
         var payload = new TaskCreateWithMultLangsRequest(parameters);
@@ -98,6 +101,21 @@ public class TaskActions : LokaliseInvocable
         var request = new LokaliseRequest(endpoint, Method.Delete, Creds);
 
         return Client.ExecuteWithHandling<TaskDeleteResponse>(request);
+    }
+
+    #endregion
+
+    #region Utils
+
+    private async Task<IEnumerable<string>> ListKeysForTask(ProjectRequest project, ListProjectKeysBaseRequest input)
+    {
+        var baseEndpoint = $"/projects/{project.ProjectId}/keys";
+        var query = input.AsLokaliseDictionary().AllIsNotNull();
+
+        var endpointWithQuery = baseEndpoint.WithQuery(query);
+        var items = await Paginator.GetAll<KeysWrapper, KeyDto>(Creds, endpointWithQuery);
+
+        return items.Select(x => x.KeyId);
     }
 
     #endregion

@@ -1,4 +1,5 @@
 using Apps.Lokalise.Webhooks.Models.EventResponse;
+using Apps.Lokalise.Webhooks.Models.Payload.Base;
 using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 
@@ -36,7 +37,7 @@ public class ProjectExportedPayload : BasePayload
             UserName = User.Email,
             Filename = Export.Filename,
             Type = Export.Type,
-            Platform = Export.Platform,
+            Platform = Export.Platform
         };
     }
 }

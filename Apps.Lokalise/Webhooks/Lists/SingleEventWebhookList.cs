@@ -4,6 +4,7 @@ using Apps.Lokalise.Webhooks.Lists.Base;
 using Apps.Lokalise.Webhooks.Models.EventResponse;
 using Apps.Lokalise.Webhooks.Models.Input;
 using Apps.Lokalise.Webhooks.Models.Payload;
+using Apps.Lokalise.Webhooks.Models.Payload.Base;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Webhooks;
 using Newtonsoft.Json;
@@ -223,39 +224,6 @@ public class SingleEventWebhookList : WebhookList
     {
         return Task.FromResult(
             HandlePreflightAndMap<ContributerEvent, ProjectContributorDeletedPayload>(webhookRequest, input));
-    }
-
-    [Webhook("On project task created", typeof(ProjectTaskCreatedHandler),
-        Description = "Triggered when a new task is created in a project")]
-    public Task<WebhookResponse<TaskEvent>> ProjectTaskCreatedHandler(WebhookRequest webhookRequest,
-        [WebhookParameter(true)] WebhookInput input)
-    {
-        return Task.FromResult(HandlePreflightAndMap<TaskEvent, ProjectTaskCreatedPayload>(webhookRequest, input));
-    }
-
-    [Webhook("On project task closed", typeof(ProjectTaskClosedHandler),
-        Description = "Triggered when a project task is closed")]
-    public Task<WebhookResponse<TaskEvent>> ProjectTaskClosedHandler(WebhookRequest webhookRequest,
-        [WebhookParameter(true)] WebhookInput input)
-    {
-        return Task.FromResult(HandlePreflightAndMap<TaskEvent, ProjectTaskClosedPayload>(webhookRequest, input));
-    }
-
-    [Webhook("On project task deleted", typeof(ProjectTaskDeletedHandler),
-        Description = "Triggered when a project task is deleted")]
-    public Task<WebhookResponse<TaskEvent>> ProjectTaskDeletedHandler(WebhookRequest webhookRequest,
-        [WebhookParameter(true)] WebhookInput input)
-    {
-        return Task.FromResult(HandlePreflightAndMap<TaskEvent, ProjectTaskDeletedPayload>(webhookRequest, input));
-    }
-
-    [Webhook("On project task language closed", typeof(ProjectTaskLanguageClosedHandler),
-        Description = "Triggered when a specific language task closes")]
-    public Task<WebhookResponse<TaskLanguageEvent>> ProjectTaskLanguageClosedHandler(
-        WebhookRequest webhookRequest, [WebhookParameter(true)] WebhookInput input)
-    {
-        return Task.FromResult(
-            HandlePreflightAndMap<TaskLanguageEvent, ProjectTaskLanguageClosedPayload>(webhookRequest, input));
     }
 
     [Webhook("On team order created", typeof(TeamOrderCreatedHandler),

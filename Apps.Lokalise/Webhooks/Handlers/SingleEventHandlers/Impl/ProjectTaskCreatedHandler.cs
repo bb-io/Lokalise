@@ -4,9 +4,9 @@ using Blackbird.Applications.Sdk.Common.Webhooks;
 
 namespace Apps.Lokalise.Webhooks.Handlers.SingleEventHandlers.Impl;
 
-public class ProjectTaskCreatedHandler : BaseWebhookHandler
+public class ProjectTaskCreatedHandler : TaskWebhookHandler
 {
     const string SubscriptionEvent = "project.task.created";
 
-    public ProjectTaskCreatedHandler([WebhookParameter] WebhookInput input) : base(SubscriptionEvent, input) { }
+    public ProjectTaskCreatedHandler([WebhookParameter] TaskWebhookInput input) : base(SubscriptionEvent, input) { }
 }

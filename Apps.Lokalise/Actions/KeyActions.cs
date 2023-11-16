@@ -44,8 +44,8 @@ public class KeyActions : LokaliseInvocable
     public async Task<KeyDto> CreateKey([ActionParameter] ProjectRequest project,
         [ActionParameter] CreateKeyInput input)
     {
-        if (input.Platforms.Any(x => !ConstantValues.Platforms.Contains(x)))
-            throw new Exception($"Platforms can only contain {String.Join(", ", ConstantValues.Platforms)}");
+        if (input.Platforms.Any(x => !LokaliseConstants.Platforms.Contains(x)))
+            throw new Exception($"Platforms can only contain {String.Join(", ", LokaliseConstants.Platforms)}");
 
         var endpoint = $"/projects/{project.ProjectId}/keys";
         var request = new LokaliseRequest(endpoint, Method.Post, Creds)
