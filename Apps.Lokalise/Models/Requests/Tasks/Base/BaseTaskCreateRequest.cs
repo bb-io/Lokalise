@@ -1,4 +1,5 @@
-﻿using Apps.Lokalise.DataSourceHandlers.EnumHandlers;
+﻿using Apps.Lokalise.DataSourceHandlers;
+using Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Newtonsoft.Json;
@@ -20,7 +21,8 @@ public class BaseTaskCreateRequest
 
     [Display("Keys")] public IEnumerable<string>? Keys { get; set; }
 
-    [Display("Source language code")] public string? SourceLanguageIso { get; set; }
+    [DataSource(typeof(LanguageDataHandler))]
+    [Display("Source language")] public string? SourceLanguageIso { get; set; }
 
     [Display("Auto close languages")] public bool? AutoCloseLanguages { get; set; }
 
