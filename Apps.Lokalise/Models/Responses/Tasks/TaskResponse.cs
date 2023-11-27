@@ -1,4 +1,5 @@
-﻿using Blackbird.Applications.Sdk.Common;
+﻿using Apps.Lokalise.Utils.Converters;
+using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Responses.Tasks;
@@ -47,7 +48,7 @@ public class TaskResponse
 
     [JsonProperty("due_date")]
     [Display("Due date")]
-    public string DueDate { get; set; }
+    public DateTime? DueDate { get; set; }
 
     [JsonProperty("due_date_timestamp")]
     [Display("Due date timestamp")]
@@ -63,7 +64,7 @@ public class TaskResponse
 
     [JsonProperty("created_at")]
     [Display("Created at")]
-    public string CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     [JsonProperty("created_at_timestamp")]
     [Display("Created at timestamp")]
@@ -103,7 +104,7 @@ public class TaskResponse
 
     [JsonProperty("completed_at")]
     [Display("Completed at")]
-    public string CompletedAt { get; set; }
+    public DateTime? CompletedAt { get; set; }
 
     [JsonProperty("completed_at_timestamp")]
     [Display("Completed at timestamp")]

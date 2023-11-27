@@ -1,4 +1,5 @@
-﻿using Apps.Lokalise.Dtos;
+﻿using Apps.Lokalise.Constants;
+using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Models.Responses.Errors;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Newtonsoft.Json;
@@ -21,7 +22,7 @@ public class LokaliseClient : RestClient
     public async Task<T> ExecuteWithHandling<T>(RestRequest request)
     {
         var response = await ExecuteWithHandling(request);
-        return JsonConvert.DeserializeObject<T>(response.Content);
+        return JsonConvert.DeserializeObject<T>(response.Content, JsonConfig.Settings);
     }
 
     public async Task<RestResponse> ExecuteWithHandling(RestRequest request)
