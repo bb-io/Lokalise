@@ -1,9 +1,7 @@
 ﻿using Apps.Lokalise.DataSourceHandlers;
-using Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 using Apps.Lokalise.Models.Requests.Tasks.Base;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
-using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Requests.Tasks;
 
