@@ -48,7 +48,8 @@ public class TaskResponse
 
     [JsonProperty("due_date")]
     [Display("Due date")]
-    public DateTime? DueDate { get; set; }
+    [JsonConverter(typeof(LokaliseDateTimeConverter))]
+    public DateTime DueDate { get; set; }
 
     [JsonProperty("due_date_timestamp")]
     [Display("Due date timestamp")]
@@ -104,7 +105,8 @@ public class TaskResponse
 
     [JsonProperty("completed_at")]
     [Display("Completed at")]
-    public DateTime? CompletedAt { get; set; }
+    [JsonConverter(typeof(LokaliseDateTimeConverter))]
+    public DateTime CompletedAt { get; set; }
 
     [JsonProperty("completed_at_timestamp")]
     [Display("Completed at timestamp")]
