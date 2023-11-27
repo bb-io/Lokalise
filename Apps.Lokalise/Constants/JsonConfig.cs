@@ -9,8 +9,10 @@ public static class JsonConfig
     {
         ContractResolver = new DefaultContractResolver()
         {
-            NamingStrategy = new SnakeCaseNamingStrategy()
+            NamingStrategy = new SnakeCaseNamingStrategy(),
         },
+        DateFormatString = "yyyy-MM-dd HH:mm:ss '(Etc/UTC)'",
+        DateTimeZoneHandling = DateTimeZoneHandling.Utc,
         DefaultValueHandling = DefaultValueHandling.Ignore
     };
 }
