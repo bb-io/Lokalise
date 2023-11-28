@@ -17,7 +17,7 @@ public class BaseTaskCreateRequest
     
     [Display("Description")] public string? Description { get; set; }
 
-    [Display("Due Date")] public string? DueDate { get; set; }
+    [Display("Due Date")] public DateTime? DueDate { get; set; }
 
     [Display("Keys")] public IEnumerable<string>? Keys { get; set; }
 

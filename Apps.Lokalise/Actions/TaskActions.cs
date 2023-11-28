@@ -57,7 +57,7 @@ public class TaskActions : LokaliseInvocable
 
         var payload = new TaskCreateWithMultLangsRequest(parameters);
         var request = new LokaliseRequest(endpoint, Method.Post, Creds)
-            .WithJsonBody(payload, JsonConfig.Settings);
+            .WithJsonBody(payload, JsonConfig.SerializeSettings);
 
         var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
         response.Task.FillLanguageCodesArray();
