@@ -22,7 +22,7 @@ public class LokaliseClient : RestClient
     public async Task<T> ExecuteWithHandling<T>(RestRequest request)
     {
         var response = await ExecuteWithHandling(request);
-        return JsonConvert.DeserializeObject<T>(response.Content, JsonConfig.Settings);
+        return JsonConvert.DeserializeObject<T>(response.Content, JsonConfig.DeserializeSettings);
     }
 
     public async Task<RestResponse> ExecuteWithHandling(RestRequest request)

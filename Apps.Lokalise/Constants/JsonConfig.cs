@@ -5,7 +5,17 @@ namespace Apps.Lokalise.Constants;
 
 public static class JsonConfig
 {
-    public static readonly JsonSerializerSettings Settings = new()
+    public static readonly JsonSerializerSettings SerializeSettings = new()
+    {
+        ContractResolver = new DefaultContractResolver()
+        {
+            NamingStrategy = new SnakeCaseNamingStrategy(),
+        },
+        DateFormatString = "yyyy-MM-dd HH:mm:ss",
+        DefaultValueHandling = DefaultValueHandling.Ignore
+    };   
+    
+    public static readonly JsonSerializerSettings DeserializeSettings = new()
     {
         ContractResolver = new DefaultContractResolver()
         {
