@@ -1,5 +1,7 @@
-﻿using Apps.Lokalise.Models.Requests.Tasks.Base;
+﻿using System.Web;
+using Apps.Lokalise.Models.Requests.Tasks.Base;
 using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Requests.Tasks;
 
@@ -11,7 +13,7 @@ public class TaskCreateWithMultLangsRequest : BaseTaskCreateRequest
     {
     }
 
-    public TaskCreateWithMultLangsRequest(TaskCreateRequest input)
+    public TaskCreateWithMultLangsRequest(TaskCreateRequest input, TaskAssigneesRequest assigneesRequest)
     {
         Title = input.Title;
         Description = input.Description;
@@ -20,9 +22,28 @@ public class TaskCreateWithMultLangsRequest : BaseTaskCreateRequest
         Languages = input.Languages.Select(x => new TaskLanguage()
         {
             LanguageIso = x,
-            Users = input.Users,
-            Groups = input.Groups
+            Users = assigneesRequest.Users,
+            Groups = assigneesRequest.Groups
         });
+        SourceLanguageIso = input.SourceLanguageIso;
+        AutoCloseLanguages = input.AutoCloseLanguages;
+        AutoCloseTask = input.AutoCloseTask;
+        AutoCloseItems = input.AutoCloseItems;
+        LokaliseTaskType = input.LokaliseTaskType;
+        ParentTaskId = input.ParentTaskId;
+        ClosingTags = input.ClosingTags;
+        DoLockTranslations = input.DoLockTranslations;
+        CustomTranslationStatusIds = input.CustomTranslationStatusIds;
+    }
+
+    public TaskCreateWithMultLangsRequest(TaskFromBuiltLangsRequest input)
+    {
+        Title = input.Title;
+        Description = input.Description;
+        DueDate = input.DueDate;
+        Keys = input.Keys;
+        Languages = input.Languages.Select(x =>
+            JsonConvert.DeserializeObject<TaskLanguage>(HttpUtility.HtmlDecode(x))!);
         SourceLanguageIso = input.SourceLanguageIso;
         AutoCloseLanguages = input.AutoCloseLanguages;
         AutoCloseTask = input.AutoCloseTask;

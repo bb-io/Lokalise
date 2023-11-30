@@ -10,10 +10,4 @@ public class TaskCreateRequest : BaseTaskCreateRequest
     [Display("Languages")]
     [DataSource(typeof(LanguageDataHandler))]
     public IEnumerable<string> Languages { get; set; }
-
-    [Display("Users")]
-    public IEnumerable<string>? Users { get; set; }
-
-    [Display("Groups")]
-    public IEnumerable<string>? Groups { get; set; }
 }
