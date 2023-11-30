@@ -46,13 +46,33 @@ public class TaskActions : LokaliseInvocable
     [Action("Create task", Description = "Create a new task")]
     public async Task<TaskResponse> CreateTask([ActionParameter] ProjectRequest project,
         [ActionParameter] TaskCreateRequest parameters,
+        [ActionParameter] TaskAssigneesRequest assigneesRequest,
         [ActionParameter] ListProjectKeysBaseRequest keysRequest)
     {
-        if (parameters.Users is null && parameters.Groups is null)
+        if (assigneesRequest.Users is null && assigneesRequest.Groups is null)
             throw new("One of the inputs must be specified: Users or Groups");
 
         parameters.Keys ??= await ListKeysForTask(project, keysRequest);
-        
+
+        var endpoint = $"/projects/{project.ProjectId}/tasks";
+
+        var payload = new TaskCreateWithMultLangsRequest(parameters, assigneesRequest);
+        var request = new LokaliseRequest(endpoint, Method.Post, Creds)
+            .WithJsonBody(payload, JsonConfig.SerializeSettings);
+
+        var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
+        response.Task.FillLanguageCodesArray();
+
+        return response.Task;
+    }
+
+    [Action("Create task from the built languages", Description = "Create a new task from the built languages")]
+    public async Task<TaskResponse> CreateTaskFromBuiltLangs([ActionParameter] ProjectRequest project,
+        [ActionParameter] TaskFromBuiltLangsRequest parameters,
+        [ActionParameter] ListProjectKeysBaseRequest keysRequest)
+    {
+        parameters.Keys ??= await ListKeysForTask(project, keysRequest);
+
         var endpoint = $"/projects/{project.ProjectId}/tasks";
 
         var payload = new TaskCreateWithMultLangsRequest(parameters);
