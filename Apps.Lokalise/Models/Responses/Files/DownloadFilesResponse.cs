@@ -2,7 +2,4 @@
 
 namespace Apps.Lokalise.Models.Responses.Files;
 
-public class DownloadProjectFilesAsZipResponse
-{
-    public FileReference File { get; set; }
-}
+public record DownloadFilesResponse(IEnumerable<FileReference> Files);

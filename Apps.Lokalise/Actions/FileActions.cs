@@ -11,6 +11,7 @@ using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common.Invocation;
+using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 
@@ -19,8 +20,12 @@ namespace Apps.Lokalise.Actions;
 [ActionList]
 public class FileActions : LokaliseInvocable
 {
-    public FileActions(InvocationContext invocationContext) : base(invocationContext)
+    private readonly IFileManagementClient _fileManagementClient; 
+    
+    public FileActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) 
+        : base(invocationContext)
     {
+        _fileManagementClient = fileManagementClient;
     }
 
     #region Actions
@@ -41,8 +46,9 @@ public class FileActions : LokaliseInvocable
         [ActionParameter] UploadFileInput input)
     {
         var endpoint = $"/projects/{project.ProjectId}/files/upload";
-
-        var request = new LokaliseRequest(endpoint, Method.Post, Creds).WithJsonBody(new UploadFileRequest(input));
+        var request =
+            new LokaliseRequest(endpoint, Method.Post, Creds).WithJsonBody(
+                new UploadFileRequest(input, _fileManagementClient));
         var uploadResult = await Client.ExecuteWithHandling<QueuedProcessDto>(request);
 
         return await Client
@@ -66,28 +72,30 @@ public class FileActions : LokaliseInvocable
         await using var zipStream = new MemoryStream();
         var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, false);
 
-        var files = await zipResponse.RawBytes!.GetFilesFromZip();
+        var files = await zipResponse.RawBytes!.GetFilesFromZip(_fileManagementClient);
 
         var createZipTasks = files
             .Where(x => input.FilterLangs is null ||
                         input.FilterLangs.Any(y => x.Path.StartsWith(y) || x.File.Name.StartsWith($"{y}.")))
-            .Select(x => zipArchive.AddFileToZip(x.Path, x.File.Bytes));
+            .Select(async x =>
+            {
+                var file = await _fileManagementClient.DownloadAsync(x.File);
+                var fileBytes = await file.GetByteData();
+                zipArchive.AddFileToZip(x.Path, fileBytes);
+            });
 
         await Task.WhenAll(createZipTasks);
         zipArchive.Dispose();
 
-        return new()
-        {
-            File = new(zipStream.ToArray())
-            {
-                Name = fileUri.Segments.Last(),
-                ContentType = zipResponse.ContentType ?? MediaTypeNames.Application.Octet
-            }
-        };
+        var zipFileReference = await _fileManagementClient.UploadAsync(zipStream,
+            contentType: zipResponse.ContentType ?? MediaTypeNames.Application.Octet,
+            fileName: fileUri.Segments.Last());
+
+        return new() { File = zipFileReference };
     }
 
     [Action("Download project source files", Description = "Download all project source files")]
-    public async Task<DownloadSourceFilesResponse> DownloadProjectSourceFiles(
+    public async Task<DownloadFilesResponse> DownloadProjectSourceFiles(
         [ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadSourceFilesRequest input)
     {
@@ -97,10 +105,13 @@ public class FileActions : LokaliseInvocable
             Format = input.Format
         });
 
-        var files = await archive.File.Bytes.GetFilesFromZip();
+        var archiveStream = await _fileManagementClient.DownloadAsync(archive.File);
+        var archiveBytes = await archiveStream.GetByteData();
+        
+        var files = await archiveBytes.GetFilesFromZip(_fileManagementClient);
 
         var sourceFiles = files
-            .Where(x => x.Path.StartsWith(projectData.BaseLanguageIso) && x.File.Bytes.Any())
+            .Where(x => x.Path.StartsWith(projectData.BaseLanguageIso))
             .Select(x => x.File)
             .ToArray();
 
@@ -113,10 +124,12 @@ public class FileActions : LokaliseInvocable
         [ActionParameter] DownloadTranslatedFileRequest input)
     {
         var allFiles = await DownloadProjectFilesAsZip(project, input);
+        var allFilesStream = await _fileManagementClient.DownloadAsync(allFiles.File);
+        var allFilesBytes = await allFilesStream.GetByteData();
 
-        var fileData = await allFiles.File.Bytes.GetFileFromZip(en =>
-            en.FullName.Split('/').First() == input.LanguageCode.Replace("-", "_") &&
-            en.Name == input.FileName);
+        var fileData = await allFilesBytes.GetFileFromZip(
+            en => en.FullName.Split('/').First() == input.LanguageCode.Replace("-", "_") && en.Name == input.FileName,
+            _fileManagementClient);
 
         return new()
         {
@@ -134,9 +147,11 @@ public class FileActions : LokaliseInvocable
             AllPlatforms = input.AllPlatforms ?? true,
             FilterTaskId = input.FilterTaskId
         });
+        var allFilesStream = await _fileManagementClient.DownloadAsync(allFiles.File);
+        var allFilesBytes = await allFilesStream.GetByteData();
 
-        var fileData = await allFiles.File.Bytes
-            .GetFileFromZip(en => en.Name == $"{input.LanguageCode.Replace("_", "-")}.xliff");
+        var fileData = await allFilesBytes
+            .GetFileFromZip(en => en.Name == $"{input.LanguageCode.Replace("_", "-")}.xliff", _fileManagementClient);
 
         return new()
         {
@@ -145,7 +160,7 @@ public class FileActions : LokaliseInvocable
     }
 
     [Action("Download XLIFF files from task", Description = "Download XLIFF files from task")]
-    public async Task<DownloadXLIFFAllResponse> DownloadXLIFFFromTask([ActionParameter] ProjectRequest project,
+    public async Task<DownloadFilesResponse> DownloadXLIFFFromTask([ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadTaskXLIFFFileRequest input)
     {
         var allFiles = await DownloadProjectFilesAsZip(project, new(input)
@@ -154,17 +169,14 @@ public class FileActions : LokaliseInvocable
             AllPlatforms = input.AllPlatforms ?? true,
             FilterTaskId = input.FilterTaskId
         });
-
-        var files = await allFiles.File.Bytes.GetFilesFromZip();
-
-        return new()
-        {
-            Files = files.Where(f => f.File.Bytes.Length > 0).Select(f => f.File).ToList()
-        };
+        var allFilesStream = await _fileManagementClient.DownloadAsync(allFiles.File);
+        var allFilesBytes = await allFilesStream.GetByteData();
+        var files = await allFilesBytes.GetFilesFromZip(_fileManagementClient);
+        return new(files.Select(f => f.File));
     }
 
     [Action("Download all XLIFF files from project", Description = "Download all XLIFF files from project")]
-    public async Task<DownloadXLIFFAllResponse> DownloadXLIFFAll([ActionParameter] ProjectRequest project,
+    public async Task<DownloadFilesResponse> DownloadXLIFFAll([ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadAllXLIFFFilesRequest input)
     {
         var allFiles = await DownloadProjectFilesAsZip(project, new(input)
@@ -172,13 +184,10 @@ public class FileActions : LokaliseInvocable
             Format = "offline_xliff",
             AllPlatforms = input.AllPlatforms ?? true
         });
-
-        var files = await allFiles.File.Bytes.GetFilesFromZip();
-
-        return new()
-        {
-            Files = files.Where(f => f.File.Bytes.Length > 0).Select(f => f.File).ToList()
-        };
+        var allFilesStream = await _fileManagementClient.DownloadAsync(allFiles.File);
+        var allFilesBytes = await allFilesStream.GetByteData();
+        var files = await allFilesBytes.GetFilesFromZip(_fileManagementClient);
+        return new(files.Select(f => f.File));
     }
 
     [Action("Delete file", Description = "Delete file from project")]
