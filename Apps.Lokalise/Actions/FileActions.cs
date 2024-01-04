@@ -65,29 +65,31 @@ public class FileActions : LokaliseInvocable
             .WithJsonBody(input);
 
         var exportResult = await Client.ExecuteWithHandling<ExportFilesDto>(request);
-
         var fileUri = new Uri(exportResult.BundleUrl);
         var zipResponse = await Client.ExecuteWithHandling(new(fileUri));
 
         await using var zipStream = new MemoryStream();
-        var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, false);
+        using var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, false);
 
         var files = await zipResponse.RawBytes!.GetFilesFromZip(_fileManagementClient);
+        var filteredFiles = files
+            .Where(file => input.FilterLangs is null || input.FilterLangs.Any(lang =>
+                file.Path.StartsWith(lang) || file.File.Name.StartsWith($"{lang}.")));
 
-        var createZipTasks = files
-            .Where(x => input.FilterLangs is null ||
-                        input.FilterLangs.Any(y => x.Path.StartsWith(y) || x.File.Name.StartsWith($"{y}.")))
-            .Select(async x =>
-            {
-                var file = await _fileManagementClient.DownloadAsync(x.File);
-                var fileBytes = await file.GetByteData();
-                zipArchive.AddFileToZip(x.Path, fileBytes);
-            });
+        foreach (var file in filteredFiles)
+        {
+            await using var fileStream = await _fileManagementClient.DownloadAsync(file.File);
+            var fileBytes = await fileStream.GetByteData();
+            await zipArchive.AddFileToZip(file.Path, fileBytes);
+        }
 
-        await Task.WhenAll(createZipTasks);
-        zipArchive.Dispose();
+        zipStream.Position = 0;
 
-        var zipFileReference = await _fileManagementClient.UploadAsync(zipStream,
+        await using var copiedZipStream = new MemoryStream();
+        await zipStream.CopyToAsync(copiedZipStream);
+        copiedZipStream.Position = 0;
+
+        var zipFileReference = await _fileManagementClient.UploadAsync(copiedZipStream,
             contentType: zipResponse.ContentType ?? MediaTypeNames.Application.Octet,
             fileName: fileUri.Segments.Last());
 
