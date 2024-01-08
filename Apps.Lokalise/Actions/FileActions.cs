@@ -65,27 +65,27 @@ public class FileActions : LokaliseInvocable
             .WithJsonBody(input);
 
         var exportResult = await Client.ExecuteWithHandling<ExportFilesDto>(request);
-
         var fileUri = new Uri(exportResult.BundleUrl);
         var zipResponse = await Client.ExecuteWithHandling(new(fileUri));
 
         await using var zipStream = new MemoryStream();
-        var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, false);
+        var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, true);
 
         var files = await zipResponse.RawBytes!.GetFilesFromZip(_fileManagementClient);
+        var filteredFiles = files
+            .Where(file => input.FilterLangs is null || input.FilterLangs.Any(lang =>
+                file.Path.StartsWith(lang) || file.File.Name.StartsWith($"{lang}.")));
 
-        var createZipTasks = files
-            .Where(x => input.FilterLangs is null ||
-                        input.FilterLangs.Any(y => x.Path.StartsWith(y) || x.File.Name.StartsWith($"{y}.")))
-            .Select(async x =>
-            {
-                var file = await _fileManagementClient.DownloadAsync(x.File);
-                var fileBytes = await file.GetByteData();
-                zipArchive.AddFileToZip(x.Path, fileBytes);
-            });
-
-        await Task.WhenAll(createZipTasks);
+        foreach (var file in filteredFiles)
+        {
+            await using var fileStream = await _fileManagementClient.DownloadAsync(file.File);
+            var fileBytes = await fileStream.GetByteData();
+            await zipArchive.AddFileToZip(file.Path, fileBytes);
+        }
+        
         zipArchive.Dispose();
+        
+        zipStream.Position = 0;
 
         var zipFileReference = await _fileManagementClient.UploadAsync(zipStream,
             contentType: zipResponse.ContentType ?? MediaTypeNames.Application.Octet,
@@ -111,8 +111,8 @@ public class FileActions : LokaliseInvocable
         var files = await archiveBytes.GetFilesFromZip(_fileManagementClient);
 
         var sourceFiles = files
-            .Where(x => x.Path.StartsWith(projectData.BaseLanguageIso))
-            .Select(x => x.File)
+            .Where(file => file.File.Size > 0 && file.Path.StartsWith(projectData.BaseLanguageIso))
+            .Select(file => file.File)
             .ToArray();
 
         return new(sourceFiles);
@@ -172,7 +172,7 @@ public class FileActions : LokaliseInvocable
         var allFilesStream = await _fileManagementClient.DownloadAsync(allFiles.File);
         var allFilesBytes = await allFilesStream.GetByteData();
         var files = await allFilesBytes.GetFilesFromZip(_fileManagementClient);
-        return new(files.Select(f => f.File));
+        return new(files.Where(file => file.File.Size > 0).Select(file => file.File));
     }
 
     [Action("Download all XLIFF files from project", Description = "Download all XLIFF files from project")]
@@ -187,7 +187,7 @@ public class FileActions : LokaliseInvocable
         var allFilesStream = await _fileManagementClient.DownloadAsync(allFiles.File);
         var allFilesBytes = await allFilesStream.GetByteData();
         var files = await allFilesBytes.GetFilesFromZip(_fileManagementClient);
-        return new(files.Select(f => f.File));
+        return new(files.Where(file => file.File.Size > 0).Select(file => file.File));
     }
 
     [Action("Delete file", Description = "Delete file from project")]
