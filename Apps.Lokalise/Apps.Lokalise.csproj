@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Product>Lokalise</Product>
@@ -9,7 +9,9 @@
     <AssemblyName>Apps.Lokalise</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Blackbird.Applications.Sdk.Utils" Version="1.0.13" />
+    <PackageReference Include="Blackbird.Applications.Sdk.Common" Version="2.3.2-alpha1" />
+    <PackageReference Include="Blackbird.Applications.SDK.Extensions.FileManagement" Version="1.0.1" />
+    <PackageReference Include="Blackbird.Applications.Sdk.Utils" Version="1.0.19" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource CopyToOutputDirectory="Always" Include="image\icon.png" />
