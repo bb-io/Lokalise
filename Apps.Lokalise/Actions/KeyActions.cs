@@ -40,6 +40,28 @@ public class KeyActions : LokaliseInvocable
         return new(items);
     }
 
+    [Action("List key IDs", Description = "List key IDs based on the provided filters")]
+    public async Task<ListProjectKeyIdsResponse> ListKeyIds([ActionParameter] ProjectRequest project,
+        [ActionParameter] ListProjectKeysRequest input,
+        [ActionParameter] ListProjectKeysFilters filters)
+    {
+        var keys = await ListProjectKeys(project, input);
+
+        var keyIds = keys.Keys
+            .Where(x => filters.Unreviewed is null ||
+                        x.Translations?.Any(x => x.IsReviewed == filters.Unreviewed) is true)
+            .Where(x => filters.Unverified is null ||
+                        x.Translations?.Any(x => x.IsUnverified == filters.Unverified) is true)
+            .Where(x => filters.TagsToSkip is null || x.Tags.All(x => !filters.TagsToSkip.Contains(x)))
+            .Select(x => x.KeyId)
+            .ToArray();
+
+        return new()
+        {
+            KeyIds = keyIds
+        };
+    }
+
     [Action("Create key", Description = "Create key in project")]
     public async Task<KeyDto> CreateKey([ActionParameter] ProjectRequest project,
         [ActionParameter] CreateKeyInput input)
