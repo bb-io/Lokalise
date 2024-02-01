@@ -8,6 +8,6 @@ public class ListProjectKeysFilters
     
     public bool? Unreviewed { get; set; }
     
-    [Display("Tags to skip")]
+    [Display("Exclude tags")]
     public IEnumerable<string>? TagsToSkip { get; set; }
 }
