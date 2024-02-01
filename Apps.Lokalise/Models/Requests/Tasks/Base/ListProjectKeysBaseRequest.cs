@@ -26,7 +26,7 @@ public class ListProjectKeysBaseRequest
     public string? FilterTranslationLangIds { get; set; }
         
     [JsonProperty("filter_tags")]
-    [Display("Filter tags")]
+    [Display("Include tags")]
     public string? FilterTags { get; set; }
         
     [JsonProperty("filter_filenames")]
