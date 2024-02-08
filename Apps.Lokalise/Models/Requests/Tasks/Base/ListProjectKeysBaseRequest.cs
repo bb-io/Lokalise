@@ -36,4 +36,18 @@ public class ListProjectKeysBaseRequest
     [JsonProperty("filter_keys")]
     [Display("Filter keys")]
     public string? FilterKeys { get; set; }
+    
+    public ListProjectKeysBaseRequest(){}
+
+    public ListProjectKeysBaseRequest(ListProjectKeysBaseRequest request)
+    {
+        FilterPlatforms = request.FilterPlatforms;
+        FilterUntranslated = request.FilterUntranslated;
+        FilterQaIssues = request.FilterQaIssues;
+        FilterArchived = request.FilterArchived;
+        FilterTranslationLangIds = request.FilterTranslationLangIds;
+        FilterTags = request.FilterTags;
+        FilterFilenames = request.FilterFilenames;
+        FilterKeys = request.FilterKeys;
+    }
 }

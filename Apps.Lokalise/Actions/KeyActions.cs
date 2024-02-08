@@ -4,6 +4,7 @@ using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Invocables;
 using Apps.Lokalise.Models.Requests.Keys;
 using Apps.Lokalise.Models.Requests.Projects;
+using Apps.Lokalise.Models.Requests.Tasks.Base;
 using Apps.Lokalise.Models.Responses.Keys;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
@@ -42,10 +43,13 @@ public class KeyActions : LokaliseInvocable
 
     [Action("List key IDs", Description = "List key IDs based on the provided filters")]
     public async Task<ListProjectKeyIdsResponse> ListKeyIds([ActionParameter] ProjectRequest project,
-        [ActionParameter] ListProjectKeysRequest input,
+        [ActionParameter] ListProjectKeysBaseRequest input,
         [ActionParameter] ListProjectKeysFilters filters)
     {
-        var keys = await ListProjectKeys(project, input);
+        var keys = await ListProjectKeys(project, new ListProjectKeysRequest(input)
+        {
+            IncludeTranslations = true
+        });
 
         var keyIds = keys.Keys
             .Where(x => filters.Unreviewed is null ||
@@ -53,6 +57,9 @@ public class KeyActions : LokaliseInvocable
             .Where(x => filters.Unverified is null ||
                         x.Translations?.Any(x => x.IsUnverified == filters.Unverified) is true)
             .Where(x => filters.TagsToSkip is null || x.Tags.All(x => !filters.TagsToSkip.Contains(x)))
+            .Where(x => filters.UntranslatedLanguage is null ||
+                        string.IsNullOrWhiteSpace(x.Translations
+                            .First(x => x.LanguageIso == filters.UntranslatedLanguage).Translation))
             .Select(x => x.KeyId)
             .ToArray();
 

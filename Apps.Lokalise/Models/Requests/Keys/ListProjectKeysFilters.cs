@@ -1,4 +1,6 @@
+using Apps.Lokalise.DataSourceHandlers;
 using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.Lokalise.Models.Requests.Keys;
 
@@ -10,4 +12,8 @@ public class ListProjectKeysFilters
     
     [Display("Exclude tags")]
     public IEnumerable<string>? TagsToSkip { get; set; }
+    
+    [Display("Untranslated language")]
+    [DataSource(typeof(LanguageDataHandler))]
+    public string? UntranslatedLanguage { get; set; }
 }
