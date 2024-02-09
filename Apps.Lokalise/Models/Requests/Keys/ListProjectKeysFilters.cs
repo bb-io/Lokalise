@@ -16,4 +16,12 @@ public class ListProjectKeysFilters
     [Display("Untranslated language")]
     [DataSource(typeof(LanguageDataHandler))]
     public string? UntranslatedLanguage { get; set; }
+    
+    [Display("Unreviewed language")]
+    [DataSource(typeof(LanguageDataHandler))]
+    public string? UnreviewedLanguage { get; set; }
+    
+    [Display("Unverified language")]
+    [DataSource(typeof(LanguageDataHandler))]
+    public string? UnverifiedLanguage { get; set; }
 }
