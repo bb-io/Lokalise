@@ -53,9 +53,16 @@ public class KeyActions : LokaliseInvocable
 
         var keyIds = keys.Keys
             .Where(x => filters.Unreviewed is null ||
-                        x.Translations?.Any(x => x.IsReviewed == filters.Unreviewed) is true)
+                        x.Translations?.Any(x =>
+                            x.IsReviewed == filters.Unreviewed && (filters.UnreviewedLanguage is null ||
+                                                                   x.LanguageIso ==
+                                                                   filters.UnreviewedLanguage)) is true)
             .Where(x => filters.Unverified is null ||
-                        x.Translations?.Any(x => x.IsUnverified == filters.Unverified) is true)
+                        x.Translations?.Any(x =>
+                                x.IsUnverified == filters.Unverified && (filters.UnverifiedLanguage is null ||
+                                                                         x.LanguageIso == filters.UnverifiedLanguage))
+                            is
+                            true)
             .Where(x => filters.TagsToSkip is null || x.Tags.All(x => !filters.TagsToSkip.Contains(x)))
             .Where(x => filters.UntranslatedLanguage is null ||
                         string.IsNullOrWhiteSpace(x.Translations
