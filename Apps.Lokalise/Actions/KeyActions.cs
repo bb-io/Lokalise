@@ -41,7 +41,7 @@ public class KeyActions : LokaliseInvocable
         var endpointWithQuery = baseEndpoint.WithQuery(query);
 
         var items = await Paginator.GetAll<KeysWrapper, KeyDto>(Creds, endpointWithQuery);
-        
+
         items = items
             .Where(x => filters.Unreviewed is null ||
                         x.Translations?.Any(x =>
@@ -60,7 +60,7 @@ public class KeyActions : LokaliseInvocable
                             .First(x => x.LanguageIso == filters.UntranslatedLanguage).Translation))
             .ToList();
 
-        return new(items, project.ProjectId);
+        return new ListProjectKeysResponse { Keys = items, ProjectId = project.ProjectId };
     }
 
     [Action("Create key", Description = "Create key in project")]
@@ -94,11 +94,12 @@ public class KeyActions : LokaliseInvocable
 
     [Action("Get translation for key", Description = "Get translations for key by ID")]
     public async Task<TranslationResponse> GetKeyTranslations([ActionParameter] RetrieveKeyRequest input,
-        [ActionParameter, Display("Language"), DataSource(typeof(LanguageDataHandler))] string languageIso)
+        [ActionParameter, Display("Language"), DataSource(typeof(LanguageDataHandler))]
+        string languageIso)
     {
         var keys = await RetrieveKey(input);
         var translation = keys.Translations.FirstOrDefault(x => x.LanguageIso == languageIso);
-        
+
         if (translation is null)
         {
             throw new("Translation not found");
