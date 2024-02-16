@@ -15,10 +15,10 @@ namespace Apps.Lokalise.Webhooks.Lists;
 [WebhookList]
 public class SingleEventWebhookList : WebhookList
 {
-    
     public SingleEventWebhookList(InvocationContext invocationContext) : base(invocationContext)
     {
     }
+
     private WebhookResponse<T1> HandlePreflightAndMap<T1, T2>(WebhookRequest webhookRequest, WebhookInput input)
         where T2 : BasePayload where T1 : BaseEvent
     {
@@ -175,10 +175,20 @@ public class SingleEventWebhookList : WebhookList
     [Webhook("On project key comment added", typeof(ProjectKeyCommentAddedHandler),
         Description = "Triggers when a new comment is added to a key")]
     public Task<WebhookResponse<KeyCommentEvent>> ProjectKeyCommentAddedHandler(WebhookRequest webhookRequest,
-        [WebhookParameter(true)] WebhookInput input)
+        [WebhookParameter(true)] CommentAddedWebhookInput input)
     {
-        return Task.FromResult(
-            HandlePreflightAndMap<KeyCommentEvent, ProjectKeyCommentAddedPayload>(webhookRequest, input));
+        var preflightResponse =
+            HandlePreflightAndMap<KeyCommentEvent, ProjectKeyCommentAddedPayload>(webhookRequest, input);
+
+        if (preflightResponse.ReceivedWebhookRequestType != WebhookRequestType.Preflight)
+        {
+            if (input.KeyId != null && preflightResponse.Result.Id != input.KeyId)
+            {
+                preflightResponse.ReceivedWebhookRequestType = WebhookRequestType.Preflight;
+            }
+        }
+        
+        return Task.FromResult(preflightResponse);
     }
 
     [Webhook("On project translation updated", typeof(ProjectTranslationUpdatedHandler),
