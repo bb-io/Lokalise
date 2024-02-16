@@ -6,7 +6,7 @@ namespace Apps.Lokalise.Webhooks.Handlers.SingleEventHandlers.Impl;
 
 public class ProjectKeysDeletedHandler : BaseWebhookHandler
 {
-    const string SubscriptionEvent = "project.key.deleted";
+    const string SubscriptionEvent = "project.keys.deleted";
 
     public ProjectKeysDeletedHandler([WebhookParameter] WebhookInput input) : base(SubscriptionEvent, input) { }
 }

@@ -143,6 +143,7 @@ public class SingleEventWebhookList : WebhookList
     public Task<WebhookResponse<KeyEvent>> ProjectKeyAddedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input)
     {
+        throw new Exception("Exception for logging purposes.");
         return Task.FromResult(HandlePreflightAndMap<KeyEvent, ProjectKeyAddedPayload>(webhookRequest, input));
     }
 
