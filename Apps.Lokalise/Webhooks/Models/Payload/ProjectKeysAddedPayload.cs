@@ -17,7 +17,7 @@ public class ProjectKeysAddedPayload : BasePayload
             ProjectId = Project.Id,
             ProjectName = Project.Name,
             UserEmail = User.Email,
-            UserName = User.Email,
+            UserName = User.FullName,
             Keys = Keys
         };
     }

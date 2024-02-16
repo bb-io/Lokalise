@@ -6,7 +6,7 @@ namespace Apps.Lokalise.Webhooks.Handlers.SingleEventHandlers.Impl;
 
 public class ProjectKeysAddedHandler : BaseWebhookHandler
 {
-    const string SubscriptionEvent = "project.keys.added";
+    const string SubscriptionEvent = "project.key.added";
 
     public ProjectKeysAddedHandler([WebhookParameter] WebhookInput input) : base(SubscriptionEvent, input) { }
 }
