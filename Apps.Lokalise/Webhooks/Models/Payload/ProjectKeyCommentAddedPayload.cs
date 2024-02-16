@@ -54,10 +54,6 @@ public class ProjectKeyCommentAddedPayload : BasePayload
             Id = Key.Id,
             Name = Key.Name,
             Comment = Comment.Value,
-            IOS = Key.Filenames?.Ios,
-            Android = Key.Filenames?.Android,
-            Web = Key.Filenames?.Web,
-            Other = Key.Filenames?.Other
         };
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Apps.Lokalise.Constants;
+using Apps.Lokalise.DataSourceHandlers;
 using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Invocables;
@@ -6,10 +7,12 @@ using Apps.Lokalise.Models.Requests.Keys;
 using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.Models.Requests.Tasks.Base;
 using Apps.Lokalise.Models.Responses.Keys;
+using Apps.Lokalise.Models.Responses.Translations;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
+using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.Sdk.Utils.Extensions.String;
@@ -27,9 +30,10 @@ public class KeyActions : LokaliseInvocable
 
     #region Actions
 
-    [Action("List all project keys", Description = "List all project keys")]
-    public async Task<ListProjectKeysResponse> ListProjectKeys([ActionParameter] ProjectRequest project,
-        [ActionParameter] ListProjectKeysRequest input)
+    [Action("Get project keys", Description = "Get all project keys")]
+    public async Task<ListProjectKeysResponse> GetProjectKeys([ActionParameter] ProjectRequest project,
+        [ActionParameter] ListProjectKeysRequest input,
+        [ActionParameter] ListProjectKeysFilters filters)
     {
         var baseEndpoint = $"/projects/{project.ProjectId}/keys";
         var query = input.AsLokaliseDictionary().AllIsNotNull();
@@ -37,21 +41,8 @@ public class KeyActions : LokaliseInvocable
         var endpointWithQuery = baseEndpoint.WithQuery(query);
 
         var items = await Paginator.GetAll<KeysWrapper, KeyDto>(Creds, endpointWithQuery);
-
-        return new(items);
-    }
-
-    [Action("List key IDs", Description = "List key IDs based on the provided filters")]
-    public async Task<ListProjectKeyIdsResponse> ListKeyIds([ActionParameter] ProjectRequest project,
-        [ActionParameter] ListProjectKeysBaseRequest input,
-        [ActionParameter] ListProjectKeysFilters filters)
-    {
-        var keys = await ListProjectKeys(project, new ListProjectKeysRequest(input)
-        {
-            IncludeTranslations = true
-        });
-
-        var keyIds = keys.Keys
+        
+        items = items
             .Where(x => filters.Unreviewed is null ||
                         x.Translations?.Any(x =>
                             x.IsReviewed == filters.Unreviewed && (filters.UnreviewedLanguage is null ||
@@ -67,13 +58,9 @@ public class KeyActions : LokaliseInvocable
             .Where(x => filters.UntranslatedLanguage is null ||
                         string.IsNullOrWhiteSpace(x.Translations
                             .First(x => x.LanguageIso == filters.UntranslatedLanguage).Translation))
-            .Select(x => x.KeyId)
-            .ToArray();
+            .ToList();
 
-        return new()
-        {
-            KeyIds = keyIds
-        };
+        return new(items, project.ProjectId);
     }
 
     [Action("Create key", Description = "Create key in project")]
@@ -103,6 +90,30 @@ public class KeyActions : LokaliseInvocable
         var response = await Client.ExecuteWithHandling<KeyResponse>(request);
 
         return response.Key;
+    }
+
+    [Action("Get translation for key", Description = "Get translations for key by ID")]
+    public async Task<TranslationResponse> GetKeyTranslations([ActionParameter] RetrieveKeyRequest input,
+        [ActionParameter, Display("Language"), DataSource(typeof(LanguageDataHandler))] string languageIso)
+    {
+        var keys = await RetrieveKey(input);
+        var translation = keys.Translations.FirstOrDefault(x => x.LanguageIso == languageIso);
+        
+        if (translation is null)
+        {
+            throw new("Translation not found");
+        }
+
+        return new TranslationResponse
+        {
+            Translation = new Translation
+            {
+                TranslationId = translation.TranslationId, KeyId = translation.KeyId,
+                LanguageIso = translation.LanguageIso,
+                TranslationText = translation.Translation, IsUnverified = translation.IsUnverified,
+                IsReviewed = translation.IsReviewed, TaskId = translation.TaskId.ToString()
+            }
+        };
     }
 
     [Action("Delete key", Description = "Delete key by ID")]

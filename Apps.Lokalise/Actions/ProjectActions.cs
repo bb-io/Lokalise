@@ -22,29 +22,25 @@ public class ProjectActions : LokaliseInvocable
 
     #region Actions
 
-    [Action("List projects", Description = "Get a list of all projects")]
-    public Task<ProjectsResponse> ListAllProjects([ActionParameter] ProjectListParameters parameters)
+    [Action("Get projects", Description = "Get a list of all projects")]
+    public async Task<ProjectsResponse> ListAllProjects([ActionParameter] ProjectListParameters parameters, [ActionParameter]ProjectFilterByDateRequest dateParameters)
     {
         var query = parameters.AsLokaliseDictionary().AllIsNotNull();
         var endpoint = "/projects".WithQuery(query);
 
         var request = new LokaliseRequest(endpoint, Method.Get, Creds);
-        return Client.ExecuteWithHandling<ProjectsResponse>(request);
-    }
-
-    [Action("List projects by date", Description = "Get a list of all projects within a certain date range")]
-    public async Task<ProjectsResponse> ProjectForDates([ActionParameter] ProjectFilterByDateRequest parameters)
-    {
-        var projects = await ListAllProjects(parameters);
-
-        return new()
+        var response = await Client.ExecuteWithHandling<ProjectsResponse>(request);
+        
+        if (dateParameters is not null)
         {
-            Projects = projects.Projects.Where(proj =>
+            response.Projects = response.Projects.Where(proj =>
             {
                 var dateTime = DateTime.Parse(string.Join(" ", proj.CreatedAt.Split(" ").Take(2)));
-                return dateTime >= parameters.From && dateTime <= parameters.To;
-            }).ToList()
-        };
+                return dateTime >= dateParameters.From && dateTime <= dateParameters.To;
+            }).ToList();
+        }
+        
+        return response;
     }
 
     [Action("Create project", Description = "Create a new project")]
@@ -85,8 +81,8 @@ public class ProjectActions : LokaliseInvocable
         return Client.ExecuteWithHandling<ProjectDeleteResponse>(request);
     }
 
-    [Action("Empty project", Description = "Deletes all keys and translations from the project")]
-    public Task<EmptyResponse> EmptyProject([ActionParameter] ProjectRequest input)
+    [Action("Clear project", Description = "Deletes all keys and translations from the project")]
+    public Task<EmptyResponse> ClearProject([ActionParameter] ProjectRequest input)
     {
         var endpoint = $"/projects/{input.ProjectId}/empty";
         var request = new LokaliseRequest(endpoint, Method.Put, Creds);

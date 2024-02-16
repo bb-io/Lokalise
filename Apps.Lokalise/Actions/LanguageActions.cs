@@ -25,11 +25,7 @@ public class LanguageActions : LokaliseInvocable
 
     #region Actions
 
-    [Action("List all system languages", Description = "List all system languages")]
-    public Task<ListLanguagesResponse> ListSystemLanguages()
-        => ListLanguages("/system/languages");
-
-    [Action("List all project languages", Description = "List all project languages")]
+    [Action("Get all project languages", Description = "Get all project languages")]
     public Task<ListLanguagesResponse> ListProjectLanguages([ActionParameter] ProjectRequest input)
         => ListLanguages($"/projects/{input.ProjectId}/languages");
 

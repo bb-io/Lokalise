@@ -30,7 +30,7 @@ public class FileActions : LokaliseInvocable
 
     #region Actions
 
-    [Action("List all project files", Description = "List all project files")]
+    [Action("Get project files", Description = "Get all project files")]
     public async Task<ListAllFilesResponse> ListAllFiles([ActionParameter] ListAllFilesRequest input)
     {
         var endpoint =
