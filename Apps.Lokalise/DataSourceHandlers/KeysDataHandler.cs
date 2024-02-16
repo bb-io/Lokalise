@@ -27,8 +27,8 @@ public class KeysDataHandler(InvocationContext invocationContext, [ActionParamet
 
         return keys
             .Where(x => context.SearchString == null ||
-                        x.Filenames.GetNonEmptyName().Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
+                        x.KeyName.GetNonEmptyName().Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
             .Take(20)
-            .ToDictionary(x => x.KeyId, x => x.Filenames.GetNonEmptyName());
+            .ToDictionary(x => x.KeyId, x => x.KeyName.GetNonEmptyName());
     }
 }
