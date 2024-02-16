@@ -30,7 +30,7 @@ public class KeyCommentAdded
 
     [JsonProperty("filenames")]
     [Display("Filenames")]
-    public Filenames Filenames { get; set; }
+    public Filenames? Filenames { get; set; }
 }
 
 public class ProjectKeyCommentAddedPayload : BasePayload
@@ -50,14 +50,14 @@ public class ProjectKeyCommentAddedPayload : BasePayload
             ProjectId = Project.Id,
             ProjectName = Project.Name,
             UserEmail = User.Email,
-            UserName = User.Email,
+            UserName = User.FullName,
             Id = Key.Id,
             Name = Key.Name,
             Comment = Comment.Value,
-            IOS = Key.Filenames.Ios,
-            Android = Key.Filenames.Android,
-            Web = Key.Filenames.Web,
-            Other = Key.Filenames.Other
+            IOS = Key.Filenames?.Ios,
+            Android = Key.Filenames?.Android,
+            Web = Key.Filenames?.Web,
+            Other = Key.Filenames?.Other
         };
     }
 }

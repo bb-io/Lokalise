@@ -14,14 +14,14 @@ public class KeyCommentEvent : BaseEvent
     public string Comment { get; set; }
 
     [Display("iOS")]
-    public string IOS { get; set; }
+    public string? IOS { get; set; }
 
     [Display("Android")]
-    public string Android { get; set; }
+    public string? Android { get; set; }
 
     [Display("Web")]
-    public string Web { get; set; }
+    public string? Web { get; set; }
 
     [Display("Other")]
-    public string Other { get; set; }
+    public string? Other { get; set; }
 }
