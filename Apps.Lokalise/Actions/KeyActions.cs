@@ -92,31 +92,6 @@ public class KeyActions : LokaliseInvocable
         return response.Key;
     }
 
-    [Action("Get translation for key", Description = "Get translations for key by ID")]
-    public async Task<TranslationResponse> GetKeyTranslations([ActionParameter] RetrieveKeyRequest input,
-        [ActionParameter, Display("Language"), DataSource(typeof(LanguageDataHandler))]
-        string languageIso)
-    {
-        var keys = await RetrieveKey(input);
-        var translation = keys.Translations.FirstOrDefault(x => x.LanguageIso == languageIso);
-
-        if (translation is null)
-        {
-            throw new("Translation not found");
-        }
-
-        return new TranslationResponse
-        {
-            Translation = new Translation
-            {
-                TranslationId = translation.TranslationId, KeyId = translation.KeyId,
-                LanguageIso = translation.LanguageIso,
-                TranslationText = translation.Translation, IsUnverified = translation.IsUnverified,
-                IsReviewed = translation.IsReviewed, TaskId = translation.TaskId.ToString()
-            }
-        };
-    }
-
     [Action("Delete key", Description = "Delete key by ID")]
     public Task DeleteKey([ActionParameter] DeleteKeyRequest input)
     {
