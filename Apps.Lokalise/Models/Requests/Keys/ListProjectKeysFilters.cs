@@ -8,7 +8,7 @@ public class ListProjectKeysFilters
 {
     public bool? Unverified { get; set; }
     
-    public bool? Unreviewed { get; set; }
+    public bool? Reviewed { get; set; }
     
     [Display("Exclude tags")]
     public IEnumerable<string>? TagsToSkip { get; set; }
@@ -17,9 +17,9 @@ public class ListProjectKeysFilters
     [DataSource(typeof(LanguageDataHandler))]
     public string? UntranslatedLanguage { get; set; }
     
-    [Display("Unreviewed language")]
+    [Display("Reviewed language")]
     [DataSource(typeof(LanguageDataHandler))]
-    public string? UnreviewedLanguage { get; set; }
+    public string? ReviewedLanguage { get; set; }
     
     [Display("Unverified language")]
     [DataSource(typeof(LanguageDataHandler))]

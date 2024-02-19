@@ -111,7 +111,7 @@ public class SingleEventWebhookList : WebhookList
             HandlePreflightAndMap<BranchMergeEvent, ProjectBranchMergedPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project languages added", typeof(ProjectLanguagesAddedHandler),
+    [Webhook("On languages added", typeof(ProjectLanguagesAddedHandler),
         Description = "Triggered when a new language is added to a project")]
     public Task<WebhookResponse<LanguagesEvent>> ProjectLanguagesAddedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input)
@@ -120,7 +120,7 @@ public class SingleEventWebhookList : WebhookList
             HandlePreflightAndMap<LanguagesEvent, ProjectLanguagesAddedPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project language removed", typeof(ProjectLanguageRemovedHandler),
+    [Webhook("On language removed", typeof(ProjectLanguageRemovedHandler),
         Description = "Triggered when a language is removed from a project")]
     public Task<WebhookResponse<LanguageEvent>> ProjectLanguageRemovedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input)
@@ -129,7 +129,7 @@ public class SingleEventWebhookList : WebhookList
             HandlePreflightAndMap<LanguageEvent, ProjectLanguageRemovedPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project language settings changed", typeof(ProjectLanguageSettingsChangedHandler),
+    [Webhook("On language settings changed", typeof(ProjectLanguageSettingsChangedHandler),
         Description = "Triggered when project language settings change")]
     public Task<WebhookResponse<LanguageEvent>> ProjectLanguageSettings_changedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] WebhookInput input)
@@ -138,7 +138,7 @@ public class SingleEventWebhookList : WebhookList
             HandlePreflightAndMap<LanguageEvent, ProjectLanguageSettingsChangedPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project key added", typeof(ProjectKeyAddedHandler),
+    [Webhook("On key added", typeof(ProjectKeyAddedHandler),
         Description = "Triggered when a new key is added to a project")]
     public Task<WebhookResponse<KeyEvent>> ProjectKeyAddedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input)
@@ -146,7 +146,7 @@ public class SingleEventWebhookList : WebhookList
         return Task.FromResult(HandlePreflightAndMap<KeyEvent, ProjectKeyAddedPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project keys added", typeof(ProjectKeysAddedHandler),
+    [Webhook("On keys added", typeof(ProjectKeysAddedHandler),
         Description = "Triggered when multiple keys are added to a project")]
     public Task<WebhookResponse<KeysEvent>> ProjectKeysAddedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input)
@@ -154,7 +154,7 @@ public class SingleEventWebhookList : WebhookList
         return Task.FromResult(HandlePreflightAndMap<KeysEvent, ProjectKeysAddedPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project key modified", typeof(ProjectKeyModifiedHandler),
+    [Webhook("On key modified", typeof(ProjectKeyModifiedHandler),
         Description = "Triggered when keys are modified")]
     public Task<WebhookResponse<KeyModifiedEvent>> ProjectKeyModifiedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input)
@@ -163,7 +163,7 @@ public class SingleEventWebhookList : WebhookList
             HandlePreflightAndMap<KeyModifiedEvent, ProjectKeyModifiedPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project keys deleted", typeof(ProjectKeysDeletedHandler),
+    [Webhook("On keys deleted", typeof(ProjectKeysDeletedHandler),
         Description = "Triggered when keys are removed from a project")]
     public Task<WebhookResponse<KeysDeletedEvent>> ProjectKeysDeletedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input)
@@ -172,7 +172,7 @@ public class SingleEventWebhookList : WebhookList
             HandlePreflightAndMap<KeysDeletedEvent, ProjectKeysDeletedPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project key comment added", typeof(ProjectKeyCommentAddedHandler),
+    [Webhook("On key comment added", typeof(ProjectKeyCommentAddedHandler),
         Description = "Triggers when a new comment is added to a key")]
     public Task<WebhookResponse<KeyCommentEvent>> ProjectKeyCommentAddedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] CommentAddedWebhookInput input)
@@ -191,7 +191,7 @@ public class SingleEventWebhookList : WebhookList
         return Task.FromResult(preflightResponse);
     }
 
-    [Webhook("On project translation updated", typeof(ProjectTranslationUpdatedHandler),
+    [Webhook("On translation updated", typeof(ProjectTranslationUpdatedHandler),
         Description = "Triggered when a project translation is updated")]
     public Task<WebhookResponse<TranslationEvent>> ProjectTranslationUpdatedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] WebhookInput input)
@@ -200,7 +200,7 @@ public class SingleEventWebhookList : WebhookList
             HandlePreflightAndMap<TranslationEvent, ProjectTranslationUpdatedPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project translations updated", typeof(ProjectTranslationsUpdatedHandler),
+    [Webhook("On translations updated", typeof(ProjectTranslationsUpdatedHandler),
         Description = "Triggered when multiple project translations have been updated")]
     public Task<WebhookResponse<TranslationsEvent>> ProjectTranslationsUpdatedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] WebhookInput input)
@@ -209,7 +209,7 @@ public class SingleEventWebhookList : WebhookList
             HandlePreflightAndMap<TranslationsEvent, ProjectTranslationsUpdatedPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project translation proofread", typeof(ProjectTranslationProofreadHandler),
+    [Webhook("On translation proofread", typeof(ProjectTranslationProofreadHandler),
         Description = "Triggers when a proofreading has taken place")]
     public Task<WebhookResponse<ProofreadEvent>> ProjectTranslationProofreadHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] WebhookInput input)
@@ -218,7 +218,7 @@ public class SingleEventWebhookList : WebhookList
             HandlePreflightAndMap<ProofreadEvent, ProjectTranslationProofreadPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project contributor added", typeof(ProjectContributorAddedHandler),
+    [Webhook("On contributor added", typeof(ProjectContributorAddedHandler),
         Description = "Triggered when a contributor is added to a project")]
     public Task<WebhookResponse<ContributerEvent>> ProjectContributorAddedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] WebhookInput input)
@@ -227,7 +227,7 @@ public class SingleEventWebhookList : WebhookList
             HandlePreflightAndMap<ContributerEvent, ProjectContributorAddedPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project contributor deleted", typeof(ProjectContributorDeletedHandler),
+    [Webhook("On contributor deleted", typeof(ProjectContributorDeletedHandler),
         Description = "Triggered when a contributor was deleted from a project")]
     public Task<WebhookResponse<ContributerEvent>> ProjectContributorDeletedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] WebhookInput input)
@@ -236,7 +236,7 @@ public class SingleEventWebhookList : WebhookList
             HandlePreflightAndMap<ContributerEvent, ProjectContributorDeletedPayload>(webhookRequest, input));
     }
 
-    [Webhook("On team order created", typeof(TeamOrderCreatedHandler),
+    [Webhook("On order created", typeof(TeamOrderCreatedHandler),
         Description = "Triggered when a new team order is created")]
     public Task<WebhookResponse<OrderEvent>> TeamOrderCreatedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input)
@@ -244,7 +244,7 @@ public class SingleEventWebhookList : WebhookList
         return Task.FromResult(HandlePreflightAndMap<OrderEvent, TeamOrderCreatedPayload>(webhookRequest, input));
     }
 
-    [Webhook("On team order deleted", typeof(TeamOrderDeletedHandler),
+    [Webhook("On order deleted", typeof(TeamOrderDeletedHandler),
         Description = "Triggered when a new team order is deleted")]
     public Task<WebhookResponse<BaseEvent>> TeamOrderDeletedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input)
@@ -252,7 +252,7 @@ public class SingleEventWebhookList : WebhookList
         return Task.FromResult(HandlePreflightAndMap<BaseEvent, BasePayload>(webhookRequest, input));
     }
 
-    [Webhook("On team order completed", typeof(TeamOrderCompletedHandler),
+    [Webhook("On order completed", typeof(TeamOrderCompletedHandler),
         Description = "Triggered when a new team order is completed")]
     public Task<WebhookResponse<OrderEvent>> TeamOrderCompletedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input)
@@ -260,7 +260,7 @@ public class SingleEventWebhookList : WebhookList
         return Task.FromResult(HandlePreflightAndMap<OrderEvent, TeamOrderCompletedPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project task initial TM leverage calculated",
+    [Webhook("On task initial TM leverage calculated",
         typeof(ProjectTaskInitialTmLeverageCalculatedHandler),
         Description = "Triggered when TM calculation finishes")]
     public Task<WebhookResponse<TaskLeverageEvent>> ProjectTaskInitial_tm_leverageCalculatedHandler(

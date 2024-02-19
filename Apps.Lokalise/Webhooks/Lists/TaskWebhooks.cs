@@ -19,7 +19,7 @@ public class TaskWebhooks : WebhookList
     {
     }
 
-    [Webhook("On project task created", typeof(ProjectTaskCreatedHandler),
+    [Webhook("On task created", typeof(ProjectTaskCreatedHandler),
         Description = "Triggered when a new task is created in a project")]
     public Task<WebhookResponse<TaskEvent>> ProjectTaskCreatedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] TaskWebhookInput input)
@@ -27,7 +27,7 @@ public class TaskWebhooks : WebhookList
         return Task.FromResult(HandlePreflightAndMap<TaskEvent, TaskPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project task closed", typeof(ProjectTaskClosedHandler),
+    [Webhook("On task closed", typeof(ProjectTaskClosedHandler),
         Description = "Triggered when a project task is closed")]
     public Task<WebhookResponse<TaskEvent>> ProjectTaskClosedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] TaskWebhookInput input)
@@ -35,7 +35,7 @@ public class TaskWebhooks : WebhookList
         return Task.FromResult(HandlePreflightAndMap<TaskEvent, TaskPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project task deleted", typeof(ProjectTaskDeletedHandler),
+    [Webhook("On task deleted", typeof(ProjectTaskDeletedHandler),
         Description = "Triggered when a project task is deleted")]
     public Task<WebhookResponse<TaskEvent>> ProjectTaskDeletedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] TaskWebhookInput input)
@@ -43,7 +43,7 @@ public class TaskWebhooks : WebhookList
         return Task.FromResult(HandlePreflightAndMap<TaskEvent, TaskPayload>(webhookRequest, input));
     }
 
-    [Webhook("On project task language closed", typeof(ProjectTaskLanguageClosedHandler),
+    [Webhook("On task language closed", typeof(ProjectTaskLanguageClosedHandler),
         Description = "Triggered when a specific language task closes")]
     public Task<WebhookResponse<TaskLanguageEvent>> ProjectTaskLanguageClosedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] TaskWebhookInput input)

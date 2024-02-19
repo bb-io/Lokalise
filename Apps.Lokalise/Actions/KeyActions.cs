@@ -43,11 +43,11 @@ public class KeyActions : LokaliseInvocable
         var items = await Paginator.GetAll<KeysWrapper, KeyDto>(Creds, endpointWithQuery);
 
         items = items
-            .Where(x => filters.Unreviewed is null ||
+            .Where(x => filters.Reviewed is null ||
                         x.Translations?.Any(x =>
-                            x.IsReviewed == filters.Unreviewed && (filters.UnreviewedLanguage is null ||
+                            x.IsReviewed == filters.Reviewed && (filters.ReviewedLanguage is null ||
                                                                    x.LanguageIso ==
-                                                                   filters.UnreviewedLanguage)) is true)
+                                                                   filters.ReviewedLanguage)) is true)
             .Where(x => filters.Unverified is null ||
                         x.Translations?.Any(x =>
                                 x.IsUnverified == filters.Unverified && (filters.UnverifiedLanguage is null ||

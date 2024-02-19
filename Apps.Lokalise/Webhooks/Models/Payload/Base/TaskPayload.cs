@@ -19,7 +19,8 @@ public class TaskPayload : BasePayload
             TaskId = Task.Id,
             Title= Task.Title,
             //DueDate= Task.Due_date,
-            Description= Task.Description
+            Description= Task.Description,
+            Type = Task.Type,
         };
     }
 }
