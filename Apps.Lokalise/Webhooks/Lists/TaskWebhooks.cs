@@ -76,7 +76,7 @@ public class TaskWebhooks : WebhookList
         if (input.UserEmail != null && data.User.Email != input.UserEmail)
             return preflightResponse;
 
-        if (data.Task.Type != input.TaskType)
+        if (input.TaskType != null && data.Task.Type != input.TaskType)
             return preflightResponse;
 
         return new()
