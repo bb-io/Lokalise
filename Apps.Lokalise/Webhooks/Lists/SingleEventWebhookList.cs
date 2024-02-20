@@ -63,21 +63,12 @@ public class SingleEventWebhookList : WebhookList
     private async Task<WebhookResponse<GetKeyEvent>> MapToEventResponse<T>(WebhookResponse<T> response)
         where T : KeyEvent
     {
-        if (response.ReceivedWebhookRequestType == WebhookRequestType.Preflight)
-        {
-            return new WebhookResponse<GetKeyEvent>()
-            {
-                HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
-                Result = null,
-                ReceivedWebhookRequestType = WebhookRequestType.Preflight
-            };
-        }
-
         var keyResponse = await GetKeyAsync(response.Result.ProjectId, response.Result.Key.Id);
         return new()
         {
-            HttpResponseMessage = null,
-            Result = new(response.Result.ProjectId, keyResponse)
+            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+            Result = new(response.Result.ProjectId, keyResponse),
+            ReceivedWebhookRequestType = response.ReceivedWebhookRequestType
         };
     }
 
@@ -180,11 +171,21 @@ public class SingleEventWebhookList : WebhookList
 
     [Webhook("On key added", typeof(ProjectKeyAddedHandler),
         Description = "Triggered when a new key is added to a project")]
-    public Task<WebhookResponse<KeyEvent>> ProjectKeyAddedHandler(WebhookRequest webhookRequest,
+    public async Task<WebhookResponse<GetKeyEvent>> ProjectKeyAddedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input)
     {
         var response = HandlePreflightAndMap<KeyEvent, ProjectKeyAddedPayload>(webhookRequest, input);
-        return Task.FromResult(response);
+        if (response.ReceivedWebhookRequestType == WebhookRequestType.Preflight)
+        {
+            return new WebhookResponse<GetKeyEvent>
+            {
+                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+                Result = null,
+                ReceivedWebhookRequestType = WebhookRequestType.Preflight
+            };
+        }
+        
+        return await MapToEventResponse(response);
     }
 
     [Webhook("On keys added", typeof(ProjectKeysAddedHandler),
