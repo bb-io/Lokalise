@@ -180,11 +180,11 @@ public class SingleEventWebhookList : WebhookList
 
     [Webhook("On key added", typeof(ProjectKeyAddedHandler),
         Description = "Triggered when a new key is added to a project")]
-    public async Task<WebhookResponse<GetKeyEvent>> ProjectKeyAddedHandler(WebhookRequest webhookRequest,
+    public Task<WebhookResponse<KeyEvent>> ProjectKeyAddedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input)
     {
         var response = HandlePreflightAndMap<KeyEvent, ProjectKeyAddedPayload>(webhookRequest, input);
-        return await MapToEventResponse(response);
+        return Task.FromResult(response);
     }
 
     [Webhook("On keys added", typeof(ProjectKeysAddedHandler),
