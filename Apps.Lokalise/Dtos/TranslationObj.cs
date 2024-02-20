@@ -19,7 +19,9 @@ public class TranslationObj
     [Display("Language code")]
     public string LanguageIso { get; set; }
 
-    [JsonProperty("translation")] public string Translation { get; set; }
+    [JsonProperty("translation")]
+    [Display("Text")]
+    public string Translation { get; set; }
 
     [JsonProperty("is_reviewed")]
     [Display("Is reviewed")]

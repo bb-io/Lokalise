@@ -18,16 +18,11 @@ public class KeyDto
     [JsonProperty("key_name"), Display("Key name")] public KeyName KeyName { get; set; }
     [JsonProperty("filenames"), Display("Filenames")] public Filenames Filenames { get; set; }
 
-    [Display("Source translation text")] public string? SourceTranslationText => SourceTranslation?.Translation;
-
-    [Display("Source translation language code")]
-    public string? SourceTranslationLanguageCode => SourceTranslation?.LanguageIso;
-
-    [Display("Source translation")] public TranslationObj? SourceTranslation { get; set; }
+    [Display("Base language")] public TranslationObj? SourceTranslation { get; set; }
 
     private IEnumerable<TranslationObj>? _translations;
 
-    [Display("Target translations")]
+    [Display("Translations")]
     [JsonProperty("translations")]
     public IEnumerable<TranslationObj>? Translations
     {
