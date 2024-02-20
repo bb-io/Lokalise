@@ -73,7 +73,7 @@ public class SingleEventWebhookList : WebhookList
                 ReceivedWebhookRequestType = WebhookRequestType.Preflight
             };
         }
-        
+
         var keyResponse = await GetKeyAsync(response.Result.ProjectId, response.Result.Key.Id);
         return new()
         {
@@ -203,15 +203,26 @@ public class SingleEventWebhookList : WebhookList
         [WebhookParameter(true)] WebhookInput input)
     {
         var response = HandlePreflightAndMap<KeyModifiedEvent, ProjectKeyModifiedPayload>(webhookRequest, input);
+
+        if (response.ReceivedWebhookRequestType == WebhookRequestType.Preflight)
+        {
+            return await MapToEventResponse(new WebhookResponse<KeyEvent>
+            {
+                HttpResponseMessage = response.HttpResponseMessage,
+                Result = new KeyEvent(),
+                ReceivedWebhookRequestType = response.ReceivedWebhookRequestType
+            });
+        }
+
         var keyEvent = new KeyEvent
         {
             Key = new KeyWithTags { Id = response.Result.Id },
             ProjectId = response.Result.ProjectId
         };
-
+        
         return await MapToEventResponse(new WebhookResponse<KeyEvent>
         {
-            HttpResponseMessage = response.HttpResponseMessage, 
+            HttpResponseMessage = response.HttpResponseMessage,
             Result = keyEvent,
             ReceivedWebhookRequestType = response.ReceivedWebhookRequestType
         });
