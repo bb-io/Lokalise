@@ -28,7 +28,7 @@ public class TaskActions : LokaliseInvocable
 
     #region Actions
 
-    [Action("List tasks", Description = "Get all tasks of a certain project")]
+    [Action("Get tasks", Description = "Get all tasks of a certain project")]
     public async Task<ListTasksResponse> ListAllTasks([ActionParameter] ProjectRequest project,
         [ActionParameter] TaskListParameters parameters)
     {

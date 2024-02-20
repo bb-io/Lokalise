@@ -1,9 +1,12 @@
-﻿using Blackbird.Applications.Sdk.Common;
+﻿using Apps.Lokalise.Dtos;
+using Blackbird.Applications.Sdk.Common;
 
 namespace Apps.Lokalise.Webhooks.Models.EventResponse;
 
 public class TranslationEvent : BaseEvent
 {
+    private string _keyId;
+    
     [Display("Translation ID")]
     public string TranslationId { get; set; }
 
@@ -21,12 +24,19 @@ public class TranslationEvent : BaseEvent
 
     [Display("Language name")]
     public string LanguageName { get; set; }
-
-    [Display("Key ID")]
-    public string KeyId { get; set; }
+    
+    public KeyDto Key { get; set; }
 
     [Display("Key name")]
     public string KeyName { get; set; }
 
-
+    public TranslationEvent(string keyId)
+    {
+        _keyId = keyId;
+    }
+    
+    public string GetKeyId()
+    {
+        return _keyId;
+    }
 }

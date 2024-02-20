@@ -14,7 +14,7 @@ public class ProjectTranslationUpdatedPayload : BasePayload
 
     public override TranslationEvent Convert()
     {
-        return new TranslationEvent
+        return new TranslationEvent(Key.Id)
         {
             ProjectId = Project.Id,
             ProjectName = Project.Name,
@@ -23,7 +23,6 @@ public class ProjectTranslationUpdatedPayload : BasePayload
             LanguageId = Language.Id,
             Iso = Language.Iso,
             LanguageName = Language.Name,
-            KeyId = Key.Id,
             KeyName = Key.Name,
             TranslationId = Translation.Id,
             TranslationValue = Translation.Value,

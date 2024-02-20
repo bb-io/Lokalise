@@ -15,11 +15,12 @@ public class TaskPayload : BasePayload
             ProjectId = Project.Id,
             ProjectName = Project.Name,
             UserEmail = User.Email,
-            UserName = User.Email,
+            UserName = User.FullName,
             TaskId = Task.Id,
-            Title= Task.Title,
+            Title = Task.Title,
             //DueDate= Task.Due_date,
-            Description= Task.Description
+            Description= Task.Description,
+            Type = Task.Type,
         };
     }
 }

@@ -10,7 +10,7 @@ public class SegmentDto
     public int SegmentNumber { get; set; }
 
     [JsonProperty("language_iso")]
-    [Display("Language iso")]
+    [Display("Language code")]
     public string LanguageIso { get; set; }
 
     [JsonProperty("modified_at")]

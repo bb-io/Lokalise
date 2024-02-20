@@ -2,6 +2,6 @@
 
 public class ProjectFilterByDateRequest : ProjectListParameters
 {
-    public DateTime From { get; set; }
-    public DateTime To { get; set; }
+    public DateTime? From { get; set; }
+    public DateTime? To { get; set; }
 }
