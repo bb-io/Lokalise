@@ -64,7 +64,7 @@ public class TaskWebhooks : WebhookList
         var response = HandlePreflightAndMap<TaskLanguageEvent, ProjectTaskLanguageClosedPayload>(webhookRequest, input);
         var taskResponse = await MapToEventResponse(response);
 
-        var taskLanguageEvent = new GetTaskLanguageEvent(taskResponse.Result, response.Result);
+        var taskLanguageEvent = new GetTaskLanguageEvent(response.Result, taskResponse.Result.Task);
         return new()
         {
             HttpResponseMessage = null,
@@ -134,7 +134,7 @@ public class TaskWebhooks : WebhookList
         return new()
         {
             HttpResponseMessage = null,
-            Result = new(response.Result.ProjectId, task)
+            Result = new(response.Result, task)
         };
     }
 }

@@ -3,16 +3,16 @@ using Blackbird.Applications.Sdk.Common;
 
 namespace Apps.Lokalise.Webhooks.Models.EventResponse;
 
-public class GetTaskEvent
+public class GetTaskEvent : BaseEvent
 {
-    [Display("Project ID")]
-    public string ProjectId { get; set; }
-
     public TaskResponse Task { get; set; }
     
-    public GetTaskEvent(string projectId, TaskResponse task)
+    public GetTaskEvent(TaskEvent taskEvent, TaskResponse task)
     {
-        ProjectId = projectId;
+        ProjectId = taskEvent.ProjectId;
+        ProjectName = taskEvent.ProjectName;
+        UserName = taskEvent.UserName;
+        UserEmail = taskEvent.UserEmail;
         Task = task;
     }
 }

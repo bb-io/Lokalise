@@ -14,7 +14,7 @@ public class GetTaskLanguageEvent : GetTaskEvent
     [Display("Language name")]
     public string LanguageName { get; set; }
     
-    public GetTaskLanguageEvent(GetTaskEvent @event, TaskLanguageEvent taskLanguageEvent) : base(@event.ProjectId, @event.Task)
+    public GetTaskLanguageEvent(TaskLanguageEvent taskLanguageEvent, TaskResponse taskResponse) : base(taskLanguageEvent, taskResponse)
     {
         LanguageId = taskLanguageEvent.LanguageId;
         Iso = taskLanguageEvent.Iso;
