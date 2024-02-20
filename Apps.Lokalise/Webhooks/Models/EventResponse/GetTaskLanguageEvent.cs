@@ -3,7 +3,7 @@ using Blackbird.Applications.Sdk.Common;
 
 namespace Apps.Lokalise.Webhooks.Models.EventResponse;
 
-public class GetTaskLanguageResponse : GetTaskResponse
+public class GetTaskLanguageEvent : GetTaskEvent
 {
     [Display("Language ID")]
     public string LanguageId { get; set; }
@@ -14,7 +14,7 @@ public class GetTaskLanguageResponse : GetTaskResponse
     [Display("Language name")]
     public string LanguageName { get; set; }
     
-    public GetTaskLanguageResponse(GetTaskResponse response, TaskLanguageEvent taskLanguageEvent) : base(response.ProjectId, response.Task)
+    public GetTaskLanguageEvent(GetTaskEvent @event, TaskLanguageEvent taskLanguageEvent) : base(@event.ProjectId, @event.Task)
     {
         LanguageId = taskLanguageEvent.LanguageId;
         Iso = taskLanguageEvent.Iso;

@@ -32,7 +32,7 @@ public class TaskWebhooks : WebhookList
 
     [Webhook("On task created", typeof(ProjectTaskCreatedHandler),
         Description = "Triggered when a new task is created in a project")]
-    public async Task<WebhookResponse<GetTaskResponse>> ProjectTaskCreatedHandler(WebhookRequest webhookRequest,
+    public async Task<WebhookResponse<GetTaskEvent>> ProjectTaskCreatedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] TaskWebhookInput input)
     {
         var response = HandlePreflightAndMap<TaskEvent, TaskPayload>(webhookRequest, input);
@@ -41,7 +41,7 @@ public class TaskWebhooks : WebhookList
 
     [Webhook("On task closed", typeof(ProjectTaskClosedHandler),
         Description = "Triggered when a project task is closed")]
-    public async Task<WebhookResponse<GetTaskResponse>> ProjectTaskClosedHandler(WebhookRequest webhookRequest,
+    public async Task<WebhookResponse<GetTaskEvent>> ProjectTaskClosedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] TaskWebhookInput input)
     {
         var response = HandlePreflightAndMap<TaskEvent, TaskPayload>(webhookRequest, input);
@@ -58,13 +58,13 @@ public class TaskWebhooks : WebhookList
 
     [Webhook("On task language closed", typeof(ProjectTaskLanguageClosedHandler),
         Description = "Triggered when a specific language task closes")]
-    public async Task<WebhookResponse<GetTaskLanguageResponse>> ProjectTaskLanguageClosedHandler(
+    public async Task<WebhookResponse<GetTaskLanguageEvent>> ProjectTaskLanguageClosedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] TaskWebhookInput input)
     {
         var response = HandlePreflightAndMap<TaskLanguageEvent, ProjectTaskLanguageClosedPayload>(webhookRequest, input);
         var taskResponse = await MapToEventResponse(response);
 
-        var taskLanguageEvent = new GetTaskLanguageResponse(taskResponse.Result, response.Result);
+        var taskLanguageEvent = new GetTaskLanguageEvent(taskResponse.Result, response.Result);
         return new()
         {
             HttpResponseMessage = null,
@@ -117,12 +117,12 @@ public class TaskWebhooks : WebhookList
         return response.Task;
     }
 
-    private async Task<WebhookResponse<GetTaskResponse>> MapToEventResponse<T>(WebhookResponse<T> response)
+    private async Task<WebhookResponse<GetTaskEvent>> MapToEventResponse<T>(WebhookResponse<T> response)
         where T : TaskEvent
     {
         if (response.ReceivedWebhookRequestType == WebhookRequestType.Preflight)
         {
-            return new WebhookResponse<GetTaskResponse>()
+            return new WebhookResponse<GetTaskEvent>()
             {
                 HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
                 Result = null,

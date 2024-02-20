@@ -1,13 +1,18 @@
 using System.Net;
+using Apps.Lokalise.Models.Responses.Keys;
+using Apps.Lokalise.Models.Responses.Tasks;
+using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Webhooks.Handlers.SingleEventHandlers.Impl;
 using Apps.Lokalise.Webhooks.Lists.Base;
 using Apps.Lokalise.Webhooks.Models.EventResponse;
 using Apps.Lokalise.Webhooks.Models.Input;
 using Apps.Lokalise.Webhooks.Models.Payload;
 using Apps.Lokalise.Webhooks.Models.Payload.Base;
+using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Webhooks;
 using Newtonsoft.Json;
+using RestSharp;
 using Task = System.Threading.Tasks.Task;
 
 namespace Apps.Lokalise.Webhooks.Lists;
@@ -15,6 +20,11 @@ namespace Apps.Lokalise.Webhooks.Lists;
 [WebhookList]
 public class SingleEventWebhookList : WebhookList
 {
+    protected AuthenticationCredentialsProvider[] Creds =>
+        InvocationContext.AuthenticationCredentialsProviders.ToArray();
+
+    protected LokaliseClient Client { get; }
+
     public SingleEventWebhookList(InvocationContext invocationContext) : base(invocationContext)
     {
     }
@@ -48,6 +58,36 @@ public class SingleEventWebhookList : WebhookList
             HttpResponseMessage = null,
             Result = (T1)data.Convert()
         };
+    }
+
+    private async Task<WebhookResponse<GetKeyEvent>> MapToEventResponse<T>(WebhookResponse<T> response)
+        where T : KeyEvent
+    {
+        if (response.ReceivedWebhookRequestType == WebhookRequestType.Preflight)
+        {
+            return new WebhookResponse<GetKeyEvent>()
+            {
+                HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
+                Result = null,
+                ReceivedWebhookRequestType = WebhookRequestType.Preflight
+            };
+        }
+
+        var keyResponse = await GetKeyAsync(response.Result.ProjectId, response.Result.Key.Id);
+        return new()
+        {
+            HttpResponseMessage = null,
+            Result = new(response.Result.ProjectId, keyResponse)
+        };
+    }
+
+    private async Task<KeyResponse> GetKeyAsync(string projectId, string keyId)
+    {
+        var endpoint = $"/projects/{projectId}/keys/{keyId}";
+        var request = new LokaliseRequest(endpoint, Method.Get, Creds);
+
+        var response = await Client.ExecuteWithHandling<KeyResponse>(request);
+        return response;
     }
 
     [Webhook("On project imported", typeof(ProjectImportedHandler),
@@ -140,10 +180,11 @@ public class SingleEventWebhookList : WebhookList
 
     [Webhook("On key added", typeof(ProjectKeyAddedHandler),
         Description = "Triggered when a new key is added to a project")]
-    public Task<WebhookResponse<KeyEvent>> ProjectKeyAddedHandler(WebhookRequest webhookRequest,
+    public async Task<WebhookResponse<GetKeyEvent>> ProjectKeyAddedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input)
     {
-        return Task.FromResult(HandlePreflightAndMap<KeyEvent, ProjectKeyAddedPayload>(webhookRequest, input));
+        var response = HandlePreflightAndMap<KeyEvent, ProjectKeyAddedPayload>(webhookRequest, input);
+        return await MapToEventResponse(response);
     }
 
     [Webhook("On keys added", typeof(ProjectKeysAddedHandler),
@@ -156,11 +197,22 @@ public class SingleEventWebhookList : WebhookList
 
     [Webhook("On key modified", typeof(ProjectKeyModifiedHandler),
         Description = "Triggered when keys are modified")]
-    public Task<WebhookResponse<KeyModifiedEvent>> ProjectKeyModifiedHandler(WebhookRequest webhookRequest,
+    public async Task<WebhookResponse<GetKeyEvent>> ProjectKeyModifiedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input)
     {
-        return Task.FromResult(
-            HandlePreflightAndMap<KeyModifiedEvent, ProjectKeyModifiedPayload>(webhookRequest, input));
+        var response = HandlePreflightAndMap<KeyModifiedEvent, ProjectKeyModifiedPayload>(webhookRequest, input);
+        var keyEvent = new KeyEvent
+        {
+            Key = new KeyWithTags { Id = response.Result.Id },
+            ProjectId = response.Result.ProjectId
+        };
+
+        return await MapToEventResponse(new WebhookResponse<KeyEvent>
+        {
+            HttpResponseMessage = response.HttpResponseMessage, 
+            Result = keyEvent,
+            ReceivedWebhookRequestType = response.ReceivedWebhookRequestType
+        });
     }
 
     [Webhook("On keys deleted", typeof(ProjectKeysDeletedHandler),
@@ -187,7 +239,7 @@ public class SingleEventWebhookList : WebhookList
                 preflightResponse.ReceivedWebhookRequestType = WebhookRequestType.Preflight;
             }
         }
-        
+
         return Task.FromResult(preflightResponse);
     }
 
