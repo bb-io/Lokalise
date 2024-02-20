@@ -27,6 +27,7 @@ public class SingleEventWebhookList : WebhookList
 
     public SingleEventWebhookList(InvocationContext invocationContext) : base(invocationContext)
     {
+        Client = new();
     }
 
     private WebhookResponse<T1> HandlePreflightAndMap<T1, T2>(WebhookRequest webhookRequest, WebhookInput input)
@@ -63,6 +64,16 @@ public class SingleEventWebhookList : WebhookList
     private async Task<WebhookResponse<GetKeyEvent>> MapToEventResponse<T>(WebhookResponse<T> response)
         where T : KeyEvent
     {
+        if (response.ReceivedWebhookRequestType == WebhookRequestType.Preflight)
+        {
+            return new WebhookResponse<GetKeyEvent>
+            {
+                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+                Result = null,
+                ReceivedWebhookRequestType = WebhookRequestType.Preflight
+            };
+        }
+        
         var keyResponse = await GetKeyAsync(response.Result.ProjectId, response.Result.Key.Id);
         return new()
         {
@@ -175,16 +186,6 @@ public class SingleEventWebhookList : WebhookList
         [WebhookParameter(true)] WebhookInput input)
     {
         var response = HandlePreflightAndMap<KeyEvent, ProjectKeyAddedPayload>(webhookRequest, input);
-        if (response.ReceivedWebhookRequestType == WebhookRequestType.Preflight)
-        {
-            return new WebhookResponse<GetKeyEvent>
-            {
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
-                Result = null,
-                ReceivedWebhookRequestType = WebhookRequestType.Preflight
-            };
-        }
-        
         return await MapToEventResponse(response);
     }
 
