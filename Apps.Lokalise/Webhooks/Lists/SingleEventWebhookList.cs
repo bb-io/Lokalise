@@ -206,7 +206,7 @@ public class SingleEventWebhookList : WebhookList
         }
         
         var keyResponse = await GetKeyAsync(response.Result.ProjectId, response.Result.GetKeyId());
-        response.Result.Key = keyResponse;
+        response.Result.Key = keyResponse.Key;
         
         return response;
     }
