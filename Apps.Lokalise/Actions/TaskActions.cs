@@ -80,7 +80,7 @@ public class TaskActions : LokaliseInvocable
     }
 
     [Action("Get task", Description = "Get information about a specific task")]
-    public async Task<TaskResponse> RetrieveTask([ActionParameter] ProjectRequest project,
+    public async Task<TaskResponse> GetTask([ActionParameter] ProjectRequest project,
         [ActionParameter] [Display("Task ID")] string taskId)
     {
         var endpoint = $"/projects/{project.ProjectId}/tasks/{taskId}";
