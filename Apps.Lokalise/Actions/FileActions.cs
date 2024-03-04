@@ -10,6 +10,8 @@ using Apps.Lokalise.Models.Requests.Files;
 using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
+using Apps.Lokalise.Utils.Converters;
+using Blackbird.Applications.Sdk.Common.Files;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
@@ -45,6 +47,11 @@ public class FileActions : LokaliseInvocable
     public async Task<QueuedProcessDto> UploadFile([ActionParameter] ProjectRequest project,
         [ActionParameter] UploadFileInput input)
     {
+        if(input.File.Name.EndsWith(".mqxliff"))
+        {
+            input.File = await ConvertMqXliffToXliff(input.File);
+        }
+        
         var endpoint = $"/projects/{project.ProjectId}/files/upload";
         var request =
             new LokaliseRequest(endpoint, Method.Post, Creds).WithJsonBody(
@@ -200,4 +207,17 @@ public class FileActions : LokaliseInvocable
     }
 
     #endregion
+    
+    private async Task<FileReference> ConvertMqXliffToXliff(FileReference file, bool useSkeleton = false)
+    {
+        var stream = await _fileManagementClient.DownloadAsync(file);
+        var xliffFile = stream.ConvertMqXliffToXliff(useSkeleton);
+        
+        var xliffStream = new MemoryStream();
+        xliffFile.Save(xliffStream);
+        
+        string fileName = file.Name.Replace(".mqxliff", ".xliff");
+        string contentType = MimeTypes.GetMimeType(fileName);
+        return await _fileManagementClient.UploadAsync(xliffStream, contentType, fileName);
+    } 
 }
