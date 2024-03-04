@@ -47,11 +47,6 @@ public class FileActions : LokaliseInvocable
     public async Task<QueuedProcessDto> UploadFile([ActionParameter] ProjectRequest project,
         [ActionParameter] UploadFileInput input)
     {
-        if(input.File.Name.EndsWith(".mqxliff"))
-        {
-            input.File = await ConvertMqXliffToXliff(input.File);
-        }
-        
         var endpoint = $"/projects/{project.ProjectId}/files/upload";
         var request =
             new LokaliseRequest(endpoint, Method.Post, Creds).WithJsonBody(
@@ -60,6 +55,20 @@ public class FileActions : LokaliseInvocable
 
         return await Client
             .PollFileImportOperation(project.ProjectId, uploadResult.Process.ProcessId, Creds);
+    }
+    
+    [Action("Upload file to project as XLIFF", Description = "Upload file to project")]
+    public async Task<QueuedProcessDto> UploadFileAsXliff([ActionParameter] ProjectRequest project,
+        [ActionParameter] UploadFileInput input)
+    {
+        if(input.File.Name.EndsWith(".mqxliff"))
+        {
+            var fileReference = await ConvertMqXliffToXliff(input.File);
+            input.File = fileReference;
+            return await UploadFile(project, input);
+        }
+        
+        return await UploadFile(project, input);
     }
 
     [Action("Download all project files as ZIP", Description = "Download all project files as ZIP archive")]
