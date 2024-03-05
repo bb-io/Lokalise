@@ -226,7 +226,7 @@ public class FileActions : LokaliseInvocable
         xliffFile.Save(xliffStream);
         
         string fileName = file.Name.Replace(".mqxliff", ".xliff");
-        string contentType = MimeTypes.GetMimeType(fileName);
+        string contentType = MediaTypeNames.Text.Xml;
         return await _fileManagementClient.UploadAsync(xliffStream, contentType, fileName);
     } 
 }
