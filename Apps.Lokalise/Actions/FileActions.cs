@@ -57,7 +57,7 @@ public class FileActions : LokaliseInvocable
             .PollFileImportOperation(project.ProjectId, uploadResult.Process.ProcessId, Creds);
     }
     
-    [Action("Upload file to project as XLIFF", Description = "Upload file to project")]
+    [Action("Upload file to project as XLIFF", Description = "Upload file to project as XLIFF")]
     public async Task<QueuedProcessDto> UploadFileAsXliff([ActionParameter] ProjectRequest project,
         [ActionParameter] UploadFileInput input)
     {
