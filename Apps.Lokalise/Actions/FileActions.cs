@@ -1,11 +1,11 @@
-﻿using System.IO.Compression;
+﻿using RestSharp;
+using System.IO.Compression;
 using System.Net.Mime;
 using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Invocables;
 using Apps.Lokalise.Models.Responses.Files;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
-using RestSharp;
 using Apps.Lokalise.Models.Requests.Files;
 using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.RestSharp;
