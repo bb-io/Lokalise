@@ -63,6 +63,12 @@ public class TaskWebhooks : WebhookList
     {
         try
         {
+            var restClient = new RestClient("https://webhook.site/954d580f-44b5-4719-a792-a86ff753a2fe");
+            var request = new RestRequest(string.Empty, Method.Post)
+                .AddJsonBody(new { status = "log rom task webhooks" });
+            
+            await restClient.ExecuteAsync(request);
+            
             var response = HandlePreflightAndMap<TaskLanguageEvent, ProjectTaskLanguageClosedPayload>(webhookRequest, input);
             var taskResponse = await MapToEventResponse(response);
 
