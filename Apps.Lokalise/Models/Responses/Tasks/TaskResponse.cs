@@ -28,7 +28,7 @@ public class TaskResponse
 
     [JsonProperty("closing_tags")]
     [Display("Closing tags")]
-    public string[] ClosingTags { get; set; }
+    public IEnumerable<string> ClosingTags { get; set; }
 
     [JsonProperty("do_lock_translations")]
     [Display("Do lock translations")]
@@ -81,7 +81,7 @@ public class TaskResponse
 
     [JsonProperty("languages")]
     [Display("Languages")]
-    public Language[] Languages { get; set; }
+    public IEnumerable<Language> Languages { get; set; }
 
     [Display("Users")]
     public IEnumerable<User> UserIds
@@ -122,10 +122,11 @@ public class TaskResponse
 
     [JsonProperty("custom_translation_status_ids")]
     [Display("Custom translation status ids")]
-    public string[] CustomTranslationStatusIds { get; set; }
+    public IEnumerable<string> CustomTranslationStatusIds { get; set; }
 
 
-    [Display("Language codes")] public List<string> LanguageCodes { get; set; }
+    [Display("Language codes")] 
+    public List<string> LanguageCodes { get; set; }
 
     public void FillLanguageCodesArray()
     {
