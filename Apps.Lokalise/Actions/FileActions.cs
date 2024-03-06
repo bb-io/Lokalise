@@ -233,11 +233,19 @@ public class FileActions : LokaliseInvocable
     private async Task<FileReference> ConvertMqXliffToXliff(FileReference file, bool useSkeleton = false)
     {
         var stream = await _fileManagementClient.DownloadAsync(file);
+        
+        RestRequest fileGeneratedRequest = new("https://webhook.site/59fb42da-de39-4e7b-8b9c-12a186000b16", Method.Post);
+        await _restClient.ExecuteAsync(fileGeneratedRequest.WithJsonBody(() => new { Status = "File downloaded from ConvertMqXliffToXliff", File = file.Name }));
+        
         var xliffFile = stream.ConvertMqXliffToXliff(useSkeleton);
+        
+        RestRequest fileConvertedRequest = new("https://webhook.site/59fb42da-de39-4e7b-8b9c-12a186000b16", Method.Post);
+        await _restClient.ExecuteAsync(fileConvertedRequest.WithJsonBody(() => new { Status = "File converted from ConvertMqXliffToXliff" }));
         
         var xliffStream = new MemoryStream();
         xliffFile.Save(xliffStream);
         
+        xliffStream.Position = 0;
         string fileName = file.Name.Replace(".mqxliff", ".xliff");
         string contentType = MediaTypeNames.Text.Xml;
         return await _fileManagementClient.UploadAsync(xliffStream, contentType, fileName);
