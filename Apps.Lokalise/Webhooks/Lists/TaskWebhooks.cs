@@ -64,6 +64,16 @@ public class TaskWebhooks : WebhookList
         var response = HandlePreflightAndMap<TaskLanguageEvent, ProjectTaskLanguageClosedPayload>(webhookRequest, input);
         var taskResponse = await MapToEventResponse(response);
 
+        if (taskResponse.ReceivedWebhookRequestType == WebhookRequestType.Preflight)
+        {
+            return new WebhookResponse<GetTaskLanguageEvent>()
+            {
+                HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
+                Result = null,
+                ReceivedWebhookRequestType = WebhookRequestType.Preflight
+            };
+        }
+
         var taskLanguageEvent = new GetTaskLanguageEvent(response.Result, taskResponse.Result.Task);
         return new()
         {
