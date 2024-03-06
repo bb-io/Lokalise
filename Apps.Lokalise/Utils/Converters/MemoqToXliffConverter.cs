@@ -8,11 +8,12 @@ public static class MemoqToXliffConverter
     private static readonly XNamespace ns = "urn:oasis:names:tc:xliff:document:1.2";
     private static XNamespace _mqNs = "MQXliff";
 
-    public static XDocument ConvertMqXliffToXliff(this Stream inputStream, bool useSkeleton)
+        public static XDocument ConvertMqXliffToXliff(this Stream inputStream, bool useSkeleton, bool ignoreChildrenInSource = true)
     {
         using var reader = new StreamReader(inputStream, Encoding.UTF8);
         var xliffDocument = XDocument.Load(reader);
 
+        // Extract the default namespace from the .mqxliff file.
         XNamespace defaultNs = xliffDocument.Root.GetDefaultNamespace();
 
         var newXliff = new XDocument(
@@ -23,7 +24,7 @@ public static class MemoqToXliffConverter
                     new XAttribute("target-language", xliffDocument.Root?.Element(defaultNs + "file")?.Attribute("target-language")?.Value ?? "unknown"),
                     new XAttribute("datatype", xliffDocument.Root?.Element(defaultNs + "file")?.Attribute("datatype")?.Value ?? "plaintext"),
                     CreateHeader(xliffDocument, useSkeleton),
-                    CreateBody(xliffDocument, defaultNs)
+                    CreateBody(xliffDocument, defaultNs, ignoreChildrenInSource)
                 )
             )
         );
@@ -49,7 +50,7 @@ public static class MemoqToXliffConverter
         return header;
     }
 
-    private static XElement CreateBody(XDocument xliffDocument, XNamespace defaultNs)
+    private static XElement CreateBody(XDocument xliffDocument, XNamespace defaultNs, bool ignoreChildren)
     {
         var body = new XElement(ns + "body");
         
@@ -59,10 +60,10 @@ public static class MemoqToXliffConverter
                 new XAttribute("id", transUnit.Attribute("id")?.Value ?? "unknown")
             );
 
-            var sourceElement = ProcessTransUnitElement(transUnit.Element(defaultNs + "source"));
+            var sourceElement = ProcessTransUnitElement(transUnit.Element(defaultNs + "source"), ignoreChildren);
             if (sourceElement != null) newTransUnitElement.Add(sourceElement);
 
-            var targetElement = ProcessTransUnitElement(transUnit.Element(defaultNs + "target"));
+            var targetElement = ProcessTransUnitElement(transUnit.Element(defaultNs + "target"), ignoreChildren);
             if (targetElement != null) newTransUnitElement.Add(targetElement);
 
             body.Add(newTransUnitElement);
@@ -71,16 +72,36 @@ public static class MemoqToXliffConverter
         return body;
     }
 
-    private static XElement? ProcessTransUnitElement(XElement? element)
+    private static XElement ProcessTransUnitElement(XElement element, bool ignoreChildren)
     {
-        if (element == null) return null;
+        // Create a new element that matches the name of the original, ensuring it's in the correct namespace
+        var newElement = new XElement(ns + element.Name.LocalName);
 
-        if (element.HasElements)
+        // Check if the element contains nested elements (e.g., <ph> tags)
+        foreach (var node in element.Nodes())
         {
-            var newElement = new XElement(ns + element.Name.LocalName);
-            return newElement;
+            if (node is XElement childElement && !ignoreChildren)
+            {
+                // Recursively process nested elements to support deep structures
+                var processedChild = ProcessTransUnitElement(childElement, ignoreChildren);
+                newElement.Add(processedChild);
+            }
+            else if (node is XText textNode)
+            {
+                newElement.Add(ProcessTextNodeValue(element.Name.LocalName, textNode.Value));
+            }
         }
-        
-        return new XElement(ns + element.Name.LocalName, element.Value);
+
+        return newElement;
+    }
+    
+    private static string ProcessTextNodeValue(string elementName, string textValue)
+    {
+        if (elementName == "source" || elementName == "target")
+        {
+            return textValue.TrimStart();
+        }
+
+        return textValue;
     }
 }
