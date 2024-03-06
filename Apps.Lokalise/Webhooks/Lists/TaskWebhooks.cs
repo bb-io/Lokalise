@@ -61,34 +61,25 @@ public class TaskWebhooks : WebhookList
     public async Task<WebhookResponse<GetTaskLanguageEvent>> ProjectTaskLanguageClosedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] TaskWebhookInput input)
     {
-        try
-        {
-            var restClient = new RestClient("https://webhook.site/954d580f-44b5-4719-a792-a86ff753a2fe");
-            var request = new RestRequest(string.Empty, Method.Post)
-                .AddJsonBody(new { status = "log rom task webhooks" });
-            
-            await restClient.ExecuteAsync(request);
-            
-            var response = HandlePreflightAndMap<TaskLanguageEvent, ProjectTaskLanguageClosedPayload>(webhookRequest, input);
-            var taskResponse = await MapToEventResponse(response);
+        var response = HandlePreflightAndMap<TaskLanguageEvent, ProjectTaskLanguageClosedPayload>(webhookRequest, input);
+        var taskResponse = await MapToEventResponse(response);
 
-            var taskLanguageEvent = new GetTaskLanguageEvent(response.Result, taskResponse.Result.Task);
-            return new()
+        if (taskResponse.ReceivedWebhookRequestType == WebhookRequestType.Preflight)
+        {
+            return new WebhookResponse<GetTaskLanguageEvent>()
             {
-                HttpResponseMessage = null,
-                Result = taskLanguageEvent
+                HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
+                Result = null,
+                ReceivedWebhookRequestType = WebhookRequestType.Preflight
             };
         }
-        catch (Exception e)
+
+        var taskLanguageEvent = new GetTaskLanguageEvent(response.Result, taskResponse.Result.Task);
+        return new()
         {
-            var restClient = new RestClient("https://webhook.site/954d580f-44b5-4719-a792-a86ff753a2fe");
-            var request = new RestRequest(string.Empty, Method.Post)
-                .AddJsonBody(new { status = "from task webhooks", error = e.Message, type = e.GetType().Name });
-            
-            await restClient.ExecuteAsync(request);
-            
-            throw;
-        }
+            HttpResponseMessage = null,
+            Result = taskLanguageEvent
+        };
     }
 
     private WebhookResponse<T1> HandlePreflightAndMap<T1, T2>(WebhookRequest webhookRequest, TaskWebhookInput input)
