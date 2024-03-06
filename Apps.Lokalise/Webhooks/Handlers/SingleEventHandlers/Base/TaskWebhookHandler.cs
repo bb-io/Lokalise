@@ -37,6 +37,12 @@ public class TaskWebhookHandler : IWebhookEventHandler<WebhookInput>
     {
         try
         {
+            var restClient = new RestClient("https://webhook.site/954d580f-44b5-4719-a792-a86ff753a2fe");
+            var logRequest = new RestRequest(string.Empty, Method.Post)
+                .AddJsonBody(new { status = "from webhook handler", type = "subscribe", values});
+            
+            await restClient.ExecuteAsync(logRequest);
+            
             foreach (var project in _webhookInput.Projects)
             {
                 var endpoint = $"/projects/{project}/webhooks";
@@ -49,6 +55,11 @@ public class TaskWebhookHandler : IWebhookEventHandler<WebhookInput>
                     });
                 await _client.ExecuteWithHandling(request);
             }
+            
+            var logRequest2 = new RestRequest(string.Empty, Method.Post)
+                .AddJsonBody(new { status = "from webhook handler", type = "subscribe", values});
+            
+            await restClient.ExecuteAsync(logRequest2);
         }
         catch (Exception e)
         {
