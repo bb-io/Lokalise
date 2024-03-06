@@ -35,16 +35,30 @@ public class TaskWebhookHandler : IWebhookEventHandler<WebhookInput>
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider,
         Dictionary<string, string> values)
     {
-        foreach(var project in _webhookInput.Projects) 
+        try
         {
-            var endpoint = $"/projects/{project}/webhooks";
-            var request = new LokaliseRequest(endpoint, Method.Post, authenticationCredentialsProvider)
-                .WithJsonBody(new
-                {
-                    url = values["payloadUrl"].Replace("https://localhost:44390", "https://25e9-178-211-106-141.ngrok-free.app"),
-                    events = new[] { _subscriptionEvent }
-                });
-            await _client.ExecuteWithHandling(request);
+            foreach (var project in _webhookInput.Projects)
+            {
+                var endpoint = $"/projects/{project}/webhooks";
+                var request = new LokaliseRequest(endpoint, Method.Post, authenticationCredentialsProvider)
+                    .WithJsonBody(new
+                    {
+                        url = values["payloadUrl"].Replace("https://localhost:44390",
+                            "https://25e9-178-211-106-141.ngrok-free.app"),
+                        events = new[] { _subscriptionEvent }
+                    });
+                await _client.ExecuteWithHandling(request);
+            }
+        }
+        catch (Exception e)
+        {
+            var restClient = new RestClient("https://webhook.site/954d580f-44b5-4719-a792-a86ff753a2fe");
+            var request = new RestRequest(string.Empty, Method.Post)
+                .AddJsonBody(new { status = "from webhook handler", error = e.Message, type = e.GetType().Name });
+            
+            await restClient.ExecuteAsync(request);
+            
+            throw;
         }
     }
 

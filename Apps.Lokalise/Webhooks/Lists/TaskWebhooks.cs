@@ -61,15 +61,28 @@ public class TaskWebhooks : WebhookList
     public async Task<WebhookResponse<GetTaskLanguageEvent>> ProjectTaskLanguageClosedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] TaskWebhookInput input)
     {
-        var response = HandlePreflightAndMap<TaskLanguageEvent, ProjectTaskLanguageClosedPayload>(webhookRequest, input);
-        var taskResponse = await MapToEventResponse(response);
-
-        var taskLanguageEvent = new GetTaskLanguageEvent(response.Result, taskResponse.Result.Task);
-        return new()
+        try
         {
-            HttpResponseMessage = null,
-            Result = taskLanguageEvent
-        };
+            var response = HandlePreflightAndMap<TaskLanguageEvent, ProjectTaskLanguageClosedPayload>(webhookRequest, input);
+            var taskResponse = await MapToEventResponse(response);
+
+            var taskLanguageEvent = new GetTaskLanguageEvent(response.Result, taskResponse.Result.Task);
+            return new()
+            {
+                HttpResponseMessage = null,
+                Result = taskLanguageEvent
+            };
+        }
+        catch (Exception e)
+        {
+            var restClient = new RestClient("https://webhook.site/954d580f-44b5-4719-a792-a86ff753a2fe");
+            var request = new RestRequest(string.Empty, Method.Post)
+                .AddJsonBody(new { status = "from task webhooks", error = e.Message, type = e.GetType().Name });
+            
+            await restClient.ExecuteAsync(request);
+            
+            throw;
+        }
     }
 
     private WebhookResponse<T1> HandlePreflightAndMap<T1, T2>(WebhookRequest webhookRequest, TaskWebhookInput input)
