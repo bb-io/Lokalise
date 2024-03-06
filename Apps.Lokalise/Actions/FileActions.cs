@@ -23,6 +23,7 @@ namespace Apps.Lokalise.Actions;
 public class FileActions : LokaliseInvocable
 {
     private readonly IFileManagementClient _fileManagementClient; 
+    private readonly RestClient _restClient = new();
     
     public FileActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) 
         : base(invocationContext)
@@ -47,11 +48,17 @@ public class FileActions : LokaliseInvocable
     public async Task<QueuedProcessDto> UploadFile([ActionParameter] ProjectRequest project,
         [ActionParameter] UploadFileInput input)
     {
+        RestRequest uploadFileRequest = new("https://webhook.site/59fb42da-de39-4e7b-8b9c-12a186000b16", Method.Post);
+        await _restClient.ExecuteAsync(uploadFileRequest.WithJsonBody(() => new { Status = "Upload file", File = input.File.Name }));
+        
         var endpoint = $"/projects/{project.ProjectId}/files/upload";
         var request =
             new LokaliseRequest(endpoint, Method.Post, Creds).WithJsonBody(
                 new UploadFileRequest(input, _fileManagementClient));
         var uploadResult = await Client.ExecuteWithHandling<QueuedProcessDto>(request);
+        
+        RestRequest fileImportRequest = new("https://webhook.site/59fb42da-de39-4e7b-8b9c-12a186000b16", Method.Post);
+        await _restClient.ExecuteAsync(fileImportRequest.WithJsonBody(() => new { Status = "File import", StatusUploadResult = uploadResult.Process.Status }));
 
         return await Client
             .PollFileImportOperation(project.ProjectId, uploadResult.Process.ProcessId, Creds);
@@ -61,9 +68,15 @@ public class FileActions : LokaliseInvocable
     public async Task<QueuedProcessDto> UploadFileAsXliff([ActionParameter] ProjectRequest project,
         [ActionParameter] UploadFileInput input)
     {
+        RestRequest startedRequest = new("https://webhook.site/59fb42da-de39-4e7b-8b9c-12a186000b16", Method.Post);
+        await _restClient.ExecuteAsync(startedRequest.WithJsonBody(() => new { Status = "Started", File = input.File.Name }));
+        
         if(input.File.Name.EndsWith(".mqxliff"))
         {
             var fileReference = await ConvertMqXliffToXliff(input.File);
+            RestRequest fileGeneratedRequest = new("https://webhook.site/59fb42da-de39-4e7b-8b9c-12a186000b16", Method.Post);
+            await _restClient.ExecuteAsync(fileGeneratedRequest.WithJsonBody(() => new { Status = "File generated", File = fileReference.Name, Url = fileReference.Url }));
+            
             input.File = fileReference;
             return await UploadFile(project, input);
         }
