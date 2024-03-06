@@ -83,9 +83,9 @@ public class TaskResponse
     [Display("Languages")]
     public IEnumerable<Language> Languages { get; set; }
 
-    [Display("User IDs")]
-    public IEnumerable<string> UserIds
-        => Languages.SelectMany(x => x.Users.Select(x => x.UserId)).Distinct();
+    [Display("Users")]
+    public IEnumerable<User> UserIds
+        => Languages.SelectMany(x => x.Users).Distinct();
 
     [JsonProperty("source_language_iso")]
     [Display("Source language code")]

@@ -39,7 +39,7 @@ namespace Apps.Lokalise.Dtos
         [JsonProperty("language_id")]
         public int LanguageId { get; set; }
 
-        [Display("Language ISO")]
+        [Display("Language code")]
         [JsonProperty("language_iso")]
         public string LanguageIso { get; set; }
 

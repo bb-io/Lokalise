@@ -4,6 +4,7 @@ using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Invocables;
 using Apps.Lokalise.Models.Requests.Keys;
 using Apps.Lokalise.Models.Requests.Projects;
+using Apps.Lokalise.Models.Requests.Tasks.Base;
 using Apps.Lokalise.Models.Responses.Keys;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
@@ -26,9 +27,10 @@ public class KeyActions : LokaliseInvocable
 
     #region Actions
 
-    [Action("List all project keys", Description = "List all project keys")]
-    public async Task<ListProjectKeysResponse> ListProjectKeys([ActionParameter] ProjectRequest project,
-        [ActionParameter] ListProjectKeysRequest input)
+    [Action("Get project keys", Description = "Get all project keys")]
+    public async Task<ListProjectKeysResponse> GetProjectKeys([ActionParameter] ProjectRequest project,
+        [ActionParameter] ListProjectKeysRequest input,
+        [ActionParameter] ListProjectKeysFilters filters)
     {
         var baseEndpoint = $"/projects/{project.ProjectId}/keys";
         var query = input.AsLokaliseDictionary().AllIsNotNull();
@@ -37,7 +39,60 @@ public class KeyActions : LokaliseInvocable
 
         var items = await Paginator.GetAll<KeysWrapper, KeyDto>(Creds, endpointWithQuery);
 
-        return new(items);
+        items = items
+            .Where(x => filters.Reviewed is null ||
+                        x.Translations?.Any(x =>
+                            x.IsReviewed == filters.Reviewed && (filters.ReviewedLanguage is null ||
+                                                                 x.LanguageIso ==
+                                                                 filters.ReviewedLanguage)) is true)
+            .Where(x => filters.Unverified is null ||
+                        x.Translations?.Any(x =>
+                                x.IsUnverified == filters.Unverified && (filters.UnverifiedLanguage is null ||
+                                                                         x.LanguageIso == filters.UnverifiedLanguage))
+                            is
+                            true)
+            .Where(x => filters.TagsToSkip is null || x.Tags.All(x => !filters.TagsToSkip.Contains(x)))
+            .Where(x => filters.UntranslatedLanguage is null ||
+                        string.IsNullOrWhiteSpace(x.Translations
+                            .First(x => x.LanguageIso == filters.UntranslatedLanguage).Translation))
+            .ToList();
+
+        return new ListProjectKeysResponse { Keys = items, ProjectId = project.ProjectId };
+    }
+
+    [Action("List key IDs", Description = "List key IDs based on the provided filters")]
+    public async Task<ListProjectKeyIdsResponse> ListKeyIds([ActionParameter] ProjectRequest project,
+        [ActionParameter] ListProjectKeysBaseRequest input,
+        [ActionParameter] ListProjectKeysFilters filters)
+    {
+        var keys = await GetProjectKeys(project, new ListProjectKeysRequest(input)
+        {
+            IncludeTranslations = true
+        }, new ListProjectKeysFilters());
+
+        var keyIds = keys.Keys.Where(x => filters.Reviewed is null ||
+                                          x.Translations?.Any(x =>
+                                              x.IsReviewed == filters.Reviewed &&
+                                              (filters.ReviewedLanguage is null ||
+                                               x.LanguageIso ==
+                                               filters.ReviewedLanguage)) is true)
+            .Where(x => filters.Unverified is null ||
+                        x.Translations?.Any(x =>
+                                x.IsUnverified == filters.Unverified && (filters.UnverifiedLanguage is null ||
+                                                                         x.LanguageIso == filters.UnverifiedLanguage))
+                            is
+                            true)
+            .Where(x => filters.TagsToSkip is null || x.Tags.All(x => !filters.TagsToSkip.Contains(x)))
+            .Where(x => filters.UntranslatedLanguage is null ||
+                        string.IsNullOrWhiteSpace(x.Translations
+                            .First(x => x.LanguageIso == filters.UntranslatedLanguage).Translation))
+            .Select(x => x.KeyId)
+            .ToArray();
+        
+        return new()
+        {
+            KeyIds = keyIds
+        };
     }
 
     [Action("Create key", Description = "Create key in project")]

@@ -10,7 +10,7 @@ public class LanguageDto
     public string LangId { get; set; }
 
     [JsonProperty("lang_iso")]
-    [Display("Language iso")]
+    [Display("Language code")]
     public string LangIso { get; set; }
         
     [JsonProperty("lang_name")]

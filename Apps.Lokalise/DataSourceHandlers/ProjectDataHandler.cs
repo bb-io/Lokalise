@@ -23,7 +23,9 @@ public class ProjectDataHandler : LokaliseInvocable, IAsyncDataSourceHandler
         return projects.Projects
             .Where(x => context.SearchString == null ||
                         x.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
+            .DistinctBy(x => x.ProjectId)
             .OrderByDescending(x => x.CreatedAt)
+            .DistinctBy(x => x.ProjectId)
             .Take(20)
             .ToDictionary(x => x.ProjectId, x => x.Name);
     }

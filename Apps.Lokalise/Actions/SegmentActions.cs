@@ -24,7 +24,7 @@ public class SegmentActions : LokaliseInvocable
 
     #region Actions
 
-    [Action("List all segments", Description = "List all key segments")]
+    [Action("Get all segments", Description = "Get all key segments")]
     public async Task<ListAllSegmentsResponse> ListAllSegments([ActionParameter] ListAllSegmentsPathRequest pathInput,
         [ActionParameter] ListAllSegmentsQueryRequest queryInput)
     {

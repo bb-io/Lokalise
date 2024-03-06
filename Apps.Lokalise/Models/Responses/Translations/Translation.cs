@@ -14,27 +14,11 @@ public class Translation
     public string KeyId { get; set; }
 
     [JsonProperty("language_iso")]
-    [Display("Language ISO")]
+    [Display("Language code")]
     public string LanguageIso { get; set; }
 
-    [JsonProperty("modified_at")]
-    [Display("Modified at")]
-    public string ModifiedAt { get; set; }
-
-    [JsonProperty("modified_at_timestamp")]
-    [Display("Modified at timestamp")]
-    public int ModifiedAtTimestamp { get; set; }
-
-    [JsonProperty("modified_by")]
-    [Display("Modified by")]
-    public int ModifiedBy { get; set; }
-
-    [JsonProperty("modified_by_email")]
-    [Display("Modified by email")]
-    public string ModifiedByEmail { get; set; }
-
     [JsonProperty("translation")]
-    [Display("Translation")]
+    [Display("Translation text")]
     public string TranslationText { get; set; }
 
     [JsonProperty("is_unverified")]
@@ -45,19 +29,7 @@ public class Translation
     [Display("Is reviewed")]
     public bool IsReviewed { get; set; }
 
-    [JsonProperty("reviewed_by")]
-    [Display("Reviewed by")]
-    public int ReviewedBy { get; set; }
-
-    [JsonProperty("words")]
-    [Display("Words")]
-    public int Words { get; set; }
-
     [JsonProperty("task_id")]
     [Display("Task ID")]
     public string? TaskId { get; set; }
-
-    [JsonProperty("segment_number")]
-    [Display("Segment number")]
-    public int SegmentNumber { get; set; }
 }

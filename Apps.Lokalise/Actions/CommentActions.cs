@@ -20,12 +20,12 @@ public class CommentActions : LokaliseInvocable
 
     #region Actions
 
-    [Action("Add comments", Description = "Add comments to the key")]
+    [Action("Add comment", Description = "Add a comment to a key")]
     public Task<CommentsResponse> AddComment([ActionParameter] KeyRequest pathData,
-        [ActionParameter] [Display("Comments")] IEnumerable<string> comments)
+        [ActionParameter] [Display("Comment")] string comment)
     {
         var endpoint = $"/projects/{pathData.ProjectId}/keys/{pathData.KeyId}/comments";
-        var payload = new AddCommentsRequest(comments);
+        var payload = new AddCommentsRequest(new List<string> { comment });
 
         var request = new LokaliseRequest(endpoint, Method.Post, Creds)
             .WithJsonBody(payload);

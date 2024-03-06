@@ -6,7 +6,7 @@ namespace Apps.Lokalise.Models.Requests.Translations;
 public class UpdateTranslationRequest
 {
     [JsonProperty("translation")]
-    [Display("Translation")]
+    [Display("Translation text")]
     public string Translation { get; set; }
 
     [JsonProperty("is_unverified")]

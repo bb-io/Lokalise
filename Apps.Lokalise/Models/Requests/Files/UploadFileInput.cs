@@ -1,7 +1,7 @@
 ﻿using Apps.Lokalise.DataSourceHandlers;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
-using File = Blackbird.Applications.Sdk.Common.Files.File;
+using Blackbird.Applications.Sdk.Common.Files;
 
 namespace Apps.Lokalise.Models.Requests.Files;
 
@@ -10,7 +10,7 @@ public class UploadFileInput
     [Display("File name")]
     public string? FileName { get; set; }
 
-    public File File { get; set; }
+    public FileReference File { get; set; }
         
     [Display("Language code")]
     [DataSource(typeof(LanguageDataHandler))]

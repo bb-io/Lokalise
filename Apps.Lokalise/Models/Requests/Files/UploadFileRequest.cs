@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
+using Blackbird.Applications.Sdk.Utils.Extensions.Files;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Requests.Files;
 
@@ -57,10 +59,10 @@ public class UploadFileRequest
 
     [JsonProperty("filter_task_id")] public long? FilterTaskId { get; set; }
 
-    public UploadFileRequest(UploadFileInput input)
+    public UploadFileRequest(UploadFileInput input, IFileManagementClient fileManagementClient)
     {
         FileName = input.FileName ?? input.File.Name;
-        File = input.File.Bytes;
+        File = fileManagementClient.DownloadAsync(input.File).Result.GetByteData().Result;
         LanguageCode = input.LanguageCode;
         ConvertPlaceHolders = input.ConvertPlaceHolders;
         DetectIcuPlurals = input.DetectIcuPlurals;
