@@ -29,7 +29,6 @@ public class CommentActions : LokaliseInvocable
 
         var request = new LokaliseRequest(endpoint, Method.Post, Creds)
             .WithJsonBody(payload);
-
         return Client.ExecuteWithHandling<CommentsResponse>(request);
     }
 
