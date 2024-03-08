@@ -41,7 +41,6 @@ public class TaskCreateWithMultLangsRequest : BaseTaskCreateRequest
         Title = input.Title;
         Description = input.Description;
         DueDate = input.DueDate;
-        Keys = keys;
         Languages = new List<TaskLanguage> { new TaskLanguage()
         {
             LanguageIso = input.TargetLanguageIso,
@@ -57,6 +56,8 @@ public class TaskCreateWithMultLangsRequest : BaseTaskCreateRequest
         ClosingTags = input.ClosingTags;
         DoLockTranslations = input.DoLockTranslations;
         CustomTranslationStatusIds = input.CustomTranslationStatusIds;
+
+        if (ParentTaskId == null) Keys = keys;
     }
 
     public TaskCreateWithMultLangsRequest(TaskFromBuiltLangsRequest input)

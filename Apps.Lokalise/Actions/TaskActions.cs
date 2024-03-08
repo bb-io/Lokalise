@@ -97,16 +97,20 @@ public class TaskActions : LokaliseInvocable
         if (langId == null) throw new Exception($"Language {parameters.TargetLanguageIso} is not part of this project.");
 
         // Getting all the translations
-        var translationsRequest = new LokaliseRequest($"/projects/{project.ProjectId}/translations", Method.Get, Creds);
-        translationsRequest.AddParameter("filter_lang_id", langId);
+        IEnumerable<string> keys;
+        if (parameters.ParentTaskId == null)
+        {
+            var translationsRequest = new LokaliseRequest($"/projects/{project.ProjectId}/translations", Method.Get, Creds);
+            translationsRequest.AddParameter("filter_lang_id", langId);
 
-        if (filters.FilterIsReviewed.HasValue) translationsRequest.AddParameter("filter_is_reviewed", filters.FilterIsReviewed.Value ? 1 : 0);
-        if (filters.FilterUnverified.HasValue) translationsRequest.AddParameter("filter_unverified", filters.FilterUnverified.Value ? 1 : 0);
-        if (filters.FilterUntranslated.HasValue) translationsRequest.AddParameter("filter_untranslated", filters.FilterUntranslated.Value ? 1 : 0);
+            if (filters.FilterIsReviewed.HasValue) translationsRequest.AddParameter("filter_is_reviewed", filters.FilterIsReviewed.Value ? 1 : 0);
+            if (filters.FilterUnverified.HasValue) translationsRequest.AddParameter("filter_unverified", filters.FilterUnverified.Value ? 1 : 0);
+            if (filters.FilterUntranslated.HasValue) translationsRequest.AddParameter("filter_untranslated", filters.FilterUntranslated.Value ? 1 : 0);
 
-        var translations = await Client.ExecutePaginated<TranslationsWrapper, TranslationObj>(translationsRequest, 5000);
+            var translations = await Client.ExecutePaginated<TranslationsWrapper, TranslationObj>(translationsRequest, 5000);
 
-        var keys = translations.Select(x => x.KeyId);
+            keys = translations.Select(x => x.KeyId);
+        }        
 
         // Create task
         var payload = new TaskCreateWithMultLangsRequest(parameters, assigneesRequest, keys);
