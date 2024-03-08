@@ -97,7 +97,7 @@ public class TaskActions : LokaliseInvocable
         if (langId == null) throw new Exception($"Language {parameters.TargetLanguageIso} is not part of this project.");
 
         // Getting all the translations
-        IEnumerable<string> keys;
+        IEnumerable<string> keys = new List<string>();
         if (parameters.ParentTaskId == null)
         {
             var translationsRequest = new LokaliseRequest($"/projects/{project.ProjectId}/translations", Method.Get, Creds);
