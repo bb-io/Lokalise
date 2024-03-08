@@ -36,6 +36,29 @@ public class TaskCreateWithMultLangsRequest : BaseTaskCreateRequest
         CustomTranslationStatusIds = input.CustomTranslationStatusIds;
     }
 
+    public TaskCreateWithMultLangsRequest(LanguageTaskCreateRequest input, TaskAssigneesRequest assigneesRequest, IEnumerable<string> keys)
+    {
+        Title = input.Title;
+        Description = input.Description;
+        DueDate = input.DueDate;
+        Keys = keys;
+        Languages = new List<TaskLanguage> { new TaskLanguage()
+        {
+            LanguageIso = input.TargetLanguageIso,
+            Users = assigneesRequest.Users,
+            Groups = assigneesRequest.Groups
+        } };
+        SourceLanguageIso = input.SourceLanguageIso;
+        AutoCloseLanguages = input.AutoCloseLanguages;
+        AutoCloseTask = input.AutoCloseTask;
+        AutoCloseItems = input.AutoCloseItems;
+        LokaliseTaskType = input.LokaliseTaskType;
+        ParentTaskId = input.ParentTaskId;
+        ClosingTags = input.ClosingTags;
+        DoLockTranslations = input.DoLockTranslations;
+        CustomTranslationStatusIds = input.CustomTranslationStatusIds;
+    }
+
     public TaskCreateWithMultLangsRequest(TaskFromBuiltLangsRequest input)
     {
         Title = input.Title;

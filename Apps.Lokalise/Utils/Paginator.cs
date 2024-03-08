@@ -14,7 +14,7 @@ public static class Paginator
         Client = new();
     }
     
-    public static async Task<List<TV>> GetAll<T, TV>(AuthenticationCredentialsProvider[] creds, string baseUrl) where T : PaginationResponse<TV>
+    public static async Task<List<TV>> GetAll<T, TV>(AuthenticationCredentialsProvider[] creds, string baseUrl, int limit = 100) where T : PaginationResponse<TV>
     {
         var results = new List<TV>();
         T response;
@@ -23,8 +23,8 @@ public static class Paginator
         do
         {
             var requestUrl = baseUrl.Contains("?") ?
-                $"{baseUrl}&page={page++}" :
-                $"{baseUrl}?page={page++}";
+                $"{baseUrl}&page={page++}&limit={limit}" :
+                $"{baseUrl}?page={page++}&limit={limit}";
             
             var request = new LokaliseRequest(requestUrl, Method.Get, creds);
             

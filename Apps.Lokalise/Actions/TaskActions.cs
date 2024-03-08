@@ -5,7 +5,9 @@ using Apps.Lokalise.Invocables;
 using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.Models.Requests.Tasks;
 using Apps.Lokalise.Models.Requests.Tasks.Base;
+using Apps.Lokalise.Models.Requests.Translations;
 using Apps.Lokalise.Models.Responses.Keys;
+using Apps.Lokalise.Models.Responses.Languages;
 using Apps.Lokalise.Models.Responses.Tasks;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
@@ -71,6 +73,44 @@ public class TaskActions : LokaliseInvocable
 
         var payload = new TaskCreateWithMultLangsRequest(parameters);
         var request = new LokaliseRequest(endpoint, Method.Post, Creds)
+            .WithJsonBody(payload, JsonConfig.SerializeSettings);
+
+        var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
+        response.Task.FillLanguageCodesArray();
+
+        return response.Task;
+    }
+
+    [Action("Create language task", Description = "Create a new task with a single language for filtering keys and users")]
+    public async Task<TaskResponse> CreateLanguageTask([ActionParameter] ProjectRequest project,
+    [ActionParameter] LanguageTaskCreateRequest parameters,
+    [ActionParameter] TaskAssigneesRequest assigneesRequest,
+    [ActionParameter] FilterRequest filters)
+    {
+        if (assigneesRequest.Users is null && assigneesRequest.Groups is null)
+            throw new("One of the inputs must be specified: Users or Groups");
+
+        // Getting project languages
+        var languages = await Client.ExecutePaginated<LanguagesWrapper, LanguageDto>(new LokaliseRequest($"/projects/{project.ProjectId}/languages", Method.Get, Creds));
+
+        var langId = languages.Find(x => x.LangIso == parameters.TargetLanguageIso)?.LangId;
+        if (langId == null) throw new Exception($"Language {parameters.TargetLanguageIso} is not part of this project.");
+
+        // Getting all the translations
+        var translationsRequest = new LokaliseRequest($"/projects/{project.ProjectId}/translations", Method.Get, Creds);
+        translationsRequest.AddParameter("filter_lang_id", langId);
+
+        if (filters.FilterIsReviewed.HasValue) translationsRequest.AddParameter("filter_is_reviewed", filters.FilterIsReviewed.Value ? 1 : 0);
+        if (filters.FilterUnverified.HasValue) translationsRequest.AddParameter("filter_unverified", filters.FilterUnverified.Value ? 1 : 0);
+        if (filters.FilterUntranslated.HasValue) translationsRequest.AddParameter("filter_untranslated", filters.FilterUntranslated.Value ? 1 : 0);
+
+        var translations = await Client.ExecutePaginated<TranslationsWrapper, TranslationObj>(translationsRequest, 5000);
+
+        var keys = translations.Select(x => x.KeyId);
+
+        // Create task
+        var payload = new TaskCreateWithMultLangsRequest(parameters, assigneesRequest, keys);
+        var request = new LokaliseRequest($"/projects/{project.ProjectId}/tasks", Method.Post, Creds)
             .WithJsonBody(payload, JsonConfig.SerializeSettings);
 
         var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
