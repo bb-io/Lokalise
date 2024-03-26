@@ -147,7 +147,8 @@ public class TaskActions : LokaliseInvocable
                 users.AddRange(usersFromGroup);
             }
             
-            response.Task.UsersFromGroups = users;
+            response.Task.Users.AddRange(users);
+            response.Task.Users = response.Task.Users.Distinct().ToList();
         }
 
         return response.Task;
