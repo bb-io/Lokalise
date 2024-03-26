@@ -87,6 +87,9 @@ public class TaskResponse
     public IEnumerable<User> UserIds
         => Languages.SelectMany(x => x.Users).Distinct();
 
+    [Display("Users from groups")] 
+    public IEnumerable<User> UsersFromGroups { get; set; }
+
     [JsonProperty("source_language_iso")]
     [Display("Source language code")]
     public string SourceLanguageIso { get; set; }
