@@ -126,11 +126,10 @@ public class TaskActions : LokaliseInvocable
     }
 
     [Action("Get task", Description = "Get information about a specific task")]
-    public async Task<TaskResponse> RetrieveTask([ActionParameter] ProjectRequest project,
-        [ActionParameter] [Display("Task ID")] string taskId, 
+    public async Task<TaskResponse> RetrieveTask([ActionParameter] GetTaskRequest taskRequest, 
         [ActionParameter, Display("Team ID"), DataSource(typeof(TeamDataHandler))] string? teamId)
     {
-        var endpoint = $"/projects/{project.ProjectId}/tasks/{taskId}";
+        var endpoint = $"/projects/{taskRequest.ProjectId}/tasks/{taskRequest.TaskId}";
         var request = new LokaliseRequest(endpoint, Method.Get, Creds);
 
         var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
