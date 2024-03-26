@@ -1,4 +1,5 @@
-﻿using Blackbird.Applications.Sdk.Common;
+﻿using Apps.Lokalise.Models.Responses.Languages;
+using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Models.Responses.Tasks;
@@ -14,7 +15,7 @@ public class Language
 
     [JsonProperty("groups")]
     [Display("Groups")]
-    public object Groups { get; set; }
+    public List<GroupFromLanguageResponse> Groups { get; set; }
 
     [JsonProperty("keys")]
     [Display("Keys")]

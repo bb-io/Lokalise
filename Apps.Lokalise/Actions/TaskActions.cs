@@ -1,4 +1,5 @@
 ﻿using Apps.Lokalise.Constants;
+using Apps.Lokalise.DataSourceHandlers;
 using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Invocables;
@@ -13,6 +14,7 @@ using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
+using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.Sdk.Utils.Extensions.String;
@@ -124,14 +126,30 @@ public class TaskActions : LokaliseInvocable
     }
 
     [Action("Get task", Description = "Get information about a specific task")]
-    public async Task<TaskResponse> RetrieveTask([ActionParameter] ProjectRequest project,
-        [ActionParameter] [Display("Task ID")] string taskId)
+    public async Task<TaskResponse> RetrieveTask([ActionParameter] GetTaskRequest taskRequest, 
+        [ActionParameter, Display("Team ID"), DataSource(typeof(TeamDataHandler))] string? teamId)
     {
-        var endpoint = $"/projects/{project.ProjectId}/tasks/{taskId}";
+        var endpoint = $"/projects/{taskRequest.ProjectId}/tasks/{taskRequest.TaskId}";
         var request = new LokaliseRequest(endpoint, Method.Get, Creds);
 
         var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
         response.Task.FillLanguageCodesArray();
+
+        if (!string.IsNullOrEmpty(teamId))
+        {
+            var groups = response.Task.Languages.SelectMany(x => x.Groups);
+            
+            var users = new List<User>();
+            foreach (var item in groups)
+            {
+                var group = await GetGroupById(teamId, item.Id);
+                var usersFromGroup = await GetUsers(teamId, group.Members);
+                users.AddRange(usersFromGroup);
+            }
+            
+            response.Task.Users.AddRange(users);
+            response.Task.Users = response.Task.Users.Distinct().ToList();
+        }
 
         return response.Task;
     }

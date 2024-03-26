@@ -83,9 +83,8 @@ public class TaskResponse
     [Display("Languages")]
     public IEnumerable<Language> Languages { get; set; }
 
-    [Display("Users")]
-    public IEnumerable<User> UserIds
-        => Languages.SelectMany(x => x.Users).Distinct();
+    [Display("Users & group users")]
+    public List<User> Users { get; set; }
 
     [JsonProperty("source_language_iso")]
     [Display("Source language code")]
@@ -131,5 +130,14 @@ public class TaskResponse
     public void FillLanguageCodesArray()
     {
         LanguageCodes = Languages.Select(l => l.LanguageIso).ToList();
+
+        if (Users == null)
+        {
+            Users = Languages.SelectMany(x => x.Users).Distinct().ToList();
+        }
+        else
+        {
+            Users.AddRange(Languages.SelectMany(x => x.Users).Distinct());
+        }
     }
 }
