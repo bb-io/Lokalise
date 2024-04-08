@@ -1,10 +1,10 @@
-﻿using Blackbird.Applications.Sdk.Utils.Sdk.DataSourceHandlers;
+﻿using Blackbird.Applications.Sdk.Common.Dictionaries;
 
 namespace Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 
-public class FileFormatDataHandler : EnumDataHandler
+public class FileFormatDataHandler : IStaticDataSourceHandler
 {
-    protected override Dictionary<string, string> EnumValues => new()
+    private static Dictionary<string, string> EnumValues => new()
     {
         { "android_sdk", "Lokalise Android SDK bundle" },
         { "arb", "ARB" },
@@ -36,4 +36,9 @@ public class FileFormatDataHandler : EnumDataHandler
         { "xml", "Android Resources" },
         { "yaml", "YAML" }
     };
+
+    public Dictionary<string, string> GetData()
+    {
+        return EnumValues;
+    }
 }

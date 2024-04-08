@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Blackbird.Applications.Sdk.Common.Dictionaries;
 
 namespace Apps.Lokalise.Models.Requests.Tasks
 {
@@ -17,7 +18,7 @@ namespace Apps.Lokalise.Models.Requests.Tasks
 
         [JsonProperty("task_type")]
         [Display("Task type")]
-        [DataSource(typeof(TaskTypeDataHandler))]
+        [StaticDataSource(typeof(TaskTypeDataHandler))]
         public string LokaliseTaskType { get; set; }
 
         [Display("Description")] public string? Description { get; set; }

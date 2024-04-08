@@ -1,6 +1,7 @@
 ﻿using Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 using Apps.Lokalise.Models.Responses.Files;
 using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Dictionaries;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Newtonsoft.Json;
 
@@ -9,7 +10,7 @@ namespace Apps.Lokalise.Models.Requests.Files;
 public class DownloadFileRequest
 {
     [JsonProperty("format")]
-    [DataSource(typeof(FileFormatDataHandler))]
+    [StaticDataSource(typeof(FileFormatDataHandler))]
     public string Format { get; set; }
 
     [JsonProperty("original_filenames")]
@@ -18,12 +19,12 @@ public class DownloadFileRequest
 
     [JsonProperty("bundle_structure")]
     [Display("Bundle structure")]
-    [DataSource(typeof(BundleStructureDataHandler))]
+    [StaticDataSource(typeof(BundleStructureDataHandler))]
     public string? BundleStructure { get; set; }
 
     [JsonProperty("directory_prefix")]
     [Display("Directory prefix")]
-    [DataSource(typeof(DirectoryPrefixDataHandler))]
+    [StaticDataSource(typeof(DirectoryPrefixDataHandler))]
     public string? DirectoryPrefix { get; set; }
 
     [JsonProperty("all_platforms")]
@@ -60,17 +61,17 @@ public class DownloadFileRequest
 
     [JsonProperty("export_sort")]
     [Display("Export sort")]
-    [DataSource(typeof(ExportSortDataHandler))]
+    [StaticDataSource(typeof(ExportSortDataHandler))]
     public string? ExportSort { get; set; }
 
     [JsonProperty("export_empty_as")]
     [Display("Export empty as")]
-    [DataSource(typeof(ExportEmptyAsDataHandler))]
+    [StaticDataSource(typeof(ExportEmptyAsDataHandler))]
     public string? ExportEmptyAs { get; set; }
 
     [JsonProperty("export_null_as")]
     [Display("Export null as")]
-    [DataSource(typeof(ExportNullAsDataHandler))]
+    [StaticDataSource(typeof(ExportNullAsDataHandler))]
     public string? ExportNullAs { get; set; }
 
     [JsonProperty("include_comments")]
@@ -101,12 +102,12 @@ public class DownloadFileRequest
 
     [JsonProperty("plural_format")]
     [Display("Plural format")]
-    [DataSource(typeof(PluralFormatDataHandler))]
+    [StaticDataSource(typeof(PluralFormatDataHandler))]
     public string? PluralFormat { get; set; }
 
     [JsonProperty("placeholder_format")]
     [Display("Placeholder format")]
-    [DataSource(typeof(PlaceholderFormatDataHandler))]
+    [StaticDataSource(typeof(PlaceholderFormatDataHandler))]
     public string? PlaceholderFormat { get; set; }
 
     [JsonProperty("webhook_url")]
@@ -126,7 +127,7 @@ public class DownloadFileRequest
     public bool? EscapePercent { get; set; }
 
     [JsonProperty("indentation")]
-    [DataSource(typeof(IndentationDataHandler))]
+    [StaticDataSource(typeof(IndentationDataHandler))]
     public string? Indentation { get; set; }
 
     [JsonProperty("yaml_include_root")]
@@ -139,12 +140,12 @@ public class DownloadFileRequest
 
     [JsonProperty("java_properties_encoding")]
     [Display("Java properties encoding")]
-    [DataSource(typeof(JavaPropertiesEncodingDataHandler))]
+    [StaticDataSource(typeof(JavaPropertiesEncodingDataHandler))]
     public string? JavaPropertiesEncoding { get; set; }
 
     [JsonProperty("java_properties_separator")]
     [Display("Java properties separator")]
-    [DataSource(typeof(JavaPropertiesSeparatorDataHandler))]
+    [StaticDataSource(typeof(JavaPropertiesSeparatorDataHandler))]
     public string? JavaPropertiesSeparator { get; set; }
 
     [JsonProperty("bundle_description")]
