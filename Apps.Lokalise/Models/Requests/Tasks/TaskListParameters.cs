@@ -1,5 +1,6 @@
 ﻿using Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Dictionaries;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Newtonsoft.Json;
 
@@ -12,6 +13,6 @@ public class TaskListParameters
 
     [JsonProperty("filter_statuses")]
     [Display("Filter statuses")]
-    [DataSource(typeof(TaskStatusDataHandler))]
+    [StaticDataSource(typeof(TaskStatusDataHandler))]
     public string? FilterStatuses { get; set; }
 }

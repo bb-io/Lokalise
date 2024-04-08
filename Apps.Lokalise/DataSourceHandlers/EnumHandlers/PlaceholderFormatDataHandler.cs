@@ -1,10 +1,10 @@
-﻿using Blackbird.Applications.Sdk.Utils.Sdk.DataSourceHandlers;
+﻿using Blackbird.Applications.Sdk.Common.Dictionaries;
 
 namespace Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 
-public class PlaceholderFormatDataHandler : EnumDataHandler
+public class PlaceholderFormatDataHandler : IStaticDataSourceHandler
 {
-    protected override Dictionary<string, string> EnumValues => new()
+    private static Dictionary<string, string> EnumValues => new()
     {
         { "printf", "Printf" },
         { "ios", "IOS" },
@@ -12,4 +12,9 @@ public class PlaceholderFormatDataHandler : EnumDataHandler
         { "net", "Net" },
         { "symfony", "Symfony" }
     };
+
+    public Dictionary<string, string> GetData()
+    {
+        return EnumValues;
+    }
 }

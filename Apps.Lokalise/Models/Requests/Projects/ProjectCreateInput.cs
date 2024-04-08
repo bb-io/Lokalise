@@ -1,6 +1,7 @@
 ﻿using Apps.Lokalise.DataSourceHandlers;
 using Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Dictionaries;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.Lokalise.Models.Requests.Projects;
@@ -19,7 +20,7 @@ public class ProjectCreateInput
     [Display("Base project language")] public string? BaseLangIso { get; set; }
 
     [Display("Project type")]
-    [DataSource(typeof(ProjectTypeDataHandler))]
+    [StaticDataSource(typeof(ProjectTypeDataHandler))]
     public string? ProjectType { get; set; }
 
     [Display("Is segmentation enabled")] public bool? IsSegmentationEnabled { get; set; }
