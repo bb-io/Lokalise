@@ -1,15 +1,17 @@
-﻿using System.IO.Compression;
+﻿using RestSharp;
+using System.IO.Compression;
 using System.Net.Mime;
 using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Invocables;
 using Apps.Lokalise.Models.Responses.Files;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
-using RestSharp;
 using Apps.Lokalise.Models.Requests.Files;
 using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
+using Apps.Lokalise.Utils.Converters;
+using Blackbird.Applications.Sdk.Common.Files;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
@@ -53,6 +55,21 @@ public class FileActions : LokaliseInvocable
 
         return await Client
             .PollFileImportOperation(project.ProjectId, uploadResult.Process.ProcessId, Creds);
+    }
+    
+    [Action("Upload file to project as XLIFF", Description = "Upload file to project as XLIFF")]
+    public async Task<QueuedProcessDto> UploadFileAsXliff([ActionParameter] ProjectRequest project,
+        [ActionParameter] UploadFileInput input)
+    {
+        if(input.File.Name.EndsWith(".mqxliff"))
+        {
+            var fileReference = await ConvertMqXliffToXliff(input.File);
+            input.File = fileReference;
+            
+            return await UploadFile(project, input);
+        }
+        
+        return await UploadFile(project, input);
     }
 
     [Action("Download all project files as ZIP", Description = "Download all project files as ZIP archive")]
@@ -200,4 +217,35 @@ public class FileActions : LokaliseInvocable
     }
 
     #endregion
+    
+    private async Task<FileReference> ConvertMqXliffToXliff(FileReference file, bool useSkeleton = false)
+    {
+        var stream = await _fileManagementClient.DownloadAsync(file);
+        
+        var xliffFile = stream.ConvertMqXliffToXliff(useSkeleton);
+        var xliffStream = new MemoryStream();
+        xliffFile.Save(xliffStream);
+        
+        xliffStream.Position = 0;
+        string fileName = ParseFileName(file.Name);
+        string contentType = MediaTypeNames.Text.Xml;
+        return await _fileManagementClient.UploadAsync(xliffStream, contentType, fileName);
+    } 
+    
+    private string ParseFileName(string fileName)
+    {
+        if(fileName.EndsWith(".mqxliff"))
+        {
+            if (fileName.Contains(".xliff"))
+            {
+                return fileName.Replace(".mqxliff", String.Empty);
+            }
+            else
+            {
+                return fileName.Replace(".mqxliff", ".xliff");
+            }
+        }
+        
+        return fileName;
+    }
 }

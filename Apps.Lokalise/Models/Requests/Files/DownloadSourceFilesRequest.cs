@@ -1,10 +1,10 @@
 ﻿using Apps.Lokalise.DataSourceHandlers.EnumHandlers;
-using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Dictionaries;
 
 namespace Apps.Lokalise.Models.Requests.Files;
 
 public class DownloadSourceFilesRequest
 {
-    [DataSource(typeof(FileFormatDataHandler))]
+    [StaticDataSource(typeof(FileFormatDataHandler))]
     public string Format { get; set; }
 }

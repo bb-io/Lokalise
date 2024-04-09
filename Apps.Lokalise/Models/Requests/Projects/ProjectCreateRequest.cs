@@ -1,4 +1,5 @@
 using Apps.Lokalise.DataSourceHandlers.EnumHandlers;
+using Blackbird.Applications.Sdk.Common.Dictionaries;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Newtonsoft.Json;
 
@@ -19,7 +20,7 @@ public class ProjectCreateRequest
     public string? BaseLangIso { get; set; }
 
     [JsonProperty("project_type")]
-    [DataSource(typeof(ProjectTypeDataHandler))]
+    [StaticDataSource(typeof(ProjectTypeDataHandler))]
     public string? ProjectType { get; set; }
 
     [JsonProperty("is_segmentation_enabled")]

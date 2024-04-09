@@ -10,13 +10,4 @@ public class LokaliseRequest : RestRequest
         var apiToken = authenticationCredentialsProviders.First(p => p.KeyName == "apiToken").Value;
         this.AddHeader("X-Api-Token", apiToken);
     }
-
-    public void AddParameters(Dictionary<string, string?>? queryParameters)
-    {
-        if (queryParameters == null || !queryParameters.Any())
-            return;
-            
-        foreach (var queryParameter in queryParameters.Where(x => x.Value is not null))
-            this.AddParameter(queryParameter.Key, queryParameter.Value);
-    }
 }

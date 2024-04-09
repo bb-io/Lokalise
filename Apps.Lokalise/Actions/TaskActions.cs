@@ -1,16 +1,20 @@
 ﻿using Apps.Lokalise.Constants;
+using Apps.Lokalise.DataSourceHandlers;
 using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Invocables;
 using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.Models.Requests.Tasks;
 using Apps.Lokalise.Models.Requests.Tasks.Base;
+using Apps.Lokalise.Models.Requests.Translations;
 using Apps.Lokalise.Models.Responses.Keys;
+using Apps.Lokalise.Models.Responses.Languages;
 using Apps.Lokalise.Models.Responses.Tasks;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
+using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.Sdk.Utils.Extensions.String;
@@ -79,15 +83,73 @@ public class TaskActions : LokaliseInvocable
         return response.Task;
     }
 
-    [Action("Get task", Description = "Get information about a specific task")]
-    public async Task<TaskResponse> RetrieveTask([ActionParameter] ProjectRequest project,
-        [ActionParameter] [Display("Task ID")] string taskId)
+    [Action("Create language task", Description = "Create a new task with a single language for filtering keys and users")]
+    public async Task<TaskResponse> CreateLanguageTask([ActionParameter] ProjectRequest project,
+    [ActionParameter] LanguageTaskCreateRequest parameters,
+    [ActionParameter] TaskAssigneesRequest assigneesRequest,
+    [ActionParameter] FilterRequest filters)
     {
-        var endpoint = $"/projects/{project.ProjectId}/tasks/{taskId}";
+        if (assigneesRequest.Users is null && assigneesRequest.Groups is null)
+            throw new("One of the inputs must be specified: Users or Groups");
+
+        // Getting project languages
+        var languages = await Client.ExecutePaginated<LanguagesWrapper, LanguageDto>(new LokaliseRequest($"/projects/{project.ProjectId}/languages", Method.Get, Creds));
+
+        var langId = languages.Find(x => x.LangIso == parameters.TargetLanguageIso)?.LangId;
+        if (langId == null) throw new Exception($"Language {parameters.TargetLanguageIso} is not part of this project.");
+
+        // Getting all the translations
+        IEnumerable<string> keys = new List<string>();
+        if (parameters.ParentTaskId == null)
+        {
+            var translationsRequest = new LokaliseRequest($"/projects/{project.ProjectId}/translations", Method.Get, Creds);
+            translationsRequest.AddParameter("filter_lang_id", langId);
+
+            if (filters.FilterIsReviewed.HasValue) translationsRequest.AddParameter("filter_is_reviewed", filters.FilterIsReviewed.Value ? 1 : 0);
+            if (filters.FilterUnverified.HasValue) translationsRequest.AddParameter("filter_unverified", filters.FilterUnverified.Value ? 1 : 0);
+            if (filters.FilterUntranslated.HasValue) translationsRequest.AddParameter("filter_untranslated", filters.FilterUntranslated.Value ? 1 : 0);
+
+            var translations = await Client.ExecutePaginated<TranslationsWrapper, TranslationObj>(translationsRequest, 5000);
+
+            keys = translations.Select(x => x.KeyId);
+        }        
+
+        // Create task
+        var payload = new TaskCreateWithMultLangsRequest(parameters, assigneesRequest, keys);
+        var request = new LokaliseRequest($"/projects/{project.ProjectId}/tasks", Method.Post, Creds)
+            .WithJsonBody(payload, JsonConfig.SerializeSettings);
+
+        var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
+        response.Task.FillLanguageCodesArray();
+
+        return response.Task;
+    }
+
+    [Action("Get task", Description = "Get information about a specific task")]
+    public async Task<TaskResponse> RetrieveTask([ActionParameter] GetTaskRequest taskRequest, 
+        [ActionParameter, Display("Team ID"), DataSource(typeof(TeamDataHandler))] string? teamId)
+    {
+        var endpoint = $"/projects/{taskRequest.ProjectId}/tasks/{taskRequest.TaskId}";
         var request = new LokaliseRequest(endpoint, Method.Get, Creds);
 
         var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
         response.Task.FillLanguageCodesArray();
+
+        if (!string.IsNullOrEmpty(teamId))
+        {
+            var groups = response.Task.Languages.SelectMany(x => x.Groups);
+            
+            var users = new List<User>();
+            foreach (var item in groups)
+            {
+                var group = await GetGroupById(teamId, item.Id);
+                var usersFromGroup = await GetUsers(teamId, group.Members);
+                users.AddRange(usersFromGroup);
+            }
+            
+            response.Task.Users.AddRange(users);
+            response.Task.Users = response.Task.Users.Distinct().ToList();
+        }
 
         return response.Task;
     }

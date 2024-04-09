@@ -1,14 +1,19 @@
-﻿using Blackbird.Applications.Sdk.Utils.Sdk.DataSourceHandlers;
+﻿using Blackbird.Applications.Sdk.Common.Dictionaries;
 
 namespace Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 
-public class BundleStructureDataHandler : EnumDataHandler
+public class BundleStructureDataHandler : IStaticDataSourceHandler
 {
-    protected override Dictionary<string, string> EnumValues => new()
+    private static Dictionary<string, string> EnumValues => new()
     {
         {"%LANG_ISO%", "Language ISO"},
         {"%LANG_NAME%", "Language name"},
         {"%FORMAT%", "Format"},
         {"%PROJECT_NAME%", "Project name"}
     };
+
+    public Dictionary<string, string> GetData()
+    {
+        return EnumValues;
+    }
 }

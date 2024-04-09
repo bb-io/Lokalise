@@ -35,13 +35,14 @@ public class TaskWebhookHandler : IWebhookEventHandler<WebhookInput>
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider,
         Dictionary<string, string> values)
     {
-        foreach(var project in _webhookInput.Projects) 
+        foreach (var project in _webhookInput.Projects)
         {
             var endpoint = $"/projects/{project}/webhooks";
             var request = new LokaliseRequest(endpoint, Method.Post, authenticationCredentialsProvider)
                 .WithJsonBody(new
                 {
-                    url = values["payloadUrl"].Replace("https://localhost:44390", "https://25e9-178-211-106-141.ngrok-free.app"),
+                    url = values["payloadUrl"].Replace("https://localhost:44390",
+                        "https://25e9-178-211-106-141.ngrok-free.app"),
                     events = new[] { _subscriptionEvent }
                 });
             await _client.ExecuteWithHandling(request);

@@ -1,12 +1,17 @@
-﻿using Blackbird.Applications.Sdk.Utils.Sdk.DataSourceHandlers;
+﻿using Blackbird.Applications.Sdk.Common.Dictionaries;
 
 namespace Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 
-public class ProjectTypeDataHandler : EnumDataHandler
+public class ProjectTypeDataHandler : IStaticDataSourceHandler
 {
-    protected override Dictionary<string, string> EnumValues => new()
+    private static Dictionary<string, string> EnumValues => new()
     {
         { "localization_files", "Localization files" },
         { "paged_documents", "Paged documents" }
     };
+
+    public Dictionary<string, string> GetData()
+    {
+        return EnumValues;
+    }
 }

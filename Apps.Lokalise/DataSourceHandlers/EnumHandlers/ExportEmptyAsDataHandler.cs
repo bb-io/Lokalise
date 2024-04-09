@@ -1,14 +1,19 @@
-﻿using Blackbird.Applications.Sdk.Utils.Sdk.DataSourceHandlers;
+﻿using Blackbird.Applications.Sdk.Common.Dictionaries;
 
 namespace Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 
-public class ExportEmptyAsDataHandler : EnumDataHandler
+public class ExportEmptyAsDataHandler : IStaticDataSourceHandler
 {
-    protected override Dictionary<string, string> EnumValues => new()
+    private static Dictionary<string, string> EnumValues => new()
     {
         { "empty", "Empty" },
         { "base", "Base" },
         { "null", "Null" },
         { "skip", "Skip" }
     };
+
+    public Dictionary<string, string> GetData()
+    {
+        return EnumValues;
+    }
 }

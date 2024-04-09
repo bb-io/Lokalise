@@ -75,5 +75,5 @@ public class UploadFileInput
     public string? Format { get; set; }
         
     [Display("Filter task ID")]
-    public long? FilterTaskId { get; set; }
+    public string? FilterTaskId { get; set; }
 }

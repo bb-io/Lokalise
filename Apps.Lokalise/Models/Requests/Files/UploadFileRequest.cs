@@ -84,6 +84,6 @@ public class UploadFileRequest
         CustomTranslationStatusSkippedKeys = input.CustomTranslationStatusSkippedKeys;
         SkipDetectLangIso = input.SkipDetectLangIso;
         Format = input.Format;
-        FilterTaskId = input.FilterTaskId;
+        FilterTaskId = input.FilterTaskId == null ? null : long.Parse(input.FilterTaskId);
     }
 }

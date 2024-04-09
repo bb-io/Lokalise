@@ -1,5 +1,6 @@
 ﻿using Apps.Lokalise.Constants;
 using Apps.Lokalise.Dtos;
+using Apps.Lokalise.Models.Responses.Base;
 using Apps.Lokalise.Models.Responses.Errors;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Newtonsoft.Json;
@@ -63,5 +64,23 @@ public class LokaliseClient : RestClient
         }
 
         return response;
+    }
+
+    public async Task<List<TV>> ExecutePaginated<T, TV>(RestRequest request, int limit = 100) where T : PaginationResponse<TV>
+    {
+        var results = new List<TV>();
+        T response;
+        var page = 1;
+
+        do
+        {
+            request.AddParameter("limit", limit);
+            request.AddParameter("page", page++);
+
+            response = await ExecuteWithHandling<T>(request);
+            results.AddRange(response.Items);
+        } while (response.Items.Count() == limit && response.Items.Any());
+
+        return results;
     }
 }
