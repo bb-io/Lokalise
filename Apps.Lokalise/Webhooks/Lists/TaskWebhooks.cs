@@ -1,5 +1,7 @@
 using System.Net;
-using Apps.Lokalise.Models.Requests.Projects;
+using Apps.Lokalise.Actions;
+using Apps.Lokalise.DataSourceHandlers;
+using Apps.Lokalise.Models.Requests.Tasks;
 using Apps.Lokalise.Models.Responses.Tasks;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Webhooks.Handlers.SingleEventHandlers.Impl;
@@ -8,11 +10,12 @@ using Apps.Lokalise.Webhooks.Models.EventResponse;
 using Apps.Lokalise.Webhooks.Models.Input;
 using Apps.Lokalise.Webhooks.Models.Payload;
 using Apps.Lokalise.Webhooks.Models.Payload.Base;
+using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Webhooks;
 using Newtonsoft.Json;
-using RestSharp;
 using Task = System.Threading.Tasks.Task;
 
 namespace Apps.Lokalise.Webhooks.Lists;
@@ -33,19 +36,21 @@ public class TaskWebhooks : WebhookList
     [Webhook("On task created", typeof(ProjectTaskCreatedHandler),
         Description = "Triggered when a new task is created in a project")]
     public async Task<WebhookResponse<GetTaskEvent>> ProjectTaskCreatedHandler(WebhookRequest webhookRequest,
-        [WebhookParameter(true)] TaskWebhookInput input)
+        [WebhookParameter(true)] TaskWebhookInput input,
+        [WebhookParameter, Display("Team ID"), DataSource(typeof(TeamDataHandler))] string? teamId)
     {
         var response = HandlePreflightAndMap<TaskEvent, TaskPayload>(webhookRequest, input);
-        return await MapToEventResponse(response);
+        return await MapToEventResponse(response, teamId);
     }
 
     [Webhook("On task closed", typeof(ProjectTaskClosedHandler),
         Description = "Triggered when a project task is closed")]
     public async Task<WebhookResponse<GetTaskEvent>> ProjectTaskClosedHandler(WebhookRequest webhookRequest,
-        [WebhookParameter(true)] TaskWebhookInput input)
+        [WebhookParameter(true)] TaskWebhookInput input,
+        [WebhookParameter, Display("Team ID"), DataSource(typeof(TeamDataHandler))] string? teamId)
     {
         var response = HandlePreflightAndMap<TaskEvent, TaskPayload>(webhookRequest, input);
-        return await MapToEventResponse(response);
+        return await MapToEventResponse(response, teamId);
     }
 
     [Webhook("On task deleted", typeof(ProjectTaskDeletedHandler),
@@ -59,10 +64,11 @@ public class TaskWebhooks : WebhookList
     [Webhook("On task language closed", typeof(ProjectTaskLanguageClosedHandler),
         Description = "Triggered when a specific language task closes")]
     public async Task<WebhookResponse<GetTaskLanguageEvent>> ProjectTaskLanguageClosedHandler(
-        WebhookRequest webhookRequest, [WebhookParameter(true)] TaskWebhookInput input)
+        WebhookRequest webhookRequest, [WebhookParameter(true)] TaskWebhookInput input,
+        [WebhookParameter, Display("Team ID"), DataSource(typeof(TeamDataHandler))] string? teamId)
     {
         var response = HandlePreflightAndMap<TaskLanguageEvent, ProjectTaskLanguageClosedPayload>(webhookRequest, input);
-        var taskResponse = await MapToEventResponse(response);
+        var taskResponse = await MapToEventResponse(response, teamId);
 
         if (taskResponse.ReceivedWebhookRequestType == WebhookRequestType.Preflight)
         {
@@ -116,18 +122,17 @@ public class TaskWebhooks : WebhookList
         };
     }
 
-    private async Task<TaskResponse> GetTaskAsync(string projectId, string taskId)
+    private async Task<TaskResponse> GetTaskAsync(string projectId, string taskId, string teamId = null)
     {
-        var endpoint = $"/projects/{projectId}/tasks/{taskId}";
-        var request = new LokaliseRequest(endpoint, Method.Get, Creds);
-
-        var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
-        response.Task.FillLanguageCodesArray();
-
-        return response.Task;
+        var taskActions = new TaskActions(InvocationContext);
+        return await taskActions.RetrieveTask(new GetTaskRequest
+        {
+            ProjectId = projectId,
+            TaskId = taskId
+        }, teamId);
     }
 
-    private async Task<WebhookResponse<GetTaskEvent>> MapToEventResponse<T>(WebhookResponse<T> response)
+    private async Task<WebhookResponse<GetTaskEvent>> MapToEventResponse<T>(WebhookResponse<T> response, string? teamId)
         where T : TaskEvent
     {
         if (response.ReceivedWebhookRequestType == WebhookRequestType.Preflight)
@@ -140,7 +145,7 @@ public class TaskWebhooks : WebhookList
             };
         }
 
-        var task = await GetTaskAsync(response.Result.ProjectId, response.Result.TaskId);
+        var task = await GetTaskAsync(response.Result.ProjectId, response.Result.TaskId, teamId);
         return new()
         {
             HttpResponseMessage = null,
