@@ -133,6 +133,11 @@ public class TaskActions : LokaliseInvocable
         var request = new LokaliseRequest(endpoint, Method.Get, Creds);
 
         var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
+        if (response.Task == null)
+        {
+            throw new($"Task with ID {taskRequest.TaskId} for project: {taskRequest.ProjectId} returned null.");
+        }
+        
         response.Task.FillLanguageCodesArray();
 
         if (!string.IsNullOrEmpty(teamId))
