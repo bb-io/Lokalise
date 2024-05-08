@@ -1,5 +1,4 @@
-﻿
-using Apps.Lokalise.DataSourceHandlers;
+﻿using Apps.Lokalise.DataSourceHandlers;
 using Apps.Lokalise.Models.Requests.Projects;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
