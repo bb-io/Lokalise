@@ -17,20 +17,10 @@ public class KeyDto
     [JsonProperty("tags")] public IEnumerable<string> Tags { get; set; }
     [JsonProperty("key_name"), Display("Key name")] public KeyName KeyName { get; set; }
     [JsonProperty("filenames"), Display("Filenames")] public Filenames Filenames { get; set; }
-
     [Display("Base language")] public TranslationObj? SourceTranslation { get; set; }
-
-    private IEnumerable<TranslationObj>? _translations;
 
     [Display("Translations")]
     [JsonProperty("translations")]
-    public IEnumerable<TranslationObj>? Translations
-    {
-        get => _translations;
-        set
-        {
-            SourceTranslation = value?.FirstOrDefault();
-            _translations = value?.Skip(1);
-        }
-    }
+    public IEnumerable<TranslationObj>? Translations { get; set; }
+    
 }
