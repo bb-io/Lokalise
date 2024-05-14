@@ -1,10 +1,10 @@
-﻿using Blackbird.Applications.Sdk.Utils.Sdk.DataSourceHandlers;
+﻿using Blackbird.Applications.Sdk.Common.Dictionaries;
 
 namespace Apps.Lokalise.DataSourceHandlers.EnumHandlers;
 
-public class IndentationDataHandler : EnumDataHandler
+public class IndentationDataHandler : IStaticDataSourceHandler
 {
-    protected override Dictionary<string, string> EnumValues => new()
+    private static Dictionary<string, string> EnumValues => new()
     {
         { "default", "Default" },
         { "1sp", "1sp" },
@@ -17,4 +17,9 @@ public class IndentationDataHandler : EnumDataHandler
         { "8sp", "8sp" },
         { "tab", "Tab" }
     };
+
+    public Dictionary<string, string> GetData()
+    {
+        return EnumValues;
+    }
 }
