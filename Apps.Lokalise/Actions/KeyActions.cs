@@ -15,6 +15,7 @@ using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.Sdk.Utils.Extensions.String;
 using RestSharp;
 using Blackbird.Applications.Sdk.Utils.Extensions.System;
+using Apps.Lokalise.Models.Responses.Projects;
 
 namespace Apps.Lokalise.Actions;
 
@@ -38,6 +39,16 @@ public class KeyActions : LokaliseInvocable
         var endpointWithQuery = baseEndpoint.WithQuery(query);
 
         var items = await Paginator.GetAll<KeysWrapper, KeyDto>(Creds, endpointWithQuery);
+        
+        var projectendpoint = $"/projects/{project.ProjectId}";
+        var projectrequest = new LokaliseRequest(projectendpoint, Method.Get, Creds);
+        var projectinfo = await Client.ExecuteWithHandling<ProjectResponse>(projectrequest);
+
+        foreach (var item in items) 
+        {
+            item.SourceTranslation = item.Translations?.First(x => x.LanguageIso == projectinfo.BaseLanguageIso);
+            item.Translations = item.Translations?.Where(x => x.LanguageIso != projectinfo.BaseLanguageIso).ToList();
+        }
 
         items = items
             .Where(x => filters.Reviewed is null ||
@@ -121,8 +132,16 @@ public class KeyActions : LokaliseInvocable
         var request = new LokaliseRequest(endpoint, Method.Get, Creds);
         var response = await Client.ExecuteWithHandling<KeyResponse>(request);
 
-        return response.Key;
+        var projectendpoint = $"/projects/{input.ProjectId}";
+        var projectrequest = new LokaliseRequest(projectendpoint, Method.Get, Creds);
+        var projectinfo = await Client.ExecuteWithHandling<ProjectResponse>(projectrequest);
+        var _key = response.Key;
+        _key.SourceTranslation = _key.Translations?.FirstOrDefault(x => x.LanguageIso == projectinfo.BaseLanguageIso);
+        _key.Translations = _key.Translations?.Where(x => x.LanguageIso != projectinfo.BaseLanguageIso).ToList();
+        
+        return _key;
     }
+
 
     [Action("Delete key", Description = "Delete key by ID")]
     public Task DeleteKey([ActionParameter] DeleteKeyRequest input)
