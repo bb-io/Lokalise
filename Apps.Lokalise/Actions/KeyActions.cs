@@ -68,7 +68,7 @@ public class KeyActions : LokaliseInvocable
                             .First(x => x.LanguageIso == filters.UntranslatedLanguage).Translation))
             .ToList();
 
-        return new ListProjectKeysResponse { Keys = items, ProjectId = project.ProjectId };
+        return new ListProjectKeysResponse { Keys = items, ProjectId = project.ProjectId, TotalCount = items.Count};
     }
 
     [Action("List key IDs", Description = "List key IDs based on the provided filters")]
