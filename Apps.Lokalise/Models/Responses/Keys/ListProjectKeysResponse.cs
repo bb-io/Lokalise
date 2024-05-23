@@ -9,4 +9,7 @@ public class ListProjectKeysResponse
     
     [Display("Project ID")]
     public string ProjectId { get; set; }
+
+    [Display("Total count")]
+    public int TotalCount { get; set; }
 }
