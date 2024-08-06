@@ -72,7 +72,11 @@ public class FileActions : LokaliseInvocable
 
         if (input.OverwriteExistingKeys.HasValue && input.OverwriteExistingKeys.Value)
         {
-            var stream = await _fileManagementClient.DownloadAsync(input.File);
+            var fileStream = await _fileManagementClient.DownloadAsync(input.File);
+            var stream = new MemoryStream();
+            await fileStream.CopyToAsync(stream);
+            stream.Position = 0;
+            
             var xliff = stream.ToXliffDocument();
             var newTranslationUnits = xliff.TranslationUnits.Select(x =>
             {
