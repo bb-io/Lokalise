@@ -16,6 +16,7 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
+using Blackbird.Xliff.Utils.Extensions;
 
 namespace Apps.Lokalise.Actions;
 
@@ -59,14 +60,31 @@ public class FileActions : LokaliseInvocable
     
     [Action("Upload file to project as XLIFF", Description = "Upload file to project as XLIFF")]
     public async Task<QueuedProcessDto> UploadFileAsXliff([ActionParameter] ProjectRequest project,
-        [ActionParameter] UploadFileInput input)
+        [ActionParameter] UploadXliffInput input)
     {
         if(input.File.Name.EndsWith(".mqxliff"))
-        {
-            var fileReference = await ConvertMqXliffToXliff(input.File);
+        {        
+            var stream = await _fileManagementClient.DownloadAsync(input.File);
+            var fileReference = await ConvertMqXliffToXliff(stream, input.File.Name);
             input.File = fileReference;
-            
             return await UploadFile(project, input);
+        }
+
+        if (input.OverwriteExistingKeys.HasValue && input.OverwriteExistingKeys.Value)
+        {
+            var stream = await _fileManagementClient.DownloadAsync(input.File);
+            var xliff = stream.ToXliffDocument();
+            var newTranslationUnits = xliff.TranslationUnits.Select(x =>
+            {
+                x.Attributes.Add("old_id", x.Id);
+                x.Id = x.Attributes["resname"];
+                return x;
+            }).ToList();
+            xliff = xliff.RemoveTranslationUnits();
+            var xDocument = xliff.UpdateTranslationUnits(newTranslationUnits, true);
+        
+            var xliffStream = xDocument.ToStream();
+            input.File = await _fileManagementClient.UploadAsync(xliffStream, MediaTypeNames.Text.Xml, input.File.Name);
         }
         
         return await UploadFile(project, input);
@@ -218,16 +236,15 @@ public class FileActions : LokaliseInvocable
 
     #endregion
     
-    private async Task<FileReference> ConvertMqXliffToXliff(FileReference file, bool useSkeleton = false)
+    private async Task<FileReference> ConvertMqXliffToXliff(Stream stream, string fileName, bool useSkeleton = false)
     {
-        var stream = await _fileManagementClient.DownloadAsync(file);
-        
         var xliffFile = stream.ConvertMqXliffToXliff(useSkeleton);
+        stream.Position = 0;
         var xliffStream = new MemoryStream();
         xliffFile.Save(xliffStream);
         
         xliffStream.Position = 0;
-        string fileName = ParseFileName(file.Name);
+        fileName = ParseFileName(fileName);
         string contentType = MediaTypeNames.Text.Xml;
         return await _fileManagementClient.UploadAsync(xliffStream, contentType, fileName);
     } 
