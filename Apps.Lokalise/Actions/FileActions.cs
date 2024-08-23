@@ -111,11 +111,11 @@ public class FileActions : LokaliseInvocable
         var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, true);
 
         var files = await zipResponse.RawBytes!.GetFilesFromZip(_fileManagementClient);
-        var filteredFiles = files
-            .Where(file => input.FilterLangs is null || input.FilterLangs.Any(lang =>
-                file.Path.StartsWith(lang) || file.File.Name.StartsWith($"{lang}.")));
+        //var filteredFiles = files
+        //    .Where(file => input.FilterLangs is null || input.FilterLangs.Any(lang =>
+        //        file.Path.StartsWith(lang) || file.File.Name.Contains($"{lang}.")));
 
-        foreach (var file in filteredFiles)
+        foreach (var file in files.Where(x => !x.Path.EndsWith('/')))
         {
             await using var fileStream = await _fileManagementClient.DownloadAsync(file.File);
             var fileBytes = await fileStream.GetByteData();
