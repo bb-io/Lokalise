@@ -48,7 +48,7 @@ public class BaseWebhookHandler : IWebhookEventHandler<WebhookInput>
 
             Task.Run(async () =>
             {
-                await Task.Delay(1000);
+                await Task.Delay(2000);
                 await _client.ExecuteWithHandling(request);
             });
         }
