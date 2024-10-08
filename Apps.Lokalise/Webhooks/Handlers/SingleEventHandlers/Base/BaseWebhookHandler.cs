@@ -45,6 +45,12 @@ public class BaseWebhookHandler : IWebhookEventHandler<WebhookInput>
                     events = new[] { _subscriptionEvent }
                 });
             await _client.ExecuteWithHandling(request);
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(1000);
+                await _client.ExecuteWithHandling(request);
+            });
         }
     }
 
