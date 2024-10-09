@@ -45,7 +45,13 @@ public class TaskWebhookHandler : IWebhookEventHandler<WebhookInput>
                         "https://25e9-178-211-106-141.ngrok-free.app"),
                     events = new[] { _subscriptionEvent }
                 });
-            await _client.ExecuteWithHandling(request);
+            //await _client.ExecuteWithHandling(request);
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(1000);
+                await _client.ExecuteWithHandling(request);
+            });
         }
     }
 
