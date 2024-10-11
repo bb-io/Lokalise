@@ -44,7 +44,12 @@ public abstract class MultipleEventHandler : IWebhookEventHandler<WebhookInput>
                     events = SubscriptionEvents
                 });
 
-            await _client.ExecuteWithHandling(request);
+            //await _client.ExecuteWithHandling(request);
+            Task.Run(async () =>
+            {
+                await Task.Delay(1000);
+                await _client.ExecuteWithHandling(request);
+            });
         }        
     }
 

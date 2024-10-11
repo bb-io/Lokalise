@@ -41,10 +41,16 @@ public class BaseWebhookHandler : IWebhookEventHandler<WebhookInput>
             var request = new LokaliseRequest(endpoint, Method.Post, authenticationCredentialsProvider)
                 .WithJsonBody(new
                 {
-                    url = values["payloadUrl"].Replace("https://localhost:44390", "https://25e9-178-211-106-141.ngrok-free.app"),
+                    url = values["payloadUrl"].Replace("https://localhost:44390", "https://36ea-176-36-119-50.ngrok-free.app"),
                     events = new[] { _subscriptionEvent }
                 });
-            await _client.ExecuteWithHandling(request);
+            //await _client.ExecuteWithHandling(request);
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(1000);
+                await _client.ExecuteWithHandling(request);
+            });
         }
     }
 

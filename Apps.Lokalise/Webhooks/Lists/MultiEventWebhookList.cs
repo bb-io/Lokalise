@@ -1,4 +1,5 @@
 using System.Net;
+using Apps.Lokalise.Models.Requests.Keys;
 using Apps.Lokalise.Models.Responses.Keys;
 using Apps.Lokalise.Models.Responses.Tasks;
 using Apps.Lokalise.RestSharp;
@@ -18,16 +19,13 @@ using Task = System.Threading.Tasks.Task;
 namespace Apps.Lokalise.Webhooks.Lists;
 
 [WebhookList]
-public class MultiEventWebhookList : WebhookList
+public class MultiEventWebhookList(InvocationContext invocationContext) : WebhookList(invocationContext)
 {
-    public MultiEventWebhookList(InvocationContext invocationContext) : base(invocationContext)
-    {
-    }
-
     [Webhook("On key modified for assignee", typeof(AssigneeKeyModifiedEventHandler),
         Description = "Triggered when a key is modified for a specific assignee")]
     public async Task<WebhookResponse<AssigneeKeyModifiedEvent>> OnKeyModifiedForAssignee(WebhookRequest webhookRequest,
-        [WebhookParameter(true)] WebhookUserInput input)
+        [WebhookParameter(true)] WebhookUserInput input,
+        [WebhookParameter] KeyOptionalRequest keyOptionalRequest)
     {
         var payload = webhookRequest.Body.ToString();
         ArgumentException.ThrowIfNullOrEmpty(payload);
@@ -146,6 +144,11 @@ public class MultiEventWebhookList : WebhookList
             {
                 Keys = await Task.WhenAll(keyTasks)
             };
+        }
+        
+        if(keyOptionalRequest.KeyId != null)
+        {
+            result.Keys = result.Keys.Where(x => x.Id == keyOptionalRequest.KeyId);
         }
 
         return new()
