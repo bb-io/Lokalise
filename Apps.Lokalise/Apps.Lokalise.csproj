@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <Product>Lokalise</Product>
     <Description>The localization platform built for growth</Description>
-    <Version>1.5.10</Version>
+    <Version>1.5.11</Version>
     <AssemblyName>Apps.Lokalise</AssemblyName>
   </PropertyGroup>
   <ItemGroup>

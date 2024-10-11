@@ -21,17 +21,12 @@ using Task = System.Threading.Tasks.Task;
 namespace Apps.Lokalise.Webhooks.Lists;
 
 [WebhookList]
-public class TaskWebhooks : WebhookList
+public class TaskWebhooks(InvocationContext invocationContext) : WebhookList(invocationContext)
 {
     protected AuthenticationCredentialsProvider[] Creds =>
         InvocationContext.AuthenticationCredentialsProviders.ToArray();
 
-    protected LokaliseClient Client { get; }
-
-    public TaskWebhooks(InvocationContext invocationContext) : base(invocationContext)
-    {
-        Client = new();
-    }
+    protected LokaliseClient Client { get; } = new();
 
     [Webhook("On task created", typeof(ProjectTaskCreatedHandler),
         Description = "Triggered when a new task is created in a project")]
@@ -47,10 +42,23 @@ public class TaskWebhooks : WebhookList
         Description = "Triggered when a project task is closed")]
     public async Task<WebhookResponse<GetTaskEvent>> ProjectTaskClosedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] TaskWebhookInput input,
-        [WebhookParameter, Display("Team ID"), DataSource(typeof(TeamDataHandler))] string? teamId)
+        [WebhookParameter, Display("Team ID"), DataSource(typeof(TeamDataHandler))] string? teamId,
+        [WebhookParameter] GetTaskOptionalRequest optionalRequest)
     {
         var response = HandlePreflightAndMap<TaskEvent, TaskPayload>(webhookRequest, input);
-        return await MapToEventResponse(response, teamId);
+        var result = await MapToEventResponse(response, teamId);
+        
+        if(optionalRequest.ProjectId != null && optionalRequest.ProjectId != result.Result?.ProjectId)
+        {
+            return GetPreflightResponse<GetTaskEvent>();
+        }
+
+        if (optionalRequest.TaskId != null && optionalRequest.TaskId != result.Result?.Task.TaskId)
+        {
+            return GetPreflightResponse<GetTaskEvent>();
+        }
+        
+        return result;
     }
 
     [Webhook("On task deleted", typeof(ProjectTaskDeletedHandler),
@@ -65,7 +73,8 @@ public class TaskWebhooks : WebhookList
         Description = "Triggered when a specific language task closes")]
     public async Task<WebhookResponse<GetTaskLanguageEvent>> ProjectTaskLanguageClosedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] TaskWebhookInput input,
-        [WebhookParameter, Display("Team ID"), DataSource(typeof(TeamDataHandler))] string? teamId)
+        [WebhookParameter, Display("Team ID"), DataSource(typeof(TeamDataHandler))] string? teamId,
+        [WebhookParameter] GetTaskOptionalRequest optionalRequest)
     {
         var response = HandlePreflightAndMap<TaskLanguageEvent, ProjectTaskLanguageClosedPayload>(webhookRequest, input);
         var taskResponse = await MapToEventResponse(response, teamId);
@@ -81,6 +90,17 @@ public class TaskWebhooks : WebhookList
         }
 
         var taskLanguageEvent = new GetTaskLanguageEvent(response.Result, taskResponse.Result.Task);
+        
+        if(optionalRequest.ProjectId != null && optionalRequest.ProjectId != taskLanguageEvent.ProjectId)
+        {
+            return GetPreflightResponse<GetTaskLanguageEvent>();
+        }
+        
+        if (optionalRequest.TaskId != null && optionalRequest.TaskId != taskLanguageEvent.Task?.TaskId)
+        {
+            return GetPreflightResponse<GetTaskLanguageEvent>();
+        }
+        
         return new()
         {
             HttpResponseMessage = null,
