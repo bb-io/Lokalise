@@ -2,6 +2,8 @@
 using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 using System.Globalization;
+using static System.Net.Mime.MediaTypeNames;
+using System.Text.RegularExpressions;
 
 
 namespace Apps.Lokalise.Models.Responses.Keys
@@ -25,7 +27,7 @@ namespace Apps.Lokalise.Models.Responses.Keys
         public KeyWithDate(KeyDto k) 
         {
             KeyId = k.KeyId;
-            CreatedAt = DateTime.ParseExact(k.CreatedAt, "yyyy-MM-dd HH:mm:ss (Etc/UTC)", CultureInfo.InvariantCulture);
+            CreatedAt = DateTime.ParseExact(Regex.Match(k.CreatedAt, @"(.+? .+?) ").Groups[1].Value, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
             Description = k.Description;
             Tags = k.Tags;
             KeyName = k.KeyName;
