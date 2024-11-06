@@ -1,6 +1,7 @@
 ﻿using Apps.Lokalise.Dtos;
 using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
+using System.Globalization;
 
 
 namespace Apps.Lokalise.Models.Responses.Keys
@@ -24,7 +25,7 @@ namespace Apps.Lokalise.Models.Responses.Keys
         public KeyWithDate(KeyDto k) 
         {
             KeyId = k.KeyId;
-            CreatedAt = DateTime.Parse(k.CreatedAt);
+            CreatedAt = DateTime.ParseExact(k.CreatedAt, "yyyy-MM-dd HH:mm:ss (Etc/UTC)", CultureInfo.InvariantCulture);
             Description = k.Description;
             Tags = k.Tags;
             KeyName = k.KeyName;
