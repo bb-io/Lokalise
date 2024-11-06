@@ -68,7 +68,7 @@ public class KeyActions : LokaliseInvocable
                             .First(x => x.LanguageIso == filters.UntranslatedLanguage).Translation))
             .ToList();
 
-        return new ListProjectKeysResponse { Keys = items, ProjectId = project.ProjectId, TotalCount = items.Count};
+        return new ListProjectKeysResponse { Keys = items.Select(c => new KeyWithDate(c)).ToArray(), ProjectId = project.ProjectId, TotalCount = items.Count};
     }
 
     [Action("List key IDs", Description = "List key IDs based on the provided filters")]
@@ -117,7 +117,7 @@ public class KeyActions : LokaliseInvocable
         var request = new LokaliseRequest(endpoint, Method.Post, Creds)
             .WithJsonBody(new CreateKeyRequest(input));
 
-        var response = await Client.ExecuteWithHandling<ListProjectKeysResponse>(request);
+        var response = await Client.ExecuteWithHandling<ListProjectCreatedKeysResponse>(request);
         return response.Keys.FirstOrDefault() ?? throw new("Unknown error occured during key creation");
     }
 
