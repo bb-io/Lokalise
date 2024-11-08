@@ -3,9 +3,9 @@ using Blackbird.Applications.Sdk.Common;
 
 namespace Apps.Lokalise.Models.Responses.Keys;
 
-public class ListProjectKeysResponse
+public class ListProjectCreatedKeysResponse
 {
-    public IEnumerable<KeyWithDate> Keys { get; set; }
+    public IEnumerable<KeyDto> Keys { get; set; }
     
     [Display("Project ID")]
     public string ProjectId { get; set; }
