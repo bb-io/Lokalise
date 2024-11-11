@@ -27,7 +27,7 @@ namespace Apps.Lokalise.Models.Responses.Keys
         public KeyWithDate(KeyDto k) 
         {
             KeyId = k.KeyId;
-            CreatedAt = DateTime.ParseExact(Regex.Match(k.CreatedAt, @"(.+? .+?) ").Groups[1].Value, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+            CreatedAt = DateTime.ParseExact(Regex.Match(k.CreatedAt, @"(.+? .+?) ").Groups[1].Value, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
             Description = k.Description;
             Tags = k.Tags;
             KeyName = k.KeyName;
