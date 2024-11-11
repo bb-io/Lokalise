@@ -68,7 +68,16 @@ public class KeyActions : LokaliseInvocable
                             .First(x => x.LanguageIso == filters.UntranslatedLanguage).Translation))
             .ToList();
 
-        return new ListProjectKeysResponse { Keys = items.Select(c => new KeyWithDate(c)).ToArray(), ProjectId = project.ProjectId, TotalCount = items.Count};
+        var keys = items.Select(c => new KeyWithDate(c)).ToArray();
+
+        if (filters.DateFrom.HasValue)
+        { keys = keys.Where(x => x.CreatedAt >= filters.DateFrom).ToArray(); }
+
+        if (filters.DateTo.HasValue)
+        { keys = keys.Where(x => x.CreatedAt <= filters.DateTo).ToArray(); }
+
+
+        return new ListProjectKeysResponse { Keys = keys, ProjectId = project.ProjectId, TotalCount = keys.Count()};
     }
 
     [Action("List key IDs", Description = "List key IDs based on the provided filters")]
@@ -97,6 +106,8 @@ public class KeyActions : LokaliseInvocable
             .Where(x => filters.UntranslatedLanguage is null ||
                         string.IsNullOrWhiteSpace(x.Translations
                             .First(x => x.LanguageIso == filters.UntranslatedLanguage).Translation))
+            .Where(x => !filters.DateFrom.HasValue || x.CreatedAt >= filters.DateFrom)
+            .Where(x => !filters.DateTo.HasValue || x.CreatedAt <= filters.DateTo)
             .Select(x => x.KeyId)
             .ToArray();
         

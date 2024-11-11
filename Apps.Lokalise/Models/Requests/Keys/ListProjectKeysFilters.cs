@@ -24,4 +24,10 @@ public class ListProjectKeysFilters
     [Display("Unverified language")]
     [DataSource(typeof(LanguageDataHandler))]
     public string? UnverifiedLanguage { get; set; }
+
+    [Display("Creation date from")]
+    public DateTime? DateFrom { get; set; }
+
+    [Display("Creation date to")]
+    public DateTime? DateTo { get; set; }
 }
