@@ -77,7 +77,7 @@ public class KeyActions : LokaliseInvocable
         { keys = keys.Where(x => x.CreatedAt <= filters.DateTo).ToArray(); }
 
 
-        return new ListProjectKeysResponse { Keys = keys, ProjectId = project.ProjectId, TotalCount = items.Count};
+        return new ListProjectKeysResponse { Keys = keys, ProjectId = project.ProjectId, TotalCount = keys.Count()};
     }
 
     [Action("List key IDs", Description = "List key IDs based on the provided filters")]
