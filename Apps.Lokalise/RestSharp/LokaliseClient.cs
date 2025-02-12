@@ -3,6 +3,7 @@ using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Models.Responses.Base;
 using Apps.Lokalise.Models.Responses.Errors;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -45,7 +46,12 @@ public class LokaliseClient : RestClient
     private Exception ConfigureRequestException(string content)
     {
         var error = JsonConvert.DeserializeObject<ErrorResponse>(content);
-        return new($"{error.Error.Message}; Code: {error.Error.Code}");
+        if (error.Error.Message == "Not Found")
+        {
+            return new PluginApplicationException($"Error: {error.Error.Message}; Nothing was found using your inputs, please check and try again");
+        }
+
+        return new PluginApplicationException($"{error.Error.Message}; Code: {error.Error.Code}");
     }
 
     #endregion

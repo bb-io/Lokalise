@@ -16,6 +16,7 @@ using Blackbird.Applications.Sdk.Utils.Extensions.String;
 using RestSharp;
 using Blackbird.Applications.Sdk.Utils.Extensions.System;
 using Apps.Lokalise.Models.Responses.Projects;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 
 namespace Apps.Lokalise.Actions;
 
@@ -135,7 +136,15 @@ public class KeyActions : LokaliseInvocable
     [Action("Get key", Description = "Get key by ID")]
     public async Task<KeyDto> RetrieveKey([ActionParameter] RetrieveKeyRequest input)
     {
-        var endpoint = $"/projects/{input.ProjectId}/keys/{input.KeyId}";
+
+        if (string.IsNullOrWhiteSpace(input.ProjectId))
+            throw new PluginMisconfigurationException("Project ID cannot be null or empty. Please check your input and try again");
+
+        if (string.IsNullOrWhiteSpace(input.KeyId))
+            throw new PluginMisconfigurationException("Key ID cannot be null or empty. Please check your input and try again");
+
+
+            var endpoint = $"/projects/{input.ProjectId}/keys/{input.KeyId}";
 
         if (input.DisableReferences is not null)
             endpoint += $"?disable_references={input.DisableReferences.AsLokaliseQuery()}";
