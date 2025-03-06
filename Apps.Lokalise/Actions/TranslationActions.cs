@@ -13,6 +13,7 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.Sdk.Utils.Extensions.String;
 using Blackbird.Applications.Sdk.Utils.Extensions.System;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using RestSharp;
 
 namespace Apps.Lokalise.Actions;
@@ -63,14 +64,13 @@ public class TranslationActions : LokaliseInvocable
 
         var request1 = new LokaliseRequest(endpoint1, Method.Get, Creds);
         var keydata = await Client.ExecuteWithHandling<KeyResponse>(request1);
-
-        var translationID = keydata.Key.Translations.Where(y => y.LanguageIso == input.LanguageCode).Select(x => x.TranslationId);
-        if (translationID is null) 
+        var translationID = keydata.Key.Translations?.FirstOrDefault(y => y.LanguageIso == input.LanguageCode)?.TranslationId;
+        if (String.IsNullOrEmpty(translationID)) 
         {
-            throw new Exception($"No translation was found for language code {input.LanguageCode}");
+            throw new PluginMisconfigurationException($"Check that the language code {input.LanguageCode} is part of the specified key");
         }
 
-        var endpoint = $"/projects/{input.ProjectId}/translations/{translationID.FirstOrDefault()}";
+        var endpoint = $"/projects/{input.ProjectId}/translations/{translationID}";
         var request = new LokaliseRequest(endpoint, Method.Put, Creds)
             .WithJsonBody(bodyParams);
 
