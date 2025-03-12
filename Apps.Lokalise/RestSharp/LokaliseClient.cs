@@ -52,7 +52,7 @@ public class LokaliseClient : RestClient
         }
         if (error?.Error?.Message == "Forbidden" || error?.Error?.Code == 403)
         {
-            return new PluginMisconfigurationException(error.Error.Message);
+            return new PluginApplicationException(error.Error.Message);
         }
 
         return new PluginApplicationException($"{error.Error.Message}; Code: {error.Error.Code}");
