@@ -4,6 +4,7 @@ using Apps.Lokalise.Models.Responses.Tasks;
 using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Lokalise.DataSourceHandlers;
@@ -23,7 +24,7 @@ public class TaskDataHandler : LokaliseInvocable, IAsyncDataSourceHandler
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(_projectId))
-            throw new InvalidOperationException("You should input a project ID first");
+            throw new PluginMisconfigurationException("You should input a project ID first");
 
         string endpoint = $"/projects/{_projectId}/tasks";
         var tasks = await Paginator.GetAll<TasksWrapper, TaskResponse>(Creds, endpoint);

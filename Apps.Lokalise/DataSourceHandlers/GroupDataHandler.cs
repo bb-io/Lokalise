@@ -24,7 +24,7 @@ public class GroupDataHandler : LokaliseInvocable, IAsyncDataSourceHandler
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(TeamId))
-            throw new("You must input Team first");
+            throw new PluginMisconfigurationException("You must input Team first");
 
         var endpoint = $"/teams/{TeamId}/groups";
         var items = await Paginator

@@ -15,6 +15,7 @@ using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.Sdk.Utils.Extensions.String;
@@ -53,7 +54,7 @@ public class TaskActions : LokaliseInvocable
         [ActionParameter] TaskAssigneesRequest assigneesRequest)
     {
         if (assigneesRequest.Users is null && assigneesRequest.Groups is null)
-            throw new("One of the inputs must be specified: Users or Groups");
+            throw new PluginMisconfigurationException("One of the inputs must be specified: Users or Groups");
 
         var endpoint = $"/projects/{project.ProjectId}/tasks";
 
@@ -90,13 +91,13 @@ public class TaskActions : LokaliseInvocable
     [ActionParameter] FilterRequest filters)
     {
         if (assigneesRequest.Users is null && assigneesRequest.Groups is null)
-            throw new("One of the inputs must be specified: Users or Groups");
+            throw new PluginMisconfigurationException("One of the inputs must be specified: Users or Groups");
 
         // Getting project languages
         var languages = await Client.ExecutePaginated<LanguagesWrapper, LanguageDto>(new LokaliseRequest($"/projects/{project.ProjectId}/languages", Method.Get, Creds));
 
         var langId = languages.Find(x => x.LangIso == parameters.TargetLanguageIso)?.LangId;
-        if (langId == null) throw new Exception($"Language {parameters.TargetLanguageIso} is not part of this project.");
+        if (langId == null) throw new PluginMisconfigurationException($"Language {parameters.TargetLanguageIso} is not part of this project.");
 
         // Getting all the translations
         IEnumerable<string> keys = new List<string>();
@@ -135,7 +136,7 @@ public class TaskActions : LokaliseInvocable
         var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
         if (response.Task == null)
         {
-            throw new($"Task with ID {taskRequest.TaskId} for project: {taskRequest.ProjectId} returned null.");
+            throw new PluginMisconfigurationException($"Task with ID {taskRequest.TaskId} for project: {taskRequest.ProjectId} returned null.");
         }
         
         response.Task.FillLanguageCodesArray();

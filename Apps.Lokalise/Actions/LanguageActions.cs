@@ -9,6 +9,7 @@ using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Newtonsoft.Json;
@@ -53,7 +54,7 @@ public class LanguageActions : LokaliseInvocable
     public BuildLanguageResponse BuildLanguage([ActionParameter] BuildLanguageRequest input)
     {
         if (input.Users is null && input.Groups is null)
-            throw new("Either Users or Groups must be specified");
+            throw new PluginMisconfigurationException("Either Users or Groups must be specified");
 
         return new()
         {
