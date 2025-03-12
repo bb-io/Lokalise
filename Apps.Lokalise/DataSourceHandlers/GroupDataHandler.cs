@@ -5,6 +5,7 @@ using Apps.Lokalise.Models.Responses.Teams;
 using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Lokalise.DataSourceHandlers;
@@ -24,7 +25,7 @@ public class GroupDataHandler : LokaliseInvocable, IAsyncDataSourceHandler
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(TeamId))
-            throw new("You must input Team first");
+            throw new PluginMisconfigurationException("You must input Team first");
 
         var endpoint = $"/teams/{TeamId}/groups";
         var items = await Paginator

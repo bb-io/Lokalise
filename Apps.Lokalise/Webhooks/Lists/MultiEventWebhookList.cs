@@ -10,6 +10,7 @@ using Apps.Lokalise.Webhooks.Models.EventResponse;
 using Apps.Lokalise.Webhooks.Models.Input;
 using Apps.Lokalise.Webhooks.Models.Payload;
 using Apps.Lokalise.Webhooks.Models.Payload.Base;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Webhooks;
 using Newtonsoft.Json;
@@ -28,7 +29,10 @@ public class MultiEventWebhookList(InvocationContext invocationContext) : Webhoo
         [WebhookParameter] KeyOptionalRequest keyOptionalRequest)
     {
         var payload = webhookRequest.Body.ToString();
-        ArgumentException.ThrowIfNullOrEmpty(payload);
+        if (string.IsNullOrEmpty(payload))
+        {
+            throw new PluginMisconfigurationException("The request must contain a body.");
+        }
 
         var preflightResponse = new WebhookResponse<AssigneeKeyModifiedEvent>()
         {

@@ -5,6 +5,7 @@ using Apps.Lokalise.Models.Responses.Languages;
 using Apps.Lokalise.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Lokalise.DataSourceHandlers;
@@ -24,7 +25,7 @@ public class ProjectLanguageDataHandler : LokaliseInvocable, IAsyncDataSourceHan
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(ProjectId))
-            throw new("You must input Project first");
+            throw new PluginMisconfigurationException("You must input Project first");
 
         var endpoint = $"/projects/{ProjectId}/languages";
         var langs = await Paginator

@@ -46,9 +46,13 @@ public class LokaliseClient : RestClient
     private Exception ConfigureRequestException(string content)
     {
         var error = JsonConvert.DeserializeObject<ErrorResponse>(content);
-        if (error.Error.Message == "Not Found")
+        if (error?.Error?.Message == "Not Found" || error?.Error?.Code == 404)
         {
             return new PluginApplicationException($"Error: {error.Error.Message}; Nothing was found using your inputs, please check and try again");
+        }
+        if (error?.Error?.Message == "Forbidden" || error?.Error?.Code == 403)
+        {
+            return new PluginMisconfigurationException(error.Error.Message);
         }
 
         return new PluginApplicationException($"{error.Error.Message}; Code: {error.Error.Code}");
