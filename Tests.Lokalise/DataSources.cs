@@ -1,5 +1,7 @@
 ﻿using Apps.Lokalise.Actions;
+using Apps.Lokalise.DataSourceHandlers;
 using Apps.Lokalise.Models.Requests.Keys;
+using Blackbird.Applications.Sdk.Common.Dynamic;
 using LokaliseTests.Base;
 
 namespace Tests.Lokalise
@@ -20,5 +22,20 @@ namespace Tests.Lokalise
             Assert.IsNotNull(result);
         }
 
+
+        [TestMethod]
+        public async Task GetProjectDataReturnsValues()
+        {
+            var handler = new ProjectDataHandler(InvocationContext);
+            
+            var result = await handler.GetDataAsync(new DataSourceContext { },CancellationToken.None);
+
+            foreach (var project in result)
+            {
+                Console.WriteLine($"{project.Key}: {project.Value}");
+            }
+
+            Assert.IsNotNull(result);
+        }
     }
 }
