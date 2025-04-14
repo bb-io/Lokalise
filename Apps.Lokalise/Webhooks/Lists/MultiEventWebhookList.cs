@@ -172,12 +172,43 @@ public class MultiEventWebhookList(InvocationContext invocationContext) : Webhoo
     }
 
     [Webhook("On key added (Multiple projects)", typeof(ProjectKeyAddedMultipleProjectsHandler))]
-    public async Task<WebhookResponse<GetKeyEvent>> OnKeyAddedOrModified(WebhookRequest webhookRequest,
+    public async Task<WebhookResponse<GetKeyEvent>> OnKeyAdded(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
     {
         var response = HandlePreflightAndMap<KeyEvent, ProjectKeyAddedPayload>(webhookRequest, input, optionalRequest);
         return await MapToEventResponse(response);
+    }
+
+    [Webhook("On keys added or modified (Multiple projects)", typeof(ProjectKeysAddedOrModifiedHandler))]
+    public async Task<WebhookResponse<ProjectKeysUnifiedEvent>> OnKeyAddedOrModified(WebhookRequest webhookRequest,
+       [WebhookParameter(true)] WebhookInput input,
+       [WebhookParameter] ProjectOptionalRequest optionalRequest)
+    {
+        var response = HandlePreflightAndMap<ProjectKeysUnifiedEvent, ProjectKeysUnifiedPayload>(webhookRequest, input, optionalRequest);
+        return await MapToUnifiedEventResponse(response);
+    }
+
+
+    private async Task<WebhookResponse<ProjectKeysUnifiedEvent>> MapToUnifiedEventResponse(
+    WebhookResponse<ProjectKeysUnifiedEvent> response)
+    {
+        if (response.ReceivedWebhookRequestType == WebhookRequestType.Preflight)
+        {
+            return new WebhookResponse<ProjectKeysUnifiedEvent>
+            {
+                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+                Result = null,
+                ReceivedWebhookRequestType = WebhookRequestType.Preflight
+            };
+        }
+
+        return new WebhookResponse<ProjectKeysUnifiedEvent>
+        {
+            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+            Result = response.Result,
+            ReceivedWebhookRequestType = response.ReceivedWebhookRequestType
+        };
     }
 
     private WebhookResponse<T1> HandlePreflightAndMap<T1, T2>(WebhookRequest webhookRequest, WebhookInput input, ProjectOptionalRequest optionalRequest)

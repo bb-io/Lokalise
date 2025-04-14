@@ -5,13 +5,14 @@ using Blackbird.Applications.Sdk.Common.Webhooks;
 
 namespace Apps.Lokalise.Webhooks.Handlers.MultipleEventHandlers.Impl
 {
-    public class ProjectKeyAddedMultipleProjectsHandler : MultipleBaseWebhookBridgeHandler
+    public class ProjectKeysAddedOrModifiedHandler : MultipleBaseWebhookBridgeHandler
     {
         public static readonly IEnumerable<string> DefaultSubscriptionEvents = new[]
         {
-            "project.key.added"
+            "project.keys.added",
+            "project.keys.modified"
         };
-        public ProjectKeyAddedMultipleProjectsHandler(
+        public ProjectKeysAddedOrModifiedHandler(
             InvocationContext invocationContext,
             [WebhookParameter] WebhookUserInput input)
             : base(invocationContext, DefaultSubscriptionEvents, input.Projects)

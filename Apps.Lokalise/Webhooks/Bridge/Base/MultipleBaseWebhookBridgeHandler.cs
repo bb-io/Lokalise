@@ -31,13 +31,10 @@ namespace Apps.Lokalise.Webhooks.Bridge.Base
         public async Task SubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider,
             Dictionary<string, string> values)
         {
-            var logger = new WebLogger();
             foreach (var projectId in ProjectIds)
             {
                 foreach (var eventType in SubscriptionEvents)
                 {
-                    logger.Log($"[MultipleBaseWebhookBridgeHandler.SubscribeAsync] Start subscription for event '{eventType}' on project '{projectId}'");
-
                     var bridge = new BridgeService(authenticationCredentialsProvider, _bridgeServiceUrl);
                     bridge.Subscribe(eventType, projectId, values["payloadUrl"]);
 
@@ -51,8 +48,6 @@ namespace Apps.Lokalise.Webhooks.Bridge.Base
                          w.Events != null &&
                          w.Events.Contains(eventType));
 
-                    logger.Log($"[MultipleBaseWebhookBridgeHandler.SubscribeAsync] For event '{eventType}' on project '{projectId}' already exists: {alreadyExists}");
-
                     if (alreadyExists)
                         continue;
 
@@ -61,7 +56,6 @@ namespace Apps.Lokalise.Webhooks.Bridge.Base
                           .WithJsonBody(createWebhookRequest, null);
 
                     await Client.ExecuteAsync(postRequest);
-                    logger.Log($"[MultipleBaseWebhookBridgeHandler.SubscribeAsync] Lokalise subscription completed for event '{eventType}' on project '{projectId}'.");
                 }
             }
         }
@@ -69,17 +63,12 @@ namespace Apps.Lokalise.Webhooks.Bridge.Base
         public async Task UnsubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider,
             Dictionary<string, string> values)
         {
-            var logger = new WebLogger();
             foreach (var projectId in ProjectIds)
             {
                 foreach (var eventType in SubscriptionEvents)
                 {
-                    logger.Log($"[MultipleBaseWebhookBridgeHandler.UnsubscribeAsync] Start unsubscription for event '{eventType}' on project '{projectId}'");
-
                     var bridge = new BridgeService(authenticationCredentialsProvider, _bridgeServiceUrl);
                     bridge.Unsubscribe(eventType, projectId, values["payloadUrl"]);
-
-                    logger.Log($"[MultipleBaseWebhookBridgeHandler.UnsubscribeAsync] Unsubscription completed for event '{eventType}' on project '{projectId}'.");
                 }
             }
         }

@@ -30,18 +30,12 @@ namespace Apps.Lokalise.Webhooks.Bridge.Base
         public async Task SubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider,
             Dictionary<string, string> values)
         {
-            var logger = new WebLogger();
-            logger.Log($"[BaseWebhookBridgeHandler.SubscribeAsync] Start subscription for event '{SubscriptionEvent}' on project '{ProjectId}'");
-
-
-
-            //subscrive to bridge service
+            //subscribe to bridge service
             var bridge = new BridgeService(authenticationCredentialsProvider, _bridgeServiceUrl);
             string eventType = SubscriptionEvent;
             bridge.Subscribe(eventType, ProjectId, values["payloadUrl"]);
 
             var lokaliseWebhookUrl = _bridgeServiceUrl;
-
 
             var getRequest = new LokaliseRequest($"/projects/{ProjectId}/webhooks", Method.Get, authenticationCredentialsProvider);
             var existingWebhooksResponse = await Client.ExecuteAsync<LokaliseWebhookResponseDto>(getRequest);
@@ -64,16 +58,11 @@ namespace Apps.Lokalise.Webhooks.Bridge.Base
                   .WithJsonBody(createWebhookRequest, null);
 
             await Client.ExecuteAsync(postRequest);
-            logger.Log($"[BaseWebhookBridgeHandler.SubscribeAsync] Lokalise subscription completed.");
-
         }
 
         public async Task UnsubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider,
             Dictionary<string, string> values)
         {
-            var logger = new WebLogger();
-            logger.Log($"[BaseWebhookBridgeHandler.UnsubscribeAsync] Start unsubscription for event '{SubscriptionEvent}' on project '{ProjectId}'");
-
             var bridge = new BridgeService(authenticationCredentialsProvider, _bridgeServiceUrl);
             bridge.Unsubscribe(SubscriptionEvent, ProjectId, values["payloadUrl"]);
         }
