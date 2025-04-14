@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Webhooks.Bridge.Base.Models
 {
-    public record CreateWebhookRequest(string Url, IEnumerable<string> SubscribedEvents);
+    public record CreateWebhookRequest(
+       [property: JsonProperty("url")] string Url,
+       [property: JsonProperty("events")] IEnumerable<string> SubscribedEvents);
 }

@@ -1,17 +1,11 @@
-﻿using Blackbird.Applications.Sdk.Common.Webhooks;
-using Blackbird.Applications.Sdk.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Blackbird.Applications.Sdk.Common.Invocation;
-using Apps.Lokalise.RestSharp;
-using Blackbird.Applications.Sdk.Common.Authentication;
-using RestSharp;
+﻿using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Webhooks.Bridge.Base.Models;
-using Apps.Lokalise.Constants;
+using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Authentication;
+using Blackbird.Applications.Sdk.Common.Invocation;
+using Blackbird.Applications.Sdk.Common.Webhooks;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
+using RestSharp;
 
 namespace Apps.Lokalise.Webhooks.Bridge.Base
 {
@@ -33,7 +27,7 @@ namespace Apps.Lokalise.Webhooks.Bridge.Base
             this.ProjectId = projectId;
         }
 
-        public async Task SubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider, 
+        public async Task SubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider,
             Dictionary<string, string> values)
         {
             var logger = new WebLogger();
@@ -49,7 +43,7 @@ namespace Apps.Lokalise.Webhooks.Bridge.Base
 
             var lokaliseWebhookUrl = _bridgeServiceUrl;
 
-           
+
             var getRequest = new LokaliseRequest($"/projects/{ProjectId}/webhooks", Method.Get, authenticationCredentialsProvider);
             var existingWebhooksResponse = await Client.ExecuteAsync<LokaliseWebhookResponseDto>(getRequest);
 
@@ -77,7 +71,7 @@ namespace Apps.Lokalise.Webhooks.Bridge.Base
 
         }
 
-        public async Task UnsubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider, 
+        public async Task UnsubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider,
             Dictionary<string, string> values)
         {
             var logger = new WebLogger();
