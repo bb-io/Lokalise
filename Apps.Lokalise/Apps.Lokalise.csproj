@@ -17,4 +17,7 @@
   <ItemGroup>
     <EmbeddedResource CopyToOutputDirectory="Always" Include="image\icon.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Webhooks\Bridge\Handlers\" />
+  </ItemGroup>
 </Project>
