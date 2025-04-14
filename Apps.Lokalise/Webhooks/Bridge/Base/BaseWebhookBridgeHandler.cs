@@ -17,54 +17,54 @@ namespace Apps.Lokalise.Webhooks.Bridge.Base
 
         protected readonly LokaliseClient Client;
 
-        protected readonly string ProjectId;
+        protected readonly IEnumerable<string> ProjectIds;
 
-        public BaseWebhookBridgeHandler(InvocationContext invocationContext, string subEvent, string projectId) : base(invocationContext)
+        public BaseWebhookBridgeHandler(InvocationContext invocationContext, string subEvent, IEnumerable<string> projectIds) : base(invocationContext)
         {
             SubscriptionEvent = subEvent;
             _bridgeServiceUrl = $"{invocationContext.UriInfo.BridgeServiceUrl.ToString().TrimEnd('/')}/webhooks/lokalise";
             Client = new LokaliseClient();
-            this.ProjectId = projectId;
+            ProjectIds = projectIds;
         }
 
-        public async Task SubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider,
+        public async Task SubscribeAsync(
+            IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider,
             Dictionary<string, string> values)
         {
-            //subscribe to bridge service
-            var bridge = new BridgeService(authenticationCredentialsProvider, _bridgeServiceUrl);
-            string eventType = SubscriptionEvent;
-            bridge.Subscribe(eventType, ProjectId, values["payloadUrl"]);
-
-            var lokaliseWebhookUrl = _bridgeServiceUrl;
-
-            var getRequest = new LokaliseRequest($"/projects/{ProjectId}/webhooks", Method.Get, authenticationCredentialsProvider);
-            var existingWebhooksResponse = await Client.ExecuteAsync<LokaliseWebhookResponseDto>(getRequest);
-
-            var existingWebhooks = existingWebhooksResponse.Data?.Webhooks;
-            bool alreadyExists = existingWebhooks.Any(w =>
-                 w.Url == lokaliseWebhookUrl &&
-                 w.Events != null &&
-                 w.Events.Contains(SubscriptionEvent));
-
-
-            if (alreadyExists)
+            foreach (var projectId in ProjectIds)
             {
-                return;
+                var bridge = new BridgeService(authenticationCredentialsProvider, _bridgeServiceUrl);
+                bridge.Subscribe(SubscriptionEvent, projectId, values["payloadUrl"]);
+
+                var lokaliseWebhookUrl = _bridgeServiceUrl;
+                var getRequest = new LokaliseRequest($"/projects/{projectId}/webhooks", Method.Get, authenticationCredentialsProvider);
+                var existingWebhooksResponse = await Client.ExecuteAsync<LokaliseWebhookResponseDto>(getRequest);
+                var existingWebhooks = existingWebhooksResponse.Data?.Webhooks;
+                bool alreadyExists = existingWebhooks.Any(w =>
+                    w.Url == lokaliseWebhookUrl &&
+                    w.Events != null &&
+                    w.Events.Contains(SubscriptionEvent));
+
+                if (alreadyExists)
+                {
+                    continue;
+                }
+
+                var createWebhookRequest = new CreateWebhookRequest(lokaliseWebhookUrl, new[] { SubscriptionEvent });
+                var postRequest = new LokaliseRequest($"/projects/{projectId}/webhooks", Method.Post, authenticationCredentialsProvider)
+                    .WithJsonBody(createWebhookRequest, null);
+                await Client.ExecuteAsync(postRequest);
             }
-
-            //subscribe to lokalise
-            var createWebhookRequest = new CreateWebhookRequest(lokaliseWebhookUrl, new[] { SubscriptionEvent });
-            var postRequest = new LokaliseRequest($"/projects/{ProjectId}/webhooks", Method.Post, authenticationCredentialsProvider)
-                  .WithJsonBody(createWebhookRequest, null);
-
-            await Client.ExecuteAsync(postRequest);
         }
 
         public async Task UnsubscribeAsync(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProvider,
             Dictionary<string, string> values)
         {
-            var bridge = new BridgeService(authenticationCredentialsProvider, _bridgeServiceUrl);
-            bridge.Unsubscribe(SubscriptionEvent, ProjectId, values["payloadUrl"]);
+            foreach (var projectId in ProjectIds)
+            {
+                var bridge = new BridgeService(authenticationCredentialsProvider, _bridgeServiceUrl);
+                bridge.Unsubscribe(SubscriptionEvent, projectId, values["payloadUrl"]);
+            }
         }
     }
 }
