@@ -39,7 +39,6 @@ namespace Apps.Lokalise.Webhooks.Bridge.Base
             var bridge = new BridgeService(authenticationCredentialsProvider, _bridgeServiceUrl);
             string eventType = SubscriptionEvent;
             bridge.Subscribe(eventType, ProjectId, values["payloadUrl"]);
-            logger.Log($"[BaseWebhookBridgeHandler.SubscribeAsync] Bridge service subscription completed.");
 
             var lokaliseWebhookUrl = _bridgeServiceUrl;
 
@@ -52,8 +51,6 @@ namespace Apps.Lokalise.Webhooks.Bridge.Base
                  w.Url == lokaliseWebhookUrl &&
                  w.Events != null &&
                  w.Events.Contains(SubscriptionEvent));
-
-            logger.Log($"[BaseWebhookBridgeHandler.SubscribeAsync] Already exists: {alreadyExists}");
 
 
             if (alreadyExists)
