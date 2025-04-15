@@ -1,5 +1,6 @@
 using System.Net;
 using Apps.Lokalise.Models.Requests.Keys;
+using Apps.Lokalise.Models.Requests.Projects;
 using Apps.Lokalise.Models.Responses.Keys;
 using Apps.Lokalise.Models.Responses.Tasks;
 using Apps.Lokalise.RestSharp;
@@ -10,6 +11,8 @@ using Apps.Lokalise.Webhooks.Models.EventResponse;
 using Apps.Lokalise.Webhooks.Models.Input;
 using Apps.Lokalise.Webhooks.Models.Payload;
 using Apps.Lokalise.Webhooks.Models.Payload.Base;
+using Blackbird.Applications.Sdk.Common.Actions;
+using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Webhooks;
@@ -22,6 +25,12 @@ namespace Apps.Lokalise.Webhooks.Lists;
 [WebhookList]
 public class MultiEventWebhookList(InvocationContext invocationContext) : WebhookList(invocationContext)
 {
+    protected AuthenticationCredentialsProvider[] Creds =>
+       InvocationContext.AuthenticationCredentialsProviders.ToArray();
+
+    protected LokaliseClient Client { get; } = new();
+
+
     [Webhook("On key modified for assignee", typeof(AssigneeKeyModifiedEventHandler),
         Description = "Triggered when a key is modified for a specific assignee")]
     public async Task<WebhookResponse<AssigneeKeyModifiedEvent>> OnKeyModifiedForAssignee(WebhookRequest webhookRequest,
@@ -160,5 +169,109 @@ public class MultiEventWebhookList(InvocationContext invocationContext) : Webhoo
             HttpResponseMessage = null,
             Result = result
         };
+    }
+
+    [Webhook("On key added (Multiple projects)", typeof(ProjectKeyAddedMultipleProjectsHandler))]
+    public async Task<WebhookResponse<GetKeyEvent>> OnKeyAdded(WebhookRequest webhookRequest,
+        [WebhookParameter(true)] WebhookInput input,
+        [WebhookParameter] ProjectOptionalRequest optionalRequest)
+    {
+        var response = HandlePreflightAndMap<KeyEvent, ProjectKeyAddedPayload>(webhookRequest, input, optionalRequest);
+        return await MapToEventResponse(response);
+    }
+
+    [Webhook("On keys added or modified (Multiple projects)", typeof(ProjectKeysAddedOrModifiedHandler))]
+    public async Task<WebhookResponse<ProjectKeysUnifiedEvent>> OnKeyAddedOrModified(WebhookRequest webhookRequest,
+       [WebhookParameter(true)] WebhookInput input,
+       [WebhookParameter] ProjectOptionalRequest optionalRequest)
+    {
+        var response = HandlePreflightAndMap<ProjectKeysUnifiedEvent, ProjectKeysUnifiedPayload>(webhookRequest, input, optionalRequest);
+        return await MapToUnifiedEventResponse(response);
+    }
+
+
+    private async Task<WebhookResponse<ProjectKeysUnifiedEvent>> MapToUnifiedEventResponse(
+    WebhookResponse<ProjectKeysUnifiedEvent> response)
+    {
+        if (response.ReceivedWebhookRequestType == WebhookRequestType.Preflight)
+        {
+            return new WebhookResponse<ProjectKeysUnifiedEvent>
+            {
+                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+                Result = null,
+                ReceivedWebhookRequestType = WebhookRequestType.Preflight
+            };
+        }
+
+        return new WebhookResponse<ProjectKeysUnifiedEvent>
+        {
+            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+            Result = response.Result,
+            ReceivedWebhookRequestType = response.ReceivedWebhookRequestType
+        };
+    }
+
+    private WebhookResponse<T1> HandlePreflightAndMap<T1, T2>(WebhookRequest webhookRequest, WebhookInput input, ProjectOptionalRequest optionalRequest)
+      where T2 : BasePayload where T1 : BaseEvent
+    {
+        var preflightResponse = new WebhookResponse<T1>()
+        {
+            HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK),
+            Result = null,
+            ReceivedWebhookRequestType = WebhookRequestType.Preflight
+        };
+
+        if (webhookRequest.Body.ToString() == LokalisePingRequestBody)
+            return preflightResponse;
+
+        var data = JsonConvert.DeserializeObject<T2>(webhookRequest.Body.ToString()!);
+
+        if (data is null)
+            throw new InvalidCastException(nameof(webhookRequest.Body));
+
+        if (!input.Projects.Contains(data.Project.Id))
+            return preflightResponse;
+
+        if (input.UserEmail != null && data.User.Email != input.UserEmail)
+            return preflightResponse;
+
+        if (optionalRequest.ProjectId != null && data.Project.Id != optionalRequest.ProjectId)
+            return preflightResponse;
+
+        return new()
+        {
+            HttpResponseMessage = null,
+            Result = (T1)data.Convert()
+        };
+    }
+
+    private async Task<WebhookResponse<GetKeyEvent>> MapToEventResponse<T>(WebhookResponse<T> response)
+       where T : KeyEvent
+    {
+        if (response.ReceivedWebhookRequestType == WebhookRequestType.Preflight)
+        {
+            return new WebhookResponse<GetKeyEvent>
+            {
+                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+                Result = null,
+                ReceivedWebhookRequestType = WebhookRequestType.Preflight
+            };
+        }
+
+        var keyResponse = await GetKeyAsync(response.Result.ProjectId, response.Result.Key.Id);
+        return new()
+        {
+            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+            Result = new(response.Result, keyResponse),
+            ReceivedWebhookRequestType = response.ReceivedWebhookRequestType
+        };
+    }
+    private async Task<KeyResponse> GetKeyAsync(string projectId, string keyId)
+    {
+        var endpoint = $"/projects/{projectId}/keys/{keyId}";
+        var request = new LokaliseRequest(endpoint, Method.Get, Creds);
+
+        var response = await Client.ExecuteWithHandling<KeyResponse>(request);
+        return response;
     }
 }
