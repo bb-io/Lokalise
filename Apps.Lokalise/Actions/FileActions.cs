@@ -152,8 +152,6 @@ public class FileActions : LokaliseInvocable
         [ActionParameter] DownloadSourceFilesRequest input)
     {
         var projectData = await new ProjectActions(InvocationContext).RetrieveProject(project);
-        if (projectData?.BaseLanguageIso == null)
-            throw new InvalidOperationException("Project data or BaseLanguageIso is null.");
 
         var endpoint = $"/projects/{project.ProjectId}/files/download";
         var request = new LokaliseRequest(endpoint, Method.Post, Creds)
@@ -168,22 +166,23 @@ public class FileActions : LokaliseInvocable
 
         var rawBytes = zipResponse.RawBytes!;
         await using var zipStream = new MemoryStream(rawBytes);
-
         using var sourceArchive = new ZipArchive(zipStream, ZipArchiveMode.Read, leaveOpen: false);
 
         var result = new List<FileReference>();
         foreach (var entry in sourceArchive.Entries.Where(e => !e.FullName.EndsWith('/')))
         {
-            await using var entryStream = entry.Open();
+            using var entryStream = entry.Open();
+            using var bufferedStream = new MemoryStream();
+            await entryStream.CopyToAsync(bufferedStream);
+            bufferedStream.Position = 0;
 
             var segments = entry.FullName.Split('/');
             var languageCode = segments[0];
-            var originalFileName = Path.GetFileName(entry.FullName); 
-
+            var originalFileName = Path.GetFileName(entry.FullName);
             var newFileName = $"{languageCode}_{originalFileName}";
 
             var uploaded = await _fileManagementClient.UploadAsync(
-                entryStream,
+                bufferedStream,
                 contentType: "application/octet-stream",
                 fileName: newFileName
             );
