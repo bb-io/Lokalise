@@ -116,31 +116,31 @@ public class FileActions : LokaliseInvocable
         var zipResponse = await Client.ExecuteWithHandling(new(fileUri));
 
         await using var zipStream = new MemoryStream();
-        var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, true);
-
-        var rawBytes = zipResponse.RawBytes!;
-        using (var sourceMs = new MemoryStream(rawBytes))
-        using (var sourceArchive = new ZipArchive(sourceMs, ZipArchiveMode.Read, leaveOpen: false))
+        using (var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, leaveOpen: true))
         {
-            foreach (var entry in sourceArchive.Entries.Where(e => !e.FullName.EndsWith('/')))
+            var rawBytes = zipResponse.RawBytes!;
+            using (var sourceMs = new MemoryStream(rawBytes))
+            using (var sourceArchive = new ZipArchive(sourceMs, ZipArchiveMode.Read, leaveOpen: false))
             {
-                using var entryStream = entry.Open();
-                await zipArchive.AddFileToZip(entry.FullName, entryStream);
+                foreach (var entry in sourceArchive.Entries.Where(e => !e.FullName.EndsWith('/')))
+                {
+                    using var entryStream = entry.Open();
+                    using var bufferedStream = new MemoryStream();
+                    await entryStream.CopyToAsync(bufferedStream);
+                    bufferedStream.Position = 0;
+
+                    var zipEntry = zipArchive.CreateEntry(entry.FullName);
+                    using var zipEntryStream = zipEntry.Open();
+                    await bufferedStream.CopyToAsync(zipEntryStream);
+                }
             }
         }
-
-        //var filteredFiles = files
-        //    .Where(file => input.FilterLangs is null || input.FilterLangs.Any(lang =>
-        //        file.Path.StartsWith(lang) || file.File.Name.Contains($"{lang}.")));
-
-        zipArchive.Dispose();
-
         zipStream.Position = 0;
 
         var zipFileReference = await _fileManagementClient.UploadAsync(
-                zipStream,
-                contentType: zipResponse.ContentType ?? MediaTypeNames.Application.Octet,
-                fileName: fileUri.Segments.Last());
+            zipStream,
+            contentType: zipResponse.ContentType ?? MediaTypeNames.Application.Octet,
+            fileName: fileUri.Segments.Last());
 
         return new DownloadProjectFilesAsZipResponse { File = zipFileReference };
 
