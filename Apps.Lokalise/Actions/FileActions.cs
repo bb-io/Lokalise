@@ -246,7 +246,6 @@ public class FileActions : LokaliseInvocable
 
         var rawBytes = zipResponse.RawBytes!;
         await using var zipStream = new MemoryStream(rawBytes);
-
         using var sourceArchive = new ZipArchive(zipStream, ZipArchiveMode.Read, leaveOpen: false);
 
         var matchingEntry = sourceArchive.Entries.FirstOrDefault(en =>
@@ -254,10 +253,16 @@ public class FileActions : LokaliseInvocable
             en.FullName.Split('/').First() == input.LanguageCode.Replace("-", "_") &&
             en.Name == input.FileName);
 
-        await using var entryStream = matchingEntry.Open();
+        if (matchingEntry == null)
+            throw new InvalidOperationException($"File {input.FileName} for language {input.LanguageCode} not found in the archive.");
+
+        using var entryStream = matchingEntry.Open();
+        using var bufferedStream = new MemoryStream();
+        await entryStream.CopyToAsync(bufferedStream);
+        bufferedStream.Position = 0; 
 
         var uploadedFile = await _fileManagementClient.UploadAsync(
-            entryStream,
+            bufferedStream,
             contentType: "application/octet-stream",
             fileName: input.FileName
         );

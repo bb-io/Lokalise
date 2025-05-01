@@ -40,8 +40,6 @@ namespace Tests.Lokalise
             Assert.IsNotNull(glossary);
         }
 
-        //DownloadXLIFFAll
-
         [TestMethod]
         public async Task DownloadXLIFFFile_IsSuccess()
         {
