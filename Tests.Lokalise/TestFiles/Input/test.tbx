@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tbx type="TBX-Core" style="dca" xml:lang="en" xmlns="urn:iso:std:iso:30042:ed-2">
+  <tbxHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Project_43255416680bccef893775.42965789_Glossary</title>
+      </titleStmt>
+      <sourceDesc>
+        <p>Exported from project 43255416680bccef893775.42965789</p>
+      </sourceDesc>
+    </fileDesc>
+  </tbxHeader>
+  <text>
+    <body>
+      <conceptEntry id="5500639">
+        <descrip type="definition">Grandfather</descrip>
+        <langSec xml:lang="en">
+          <termSec>
+            <term>Grandfather</term>
+            <termNote type="description">Grandfather</termNote>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="5500640">
+        <descrip type="definition"></descrip>
+        <langSec xml:lang="en">
+          <termSec>
+            <term>Test quality code</term>
+            <termNote type="description">test</termNote>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="5500641">
+        <descrip type="definition"></descrip>
+        <langSec xml:lang="en">
+          <termSec>
+            <term>Active life</term>
+            <termNote type="description">Active</termNote>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+    </body>
+  </text>
+</tbx>

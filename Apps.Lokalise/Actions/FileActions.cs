@@ -17,6 +17,14 @@ using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Xliff.Utils.Extensions;
+using Apps.Lokalise.Models.Responses.Projects;
+using Blackbird.Applications.Sdk.Common.Exceptions;
+using Apps.Lokalise.Models.Responses.Glossary;
+using Blackbird.Applications.Sdk.Glossaries.Utils.Dtos;
+using Blackbird.Applications.Sdk.Glossaries.Utils.Converters;
+using Blackbird.Applications.Sdk.Utils.Models;
+using System.Xml.Linq;
+
 
 namespace Apps.Lokalise.Actions;
 
@@ -108,29 +116,34 @@ public class FileActions : LokaliseInvocable
         var zipResponse = await Client.ExecuteWithHandling(new(fileUri));
 
         await using var zipStream = new MemoryStream();
-        var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, true);
-
-        var files = await zipResponse.RawBytes!.GetFilesFromZip(_fileManagementClient);
-        //var filteredFiles = files
-        //    .Where(file => input.FilterLangs is null || input.FilterLangs.Any(lang =>
-        //        file.Path.StartsWith(lang) || file.File.Name.Contains($"{lang}.")));
-
-        foreach (var file in files.Where(x => !x.Path.EndsWith('/')))
+        using (var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, leaveOpen: true))
         {
-            await using var fileStream = await _fileManagementClient.DownloadAsync(file.File);
-            var fileBytes = await fileStream.GetByteData();
-            await zipArchive.AddFileToZip(file.Path, fileBytes);
+            var rawBytes = zipResponse.RawBytes!;
+            using (var sourceMs = new MemoryStream(rawBytes))
+            using (var sourceArchive = new ZipArchive(sourceMs, ZipArchiveMode.Read, leaveOpen: false))
+            {
+                foreach (var entry in sourceArchive.Entries.Where(e => !e.FullName.EndsWith('/')))
+                {
+                    using var entryStream = entry.Open();
+                    using var bufferedStream = new MemoryStream();
+                    await entryStream.CopyToAsync(bufferedStream);
+                    bufferedStream.Position = 0;
+
+                    var zipEntry = zipArchive.CreateEntry(entry.FullName);
+                    using var zipEntryStream = zipEntry.Open();
+                    await bufferedStream.CopyToAsync(zipEntryStream);
+                }
+            }
         }
-        
-        zipArchive.Dispose();
-        
         zipStream.Position = 0;
 
-        var zipFileReference = await _fileManagementClient.UploadAsync(zipStream,
+        var zipFileReference = await _fileManagementClient.UploadAsync(
+            zipStream,
             contentType: zipResponse.ContentType ?? MediaTypeNames.Application.Octet,
             fileName: fileUri.Segments.Last());
 
-        return new() { File = zipFileReference };
+        return new DownloadProjectFilesAsZipResponse { File = zipFileReference };
+
     }
 
     [Action("Download project source files", Description = "Download all project source files")]
@@ -139,22 +152,45 @@ public class FileActions : LokaliseInvocable
         [ActionParameter] DownloadSourceFilesRequest input)
     {
         var projectData = await new ProjectActions(InvocationContext).RetrieveProject(project);
-        var archive = await DownloadProjectFilesAsZip(project, new()
+
+        var endpoint = $"/projects/{project.ProjectId}/files/download";
+        var request = new LokaliseRequest(endpoint, Method.Post, Creds)
+            .WithJsonBody(new DownloadFileRequest
+            {
+                Format = input.Format
+            });
+
+        var exportResult = await Client.ExecuteWithHandling<ExportFilesDto>(request);
+        var fileUri = new Uri(exportResult.BundleUrl);
+        var zipResponse = await Client.ExecuteWithHandling(new(fileUri));
+
+        var rawBytes = zipResponse.RawBytes!;
+        await using var zipStream = new MemoryStream(rawBytes);
+        using var sourceArchive = new ZipArchive(zipStream, ZipArchiveMode.Read, leaveOpen: false);
+
+        var result = new List<FileReference>();
+        foreach (var entry in sourceArchive.Entries.Where(e => !e.FullName.EndsWith('/')))
         {
-            Format = input.Format
-        });
+            using var entryStream = entry.Open();
+            using var bufferedStream = new MemoryStream();
+            await entryStream.CopyToAsync(bufferedStream);
+            bufferedStream.Position = 0;
 
-        var archiveStream = await _fileManagementClient.DownloadAsync(archive.File);
-        var archiveBytes = await archiveStream.GetByteData();
-        
-        var files = await archiveBytes.GetFilesFromZip(_fileManagementClient);
+            var segments = entry.FullName.Split('/');
+            var languageCode = segments[0];
+            var originalFileName = Path.GetFileName(entry.FullName);
+            var newFileName = $"{languageCode}_{originalFileName}";
 
-        var sourceFiles = files
-            .Where(file => file.File.Size > 0 && file.Path.StartsWith(projectData.BaseLanguageIso))
-            .Select(file => file.File)
-            .ToArray();
+            var uploaded = await _fileManagementClient.UploadAsync(
+                bufferedStream,
+                contentType: "application/octet-stream",
+                fileName: newFileName
+            );
 
-        return new(sourceFiles);
+            result.Add(uploaded);
+        }
+
+        return new DownloadFilesResponse(result.ToArray());
     }
 
     [Action("Download translated project file", Description = "Download translated project file by name")]
@@ -162,17 +198,78 @@ public class FileActions : LokaliseInvocable
         [ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadTranslatedFileRequest input)
     {
-        var allFiles = await DownloadProjectFilesAsZip(project, input);
-        var allFilesStream = await _fileManagementClient.DownloadAsync(allFiles.File);
-        var allFilesBytes = await allFilesStream.GetByteData();
+        var endpoint = $"/projects/{project.ProjectId}/files/download";
+        var request = new LokaliseRequest(endpoint, Method.Post, Creds)
+            .WithJsonBody(new DownloadFileRequest
+            {
+                Format = input.Format,
+                OriginalFilenames = input.OriginalFilenames,
+                BundleStructure = input.BundleStructure,
+                DirectoryPrefix = input.DirectoryPrefix,
+                AllPlatforms = input.AllPlatforms,
+                FilterLangs = input.FilterLangs,
+                FilterData = input.FilterData,
+                FilterFilenames = input.FilterFilenames,
+                AddNewlineEof = input.AddNewlineEof,
+                CustomTranslationStatusIds = input.CustomTranslationStatusIds,
+                IncludeTags = input.IncludeTags,
+                ExcludeTags = input.ExcludeTags,
+                ExportSort = input.ExportSort,
+                ExportEmptyAs = input.ExportEmptyAs,
+                ExportNullAs = input.ExportNullAs,
+                IncludeComments = input.IncludeComments,
+                IncludeDescription = input.IncludeDescription,
+                IncludePids = input.IncludePids,
+                Triggers = input.Triggers,
+                FilterRepositories = input.FilterRepositories,
+                ReplaceBreaks = input.ReplaceBreaks,
+                DisableReferences = input.DisableReferences,
+                PluralFormat = input.PluralFormat,
+                PlaceholderFormat = input.PlaceholderFormat,
+                WebhookUrl = input.WebhookUrl,
+                LanguageMapping = input.LanguageMapping,
+                IcuNumeric = input.IcuNumeric,
+                EscapePercent = input.EscapePercent,
+                Indentation = input.Indentation,
+                YamlIncludeRoot = input.YamlIncludeRoot,
+                JsonUnescapedSlashes = input.JsonUnescapedSlashes,
+                JavaPropertiesEncoding = input.JavaPropertiesEncoding,
+                JavaPropertiesSeparator = input.JavaPropertiesSeparator,
+                BundleDescription = input.BundleDescription,
+                FilterTaskId = input.FilterTaskId,
+                Compact = input.Compact
+            });
 
-        var fileData = await allFilesBytes.GetFileFromZip(
-            en => en.FullName.Split('/').First() == input.LanguageCode.Replace("-", "_") && en.Name == input.FileName,
-            _fileManagementClient);
+        var exportResult = await Client.ExecuteWithHandling<ExportFilesDto>(request);
+        var fileUri = new Uri(exportResult.BundleUrl);
+        var zipResponse = await Client.ExecuteWithHandling(new(fileUri));
 
-        return new()
+        var rawBytes = zipResponse.RawBytes!;
+        await using var zipStream = new MemoryStream(rawBytes);
+        using var sourceArchive = new ZipArchive(zipStream, ZipArchiveMode.Read, leaveOpen: false);
+
+        var matchingEntry = sourceArchive.Entries.FirstOrDefault(en =>
+            !en.FullName.EndsWith('/') &&
+            en.FullName.Split('/').First() == input.LanguageCode.Replace("-", "_") &&
+            en.Name == input.FileName);
+
+        if (matchingEntry == null)
+            throw new InvalidOperationException($"File {input.FileName} for language {input.LanguageCode} not found in the archive.");
+
+        using var entryStream = matchingEntry.Open();
+        using var bufferedStream = new MemoryStream();
+        await entryStream.CopyToAsync(bufferedStream);
+        bufferedStream.Position = 0; 
+
+        var uploadedFile = await _fileManagementClient.UploadAsync(
+            bufferedStream,
+            contentType: "application/octet-stream",
+            fileName: input.FileName
+        );
+
+        return new DownloadProjectFilesAsZipResponse
         {
-            File = fileData.File
+            File = uploadedFile
         };
     }
 
@@ -180,21 +277,40 @@ public class FileActions : LokaliseInvocable
     public async Task<DownloadProjectFilesAsZipResponse> DownloadXLIFF([ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadXLIFFFileRequest input)
     {
-        var allFiles = await DownloadProjectFilesAsZip(project, new(input)
-        {
-            Format = "offline_xliff",
-            AllPlatforms = input.AllPlatforms ?? true,
-            FilterTaskId = input.FilterTaskId
-        });
-        var allFilesStream = await _fileManagementClient.DownloadAsync(allFiles.File);
-        var allFilesBytes = await allFilesStream.GetByteData();
+        var endpoint = $"/projects/{project.ProjectId}/files/download";
+        var request = new LokaliseRequest(endpoint, Method.Post, Creds)
+            .WithJsonBody(new DownloadFileRequest
+            {
+                Format = "offline_xliff",
+                AllPlatforms = input.AllPlatforms ?? true,
+                FilterTaskId = input.FilterTaskId
+            });
 
-        var fileData = await allFilesBytes
-            .GetFileFromZip(en => en.Name == $"{input.LanguageCode.Replace("_", "-")}.xliff", _fileManagementClient);
+        var exportResult = await Client.ExecuteWithHandling<ExportFilesDto>(request);
+        var fileUri = new Uri(exportResult.BundleUrl);
+        var zipResponse = await Client.ExecuteWithHandling(new(fileUri));
 
-        return new()
+        var rawBytes = zipResponse.RawBytes!;
+        await using var zipStream = new MemoryStream(rawBytes);
+
+        using var sourceArchive = new ZipArchive(zipStream, ZipArchiveMode.Read, leaveOpen: false);
+
+        var expectedFileName = $"{input.LanguageCode.Replace("_", "-")}.xliff";
+        var matchingEntry = sourceArchive.Entries.FirstOrDefault(en =>
+            !en.FullName.EndsWith('/') &&
+            en.Name == expectedFileName);
+
+        await using var entryStream = matchingEntry.Open();
+
+        var uploadedFile = await _fileManagementClient.UploadAsync(
+            entryStream,
+            contentType: "application/xliff+xml",
+            fileName: expectedFileName
+        );
+
+        return new DownloadProjectFilesAsZipResponse
         {
-            File = fileData.File
+            File = uploadedFile
         };
     }
 
@@ -202,31 +318,96 @@ public class FileActions : LokaliseInvocable
     public async Task<DownloadFilesResponse> DownloadXLIFFFromTask([ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadTaskXLIFFFileRequest input)
     {
-        var allFiles = await DownloadProjectFilesAsZip(project, new(input)
+        var endpoint = $"/projects/{project.ProjectId}/files/download";
+        var request = new LokaliseRequest(endpoint, Method.Post, Creds)
+            .WithJsonBody(new DownloadFileRequest
+            {
+                Format = "offline_xliff",
+                AllPlatforms = input.AllPlatforms ?? true,
+                FilterTaskId = input.FilterTaskId
+            });
+
+        var exportResult = await Client.ExecuteWithHandling<ExportFilesDto>(request);
+        var fileUri = new Uri(exportResult.BundleUrl);
+        var zipResponse = await Client.ExecuteWithHandling(new(fileUri));
+
+        var rawBytes = zipResponse.RawBytes!;
+        await using var zipStream = new MemoryStream(rawBytes);
+
+        using var sourceArchive = new ZipArchive(zipStream, ZipArchiveMode.Read, leaveOpen: false);
+
+        var result = new List<FileReference>();
+        foreach (var entry in sourceArchive.Entries.Where(en =>
+            !en.FullName.EndsWith('/') &&
+            en.Name.EndsWith(".xliff")))
         {
-            Format = "offline_xliff",
-            AllPlatforms = input.AllPlatforms ?? true,
-            FilterTaskId = input.FilterTaskId
-        });
-        var allFilesStream = await _fileManagementClient.DownloadAsync(allFiles.File);
-        var allFilesBytes = await allFilesStream.GetByteData();
-        var files = await allFilesBytes.GetFilesFromZip(_fileManagementClient);
-        return new(files.Where(file => file.File.Size > 0).Select(file => file.File));
+            await using var entryStream = entry.Open();
+
+            var tempStream = new MemoryStream();
+            await entryStream.CopyToAsync(tempStream);
+            tempStream.Position = 0;
+
+            if (tempStream.Length == 0)
+                continue; 
+
+            var uploadedFile = await _fileManagementClient.UploadAsync(
+                tempStream,
+                contentType: "application/xliff+xml",
+                fileName: entry.Name
+            );
+
+
+            result.Add(uploadedFile);
+        }
+
+        return new DownloadFilesResponse(result.ToArray());
     }
 
     [Action("Download all XLIFF files from project", Description = "Download all XLIFF files from project")]
     public async Task<DownloadFilesResponse> DownloadXLIFFAll([ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadAllXLIFFFilesRequest input)
     {
-        var allFiles = await DownloadProjectFilesAsZip(project, new(input)
+        var endpoint = $"/projects/{project.ProjectId}/files/download";
+        var request = new LokaliseRequest(endpoint, Method.Post, Creds)
+            .WithJsonBody(new DownloadFileRequest
+            {
+                Format = "offline_xliff",
+                AllPlatforms = input.AllPlatforms ?? true
+            });
+
+        var exportResult = await Client.ExecuteWithHandling<ExportFilesDto>(request);
+        var fileUri = new Uri(exportResult.BundleUrl);
+        var zipResponse = await Client.ExecuteWithHandling(new(fileUri));
+
+        var rawBytes = zipResponse.RawBytes!;
+        await using var zipStream = new MemoryStream(rawBytes);
+
+        using var sourceArchive = new ZipArchive(zipStream, ZipArchiveMode.Read, leaveOpen: false);
+
+        var result = new List<FileReference>();
+        foreach (var entry in sourceArchive.Entries.Where(en =>
+            !en.FullName.EndsWith('/') &&
+            en.Name.EndsWith(".xliff")))
         {
-            Format = "offline_xliff",
-            AllPlatforms = input.AllPlatforms ?? true
-        });
-        var allFilesStream = await _fileManagementClient.DownloadAsync(allFiles.File);
-        var allFilesBytes = await allFilesStream.GetByteData();
-        var files = await allFilesBytes.GetFilesFromZip(_fileManagementClient);
-        return new(files.Where(file => file.File.Size > 0).Select(file => file.File));
+            await using var entryStream = entry.Open();
+
+            var tempStream = new MemoryStream();
+            await entryStream.CopyToAsync(tempStream);
+            tempStream.Position = 0;
+
+            if (tempStream.Length == 0)
+                continue;
+
+            var uploadedFile = await _fileManagementClient.UploadAsync(
+                tempStream,
+                contentType: "application/xliff+xml",
+                fileName: entry.Name
+            );
+
+            result.Add(uploadedFile);
+        }
+
+        return new DownloadFilesResponse(result.ToArray());
     }
 
     [Action("Delete file", Description = "Delete file from project")]
@@ -238,8 +419,173 @@ public class FileActions : LokaliseInvocable
         return Client.ExecuteWithHandling(request);
     }
 
-    #endregion
+
+
+    [Action("Export glossary", Description = "Export project glossary as TBX file")]
+    public async Task<FileReference> ExportGlossaryTerms([ActionParameter] ProjectRequest input)
+    {
+        var endpoint = $"/projects/{input.ProjectId}/glossary-terms";
+        var request = new LokaliseRequest(endpoint, Method.Get, Creds);
+
+        var response = await Client.ExecuteWithHandling<GlossaryTermsResponse>(request);
+
+        var terms = response.Data;
+
+        if (terms == null || !terms.Any())
+            throw new PluginApplicationException($"No glossary terms found for project ID: {input.ProjectId}");
+
+        var conceptEntries = terms.Select(t =>
+        {
+            var sections = new List<GlossaryLanguageSection>
+                {
+                    new GlossaryLanguageSection("en", new List<GlossaryTermSection>
+                    {
+                        new GlossaryTermSection(t.Term)
+                        {
+                            TermNotes = new Dictionary<string, string>
+                            {
+                                ["description"] = t.Description
+                            }
+                        }
+                    })
+                };
+
+            sections.AddRange(t.Translations
+                .Where(tr => !string.IsNullOrWhiteSpace(tr.Translation))
+                .Select(tr => new GlossaryLanguageSection(tr.LangIso, new List<GlossaryTermSection>
+                {
+                        new GlossaryTermSection(tr.Translation)
+                        {
+                            TermNotes = new Dictionary<string, string>
+                            {
+                                ["description"] = tr.Description
+                            }
+                        }
+                }))
+            );
+
+            var entry = new GlossaryConceptEntry(t.Id.ToString(), sections)
+            {
+                Definition = t.Description,
+                Domain = t.Tags != null && t.Tags.Any()
+                               ? string.Join(",", t.Tags)
+                               : null
+            };
+
+            return entry;
+        }).ToList();
+
+        var glossary = new Glossary(conceptEntries)
+        {
+            Title = $"Project_{input.ProjectId}_Glossary",
+            SourceDescription = $"Exported from project {input.ProjectId}"
+        };
+
+        using var tbxStream = glossary.ConvertToTbx();
+
+        var fileReference = await _fileManagementClient.UploadAsync(
+            tbxStream,
+            "application/x-tbx+xml",
+            $"project_{input.ProjectId}_glossary.tbx"
+        );
+
+        return fileReference;
+    }
+
+
+
+    [Action("Import glossary", Description = "Import glossary terms from a TBX file into the project")]
+    public async Task<ImportGlossaryResponse> ImportGlossary(
+             [ActionParameter] ProjectRequest input,
+             [ActionParameter] FileReference tbxFile)
+    {
+        await using var originalStream = await _fileManagementClient.DownloadAsync(tbxFile);
+        var xDoc = XDocument.Load(originalStream);
+        var root = xDoc.Root;
+        if (root == null || !string.Equals(root.Name.LocalName, "tbx", StringComparison.OrdinalIgnoreCase))
+            throw new PluginApplicationException("The provided file is not a valid TBX document.");
+
+        XNamespace ns = root.Name.Namespace;
+
+        var entries = root
+            .Element(ns + "text")?
+            .Element(ns + "body")?
+            .Elements(ns + "conceptEntry");
+
+        if (entries == null || !entries.Any())
+            throw new PluginApplicationException("No <conceptEntry> elements found in TBX file.");
+
+        var termsPayload = new List<object>();
+
+        foreach (var entry in entries)
+        {
+            var definition = entry
+                .Elements(ns + "descrip")
+                .FirstOrDefault(d => (string)d.Attribute("type") == "definition")
+                ?.Value ?? string.Empty;
+
+            var langSecs = entry.Elements(ns + "langSec");
+
+            var primarySec = langSecs.First();
+            var baseLangIso = (string)primarySec.Attribute(XNamespace.Xml + "lang") ?? string.Empty;
+            var baseTerm = primarySec
+                .Element(ns + "termSec")
+                ?.Element(ns + "term")
+                ?.Value ?? string.Empty;
+            var baseTermNote = primarySec
+                .Element(ns + "termSec")
+                ?.Element(ns + "termNote")
+                ?.Value ?? string.Empty;
+
+            var translations = langSecs
+                .Skip(1)
+                .Select(sec => new
+                {
+                    langIso = (string)sec.Attribute(XNamespace.Xml + "lang") ?? string.Empty,
+                    translation = sec
+                        .Element(ns + "termSec")
+                        ?.Element(ns + "term")
+                        ?.Value ?? string.Empty,
+                    description = sec
+                        .Element(ns + "termSec")
+                        ?.Element(ns + "termNote")
+                        ?.Value ?? string.Empty
+                })
+                .ToList();
+
+            termsPayload.Add(new
+            {
+                term = baseTerm,
+                description = baseTermNote,
+                caseSensitive = false,
+                translatable = true,
+                forbidden = false,
+                translations = translations.Select(tr => new
+                {
+                    lang_iso = tr.langIso,
+                    translation = tr.translation,
+                    description = tr.description
+                }),
+                tags = Array.Empty<string>()
+            });
+        }
+
+        var endpoint = $"/projects/{input.ProjectId}/glossary-terms";
+        var request = new LokaliseRequest(endpoint, Method.Post, Creds);
+        request.AddJsonBody(new { terms = termsPayload });
+
+        var response = await Client.ExecuteWithHandling<ImportGlossaryResponse>(request);
+        return response;
+    }
     
+    
+
+
+
+    #endregion
+
+
+
     private async Task<FileReference> ConvertMqXliffToXliff(Stream stream, string fileName, bool useSkeleton = false)
     {
         var xliffFile = stream.ConvertMqXliffToXliff(useSkeleton);
