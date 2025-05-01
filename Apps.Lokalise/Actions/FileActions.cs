@@ -24,7 +24,7 @@ using Blackbird.Applications.Sdk.Glossaries.Utils.Dtos;
 using Blackbird.Applications.Sdk.Glossaries.Utils.Converters;
 using Blackbird.Applications.Sdk.Utils.Models;
 using System.Xml.Linq;
-using Apps.Lokalise.Utils.Zip;
+
 
 namespace Apps.Lokalise.Actions;
 
