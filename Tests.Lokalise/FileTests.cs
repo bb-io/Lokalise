@@ -2,6 +2,7 @@
 using Apps.Lokalise.Models.Requests.Files;
 using Apps.Lokalise.Models.Requests.Projects;
 using LokaliseTests.Base;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +38,10 @@ namespace Tests.Lokalise
             var action = new FileActions(InvocationContext, FileManager);
             var glossary = await action.DownloadTranslatedFile(new ProjectRequest { ProjectId = "43255416680bccef893775.42965789" },
                 new DownloadTranslatedFileRequest { Format = "json", LanguageCode="en" , FileName= "no_filename.json" });
+
+            string jsonResponse = JsonConvert.SerializeObject(glossary, Formatting.Indented);
+            Console.WriteLine(jsonResponse);
+
             Assert.IsNotNull(glossary);
         }
 
