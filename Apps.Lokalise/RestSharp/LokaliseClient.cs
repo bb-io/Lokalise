@@ -4,6 +4,7 @@ using Apps.Lokalise.Models.Responses.Base;
 using Apps.Lokalise.Models.Responses.Errors;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Exceptions;
+using Blackbird.Applications.Sdk.Glossaries.Utils.Dtos;
 using Newtonsoft.Json;
 using RestSharp;
 
