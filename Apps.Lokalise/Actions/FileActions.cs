@@ -107,18 +107,64 @@ public class FileActions : LokaliseInvocable
         [ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadFileRequest input)
     {
-        var endpoint = $"/projects/{project.ProjectId}/files/download";
+        var endpoint = $"/projects/{project.ProjectId}/files/async-download";
         var request = new LokaliseRequest(endpoint, Method.Post, Creds)
             .WithJsonBody(input);
 
-        var exportResult = await Client.ExecuteWithHandling<ExportFilesDto>(request);
-        var fileUri = new Uri(exportResult.BundleUrl);
+        var asyncProcessResult = await Client.ExecuteWithHandling<AsyncProcessInitResponse>(request);
+
+        string processId = asyncProcessResult.ProcessId ?? throw new PluginApplicationException("Process ID is null in async download response.");
+        AsyncProcessResponse processStatus = null;
+        var processEndpoint = $"/projects/{project.ProjectId}/processes/{processId}";
+        var processRequest = new LokaliseRequest(processEndpoint, Method.Get, Creds);
+        processStatus = await Client.ExecuteWithHandling<AsyncProcessResponse>(processRequest);
+
+        if (processStatus?.Process?.Status == null)
+        {
+            throw new PluginApplicationException($"Process status is null in API response for process_id: {processId}");
+        }
+
+        if (processStatus.Process.Type != "async-export")
+        {
+            throw new PluginApplicationException($"Expected 'async-export' process, but got '{processStatus.Process.Type}' for process_id: {processId}");
+        }
+
+        while (processStatus.Process.Status == "queued" ||
+               processStatus.Process.Status == "pre_processing" ||
+               processStatus.Process.Status == "running" ||
+               processStatus.Process.Status == "post_processing")
+        {
+
+            processStatus = await Client.ExecuteWithHandling<AsyncProcessResponse>(new LokaliseRequest(processEndpoint, Method.Get, Creds));
+
+            if (processStatus?.Process?.Status == null)
+            {
+                throw new PluginApplicationException($"Process status is null in API response for process_id: {processId}");
+            }
+
+            if (processStatus.Process.Type != "async-export")
+            {
+                throw new PluginApplicationException($"Expected 'async-export' process, but got '{processStatus.Process.Type}' for process_id: {processId}");
+            }
+        }
+
+        if (processStatus.Process.Status != "finished")
+        {
+            throw new PluginApplicationException($"File download process failed with status: {processStatus.Process.Status}, message: {processStatus.Process.Message ?? "No message provided"} for process_id: {processId}");
+        }
+
+        if (string.IsNullOrEmpty(processStatus.Process.Details.DownloadUrl))
+        {
+            throw new PluginApplicationException($"Download URL is null or empty in finished process response for process_id: {processId}");
+        }
+
+        var fileUri = new Uri(processStatus.Process.Details.DownloadUrl);
         var zipResponse = await Client.ExecuteWithHandling(new(fileUri));
 
         await using var zipStream = new MemoryStream();
         using (var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, leaveOpen: true))
         {
-            var rawBytes = zipResponse.RawBytes!;
+            var rawBytes = zipResponse.RawBytes ?? throw new PluginApplicationException("Downloaded file content is null.");
             using (var sourceMs = new MemoryStream(rawBytes))
             using (var sourceArchive = new ZipArchive(sourceMs, ZipArchiveMode.Read, leaveOpen: false))
             {
@@ -137,13 +183,17 @@ public class FileActions : LokaliseInvocable
         }
         zipStream.Position = 0;
 
+        var fileName = fileUri.Segments.Last();
+        if (!fileName.Contains("."))
+        {
+            fileName += ".zip";
+        }
         var zipFileReference = await _fileManagementClient.UploadAsync(
             zipStream,
             contentType: zipResponse.ContentType ?? MediaTypeNames.Application.Octet,
-            fileName: fileUri.Segments.Last());
+            fileName: fileName);
 
         return new DownloadProjectFilesAsZipResponse { File = zipFileReference };
-
     }
 
     [Action("Download project source files", Description = "Download all project source files")]
@@ -153,18 +203,70 @@ public class FileActions : LokaliseInvocable
     {
         var projectData = await new ProjectActions(InvocationContext).RetrieveProject(project);
 
-        var endpoint = $"/projects/{project.ProjectId}/files/download";
+        var endpoint = $"/projects/{project.ProjectId}/files/async-download";
         var request = new LokaliseRequest(endpoint, Method.Post, Creds)
             .WithJsonBody(new DownloadFileRequest
             {
                 Format = input.Format
             });
 
-        var exportResult = await Client.ExecuteWithHandling<ExportFilesDto>(request);
-        var fileUri = new Uri(exportResult.BundleUrl);
-        var zipResponse = await Client.ExecuteWithHandling(new(fileUri));
+        var asyncProcessResult = await Client.ExecuteWithHandling<AsyncProcessInitResponse>(request);
+        string processId = asyncProcessResult.ProcessId
+            ?? throw new PluginApplicationException("Process ID is null in async download response.");
 
-        var rawBytes = zipResponse.RawBytes!;
+        AsyncProcessResponse processStatus;
+        var processEndpoint = $"/projects/{project.ProjectId}/processes/{processId}";
+        var processRequest = new LokaliseRequest(processEndpoint, Method.Get, Creds);
+
+        processStatus = await Client.ExecuteWithHandling<AsyncProcessResponse>(processRequest);
+        if (processStatus?.Process?.Status == null)
+        {
+            throw new PluginApplicationException($"Process status is null in API response for process_id: {processId}");
+        }
+        if (processStatus.Process.Type != "async-export")
+        {
+            throw new PluginApplicationException(
+                $"Expected 'async-export' process, but got '{processStatus.Process.Type}' for process_id: {processId}");
+        }
+
+        while (processStatus.Process.Status == "queued" ||
+               processStatus.Process.Status == "pre_processing" ||
+               processStatus.Process.Status == "running" ||
+               processStatus.Process.Status == "post_processing")
+        {
+            processStatus = await Client.ExecuteWithHandling<AsyncProcessResponse>(new LokaliseRequest(processEndpoint, Method.Get, Creds));
+
+            if (processStatus?.Process?.Status == null)
+            {
+                throw new PluginApplicationException($"Process status is null in API response for process_id: {processId}");
+            }
+            if (processStatus.Process.Type != "async-export")
+            {
+                throw new PluginApplicationException(
+                    $"Expected 'async-export' process, but got '{processStatus.Process.Type}' for process_id: {processId}");
+            }
+        }
+
+        if (processStatus.Process.Status != "finished")
+        {
+            throw new PluginApplicationException(
+                $"File export process failed with status: {processStatus.Process.Status}, " +
+                $"message: {processStatus.Process.Message ?? "No message provided"} for process_id: {processId}");
+        }
+
+        var downloadUrl = processStatus.Process.Details.DownloadUrl;
+        if (string.IsNullOrEmpty(downloadUrl))
+        {
+            throw new PluginApplicationException(
+                $"Download URL is null or empty in finished process response for process_id: {processId}");
+        }
+
+        var fileUri = new Uri(downloadUrl);
+        var zipResponse = await Client.ExecuteWithHandling(new RestRequest(fileUri));
+
+        var rawBytes = zipResponse.RawBytes
+            ?? throw new PluginApplicationException("Downloaded file content is null.");
+
         await using var zipStream = new MemoryStream(rawBytes);
         using var sourceArchive = new ZipArchive(zipStream, ZipArchiveMode.Read, leaveOpen: false);
 
@@ -198,7 +300,7 @@ public class FileActions : LokaliseInvocable
         [ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadTranslatedFileRequest input)
     {
-        var endpoint = $"/projects/{project.ProjectId}/files/download";
+        var endpoint = $"/projects/{project.ProjectId}/files/async-download";
         var request = new LokaliseRequest(endpoint, Method.Post, Creds)
             .WithJsonBody(new DownloadFileRequest
             {
@@ -240,26 +342,83 @@ public class FileActions : LokaliseInvocable
                 Compact = input.Compact
             });
 
-        var exportResult = await Client.ExecuteWithHandling<ExportFilesDto>(request);
-        var fileUri = new Uri(exportResult.BundleUrl);
-        var zipResponse = await Client.ExecuteWithHandling(new(fileUri));
+        var asyncProcessResult = await Client.ExecuteWithHandling<AsyncProcessInitResponse>(request);
+        string processId = asyncProcessResult.ProcessId
+            ?? throw new PluginApplicationException("Process ID is null in async download response.");
 
-        var rawBytes = zipResponse.RawBytes!;
+        var processEndpoint = $"/projects/{project.ProjectId}/processes/{processId}";
+        var processRequest = new LokaliseRequest(processEndpoint, Method.Get, Creds);
+
+        var processStatus = await Client.ExecuteWithHandling<AsyncProcessResponse>(processRequest);
+        if (processStatus?.Process?.Status == null)
+        {
+            throw new PluginApplicationException($"Process status is null in API response for process_id: {processId}");
+        }
+        if (processStatus.Process.Type != "async-export")
+        {
+            throw new PluginApplicationException(
+                $"Expected 'async-export' process, but got '{processStatus.Process.Type}' for process_id: {processId}");
+        }
+
+        while (processStatus.Process.Status == "queued" ||
+               processStatus.Process.Status == "pre_processing" ||
+               processStatus.Process.Status == "running" ||
+               processStatus.Process.Status == "post_processing")
+        {
+            processStatus = await Client.ExecuteWithHandling<AsyncProcessResponse>(
+                new LokaliseRequest(processEndpoint, Method.Get, Creds)
+            );
+
+            if (processStatus?.Process?.Status == null)
+            {
+                throw new PluginApplicationException($"Process status is null in API response for process_id: {processId}");
+            }
+            if (processStatus.Process.Type != "async-export")
+            {
+                throw new PluginApplicationException(
+                    $"Expected 'async-export' process, but got '{processStatus.Process.Type}' for process_id: {processId}");
+            }
+        }
+
+        if (processStatus.Process.Status != "finished")
+        {
+            throw new PluginApplicationException(
+                $"Translated file export process failed with status: {processStatus.Process.Status}, " +
+                $"message: {processStatus.Process.Message ?? "No message provided"} for process_id: {processId}");
+        }
+
+        var downloadUrl = processStatus.Process.Details.DownloadUrl;
+        if (string.IsNullOrEmpty(downloadUrl))
+        {
+            throw new PluginApplicationException(
+                $"Download URL is null or empty in finished process response for process_id: {processId}");
+        }
+
+        var fileUri = new Uri(downloadUrl);
+        var zipResponse = await Client.ExecuteWithHandling(new RestRequest(fileUri));
+
+        var rawBytes = zipResponse.RawBytes
+            ?? throw new PluginApplicationException("Downloaded file content is null.");
+
         await using var zipStream = new MemoryStream(rawBytes);
         using var sourceArchive = new ZipArchive(zipStream, ZipArchiveMode.Read, leaveOpen: false);
 
+        var languageDirName = input.LanguageCode.Replace("-", "_");
         var matchingEntry = sourceArchive.Entries.FirstOrDefault(en =>
             !en.FullName.EndsWith('/') &&
-            en.FullName.Split('/').First() == input.LanguageCode.Replace("-", "_") &&
+            en.FullName.Split('/').First() == languageDirName &&
             en.Name == input.FileName);
 
         if (matchingEntry == null)
-            throw new InvalidOperationException($"File {input.FileName} for language {input.LanguageCode} not found in the archive.");
+        {
+            throw new InvalidOperationException(
+                $"File '{input.FileName}' for language '{input.LanguageCode}' not found in the archive.");
+        }
 
         using var entryStream = matchingEntry.Open();
         using var bufferedStream = new MemoryStream();
         await entryStream.CopyToAsync(bufferedStream);
-        bufferedStream.Position = 0; 
+        bufferedStream.Position = 0;
 
         var uploadedFile = await _fileManagementClient.UploadAsync(
             bufferedStream,
