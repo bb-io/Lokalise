@@ -8,10 +8,8 @@ public class CreateKeyInput
     [Display("Key name")] public string KeyName { get; set; }
     public List<string> Platforms { get; set; }
     public string? Description { get; set; }
-    public Filenames? Filenames { get; set; }
     public IEnumerable<string>? Tags { get; set; }
     public IEnumerable<string>? Comments { get; set; }
-    public IEnumerable<Screenshot>? Screenshots { get; set; }
     [Display("Is plural")] public bool? IsPlural { get; set; }
     [Display("Plural name")] public string? PluralName { get; set; }
     [Display("Is hidden")] public bool? IsHidden { get; set; }

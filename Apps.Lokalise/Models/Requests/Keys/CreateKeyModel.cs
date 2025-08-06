@@ -11,7 +11,6 @@ public class CreateKeyModel
     [JsonProperty("filenames")] public Filenames? Filenames { get; set; }
     [JsonProperty("tags")] public IEnumerable<string>? Tags { get; set; }
     [JsonProperty("comments")] public IEnumerable<string>? Comments { get; set; }
-    [JsonProperty("screenshots")] public IEnumerable<Screenshot>? Screenshots { get; set; }
     [JsonProperty("is_plural")] public bool? IsPlural { get; set; }
     [JsonProperty("plural_name")] public string? PluralName { get; set; }
     [JsonProperty("is_hidden")] public bool? IsHidden { get; set; }
@@ -25,10 +24,8 @@ public class CreateKeyModel
         KeyName = input.KeyName;
         Platforms = input.Platforms;
         Description = input.Description;
-        Filenames = input.Filenames;
         Tags = input.Tags;
         Comments = input.Comments;
-        Screenshots = input.Screenshots;
         IsPlural = input.IsPlural;
         PluralName = input.PluralName;
         IsHidden = input.IsHidden;
