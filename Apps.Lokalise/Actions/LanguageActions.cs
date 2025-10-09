@@ -17,13 +17,9 @@ using RestSharp;
 
 namespace Apps.Lokalise.Actions;
 
-[ActionList]
-public class LanguageActions : LokaliseInvocable
+[ActionList("Languages")]
+public class LanguageActions(InvocationContext invocationContext) : LokaliseInvocable(invocationContext)
 {
-    public LanguageActions(InvocationContext invocationContext) : base(invocationContext)
-    {
-    }
-
     #region Actions
 
     [Action("Get all project languages", Description = "Get all project languages")]

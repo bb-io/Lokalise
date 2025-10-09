@@ -15,13 +15,9 @@ using RestSharp;
 
 namespace Apps.Lokalise.Actions;
 
-[ActionList]
-public class SegmentActions : LokaliseInvocable
+[ActionList("Segments")]
+public class SegmentActions(InvocationContext invocationContext) : LokaliseInvocable(invocationContext)
 {
-    public SegmentActions(InvocationContext invocationContext) : base(invocationContext)
-    {
-    }
-
     #region Actions
 
     [Action("Get all segments", Description = "Get all key segments")]

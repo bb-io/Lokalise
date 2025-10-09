@@ -13,13 +13,9 @@ using RestSharp;
 
 namespace Apps.Lokalise.Actions;
 
-[ActionList]
-public class ProjectActions : LokaliseInvocable
+[ActionList("Projects")]
+public class ProjectActions(InvocationContext invocationContext) : LokaliseInvocable(invocationContext)
 {
-    public ProjectActions(InvocationContext invocationContext) : base(invocationContext)
-    {
-    }
-
     #region Actions
 
     [Action("Get projects", Description = "Get a list of all projects")]

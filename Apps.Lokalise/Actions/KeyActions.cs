@@ -20,13 +20,9 @@ using Blackbird.Applications.Sdk.Common.Exceptions;
 
 namespace Apps.Lokalise.Actions;
 
-[ActionList]
-public class KeyActions : LokaliseInvocable
+[ActionList("Keys")]
+public class KeyActions(InvocationContext invocationContext) : LokaliseInvocable(invocationContext)
 {
-    public KeyActions(InvocationContext invocationContext) : base(invocationContext)
-    {
-    }
-
     #region Actions
 
     [Action("Get project keys", Description = "Get all project keys")]
@@ -161,7 +157,6 @@ public class KeyActions : LokaliseInvocable
         
         return _key;
     }
-
 
     [Action("Delete key", Description = "Delete key by ID")]
     public Task DeleteKey([ActionParameter] DeleteKeyRequest input)
