@@ -11,13 +11,9 @@ using RestSharp;
 
 namespace Apps.Lokalise.Actions;
 
-[ActionList]
-public class CommentActions : LokaliseInvocable
+[ActionList("Comments")]
+public class CommentActions(InvocationContext invocationContext) : LokaliseInvocable(invocationContext)
 {
-    public CommentActions(InvocationContext invocationContext) : base(invocationContext)
-    {
-    }
-
     #region Actions
 
     [Action("Add comment", Description = "Add a comment to a key")]

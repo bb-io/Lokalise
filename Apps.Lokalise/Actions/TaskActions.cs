@@ -24,13 +24,9 @@ using RestSharp;
 
 namespace Apps.Lokalise.Actions;
 
-[ActionList]
-public class TaskActions : LokaliseInvocable
+[ActionList("Tasks")]
+public class TaskActions(InvocationContext invocationContext) : LokaliseInvocable(invocationContext)
 {
-    public TaskActions(InvocationContext invocationContext) : base(invocationContext)
-    {
-    }
-
     #region Actions
 
     [Action("Get tasks", Description = "Get all tasks of a certain project")]

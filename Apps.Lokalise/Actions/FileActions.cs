@@ -14,31 +14,19 @@ using Apps.Lokalise.Utils.Converters;
 using Blackbird.Applications.Sdk.Common.Files;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
-using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Xliff.Utils.Extensions;
-using Apps.Lokalise.Models.Responses.Projects;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Apps.Lokalise.Models.Responses.Glossary;
 using Blackbird.Applications.Sdk.Glossaries.Utils.Dtos;
 using Blackbird.Applications.Sdk.Glossaries.Utils.Converters;
-using Blackbird.Applications.Sdk.Utils.Models;
 using System.Xml.Linq;
-
 
 namespace Apps.Lokalise.Actions;
 
-[ActionList]
-public class FileActions : LokaliseInvocable
+[ActionList("Files")]
+public class FileActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) : LokaliseInvocable(invocationContext)
 {
-    private readonly IFileManagementClient _fileManagementClient; 
-    
-    public FileActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) 
-        : base(invocationContext)
-    {
-        _fileManagementClient = fileManagementClient;
-    }
-
     #region Actions
 
     [Action("Get project files", Description = "Get all project files")]
@@ -59,7 +47,7 @@ public class FileActions : LokaliseInvocable
         var endpoint = $"/projects/{project.ProjectId}/files/upload";
         var request =
             new LokaliseRequest(endpoint, Method.Post, Creds).WithJsonBody(
-                new UploadFileRequest(input, _fileManagementClient));
+                new UploadFileRequest(input, fileManagementClient));
         var uploadResult = await Client.ExecuteWithHandling<QueuedProcessDto>(request);
 
         return await Client
@@ -72,7 +60,7 @@ public class FileActions : LokaliseInvocable
     {
         if(input.File.Name.EndsWith(".mqxliff"))
         {        
-            var stream = await _fileManagementClient.DownloadAsync(input.File);
+            var stream = await fileManagementClient.DownloadAsync(input.File);
             var fileReference = await ConvertMqXliffToXliff(stream, input.File.Name);
             input.File = fileReference;
             return await UploadFile(project, input);
@@ -80,7 +68,7 @@ public class FileActions : LokaliseInvocable
 
         if (input.OverwriteExistingKeys.HasValue && input.OverwriteExistingKeys.Value)
         {
-            var fileStream = await _fileManagementClient.DownloadAsync(input.File);
+            var fileStream = await fileManagementClient.DownloadAsync(input.File);
             var stream = new MemoryStream();
             await fileStream.CopyToAsync(stream);
             stream.Position = 0;
@@ -96,7 +84,7 @@ public class FileActions : LokaliseInvocable
             var xDocument = xliff.UpdateTranslationUnits(newTranslationUnits, true);
         
             var xliffStream = xDocument.ToStream();
-            input.File = await _fileManagementClient.UploadAsync(xliffStream, MediaTypeNames.Text.Xml, input.File.Name);
+            input.File = await fileManagementClient.UploadAsync(xliffStream, MediaTypeNames.Text.Xml, input.File.Name);
         }
         
         return await UploadFile(project, input);
@@ -188,7 +176,7 @@ public class FileActions : LokaliseInvocable
         {
             fileName += ".zip";
         }
-        var zipFileReference = await _fileManagementClient.UploadAsync(
+        var zipFileReference = await fileManagementClient.UploadAsync(
             zipStream,
             contentType: zipResponse.ContentType ?? MediaTypeNames.Application.Octet,
             fileName: fileName);
@@ -283,7 +271,7 @@ public class FileActions : LokaliseInvocable
             var originalFileName = Path.GetFileName(entry.FullName);
             var newFileName = $"{languageCode}_{originalFileName}";
 
-            var uploaded = await _fileManagementClient.UploadAsync(
+            var uploaded = await fileManagementClient.UploadAsync(
                 bufferedStream,
                 contentType: "application/octet-stream",
                 fileName: newFileName
@@ -420,7 +408,7 @@ public class FileActions : LokaliseInvocable
         await entryStream.CopyToAsync(bufferedStream);
         bufferedStream.Position = 0;
 
-        var uploadedFile = await _fileManagementClient.UploadAsync(
+        var uploadedFile = await fileManagementClient.UploadAsync(
             bufferedStream,
             contentType: "application/octet-stream",
             fileName: input.FileName
@@ -461,7 +449,7 @@ public class FileActions : LokaliseInvocable
 
         await using var entryStream = matchingEntry.Open();
 
-        var uploadedFile = await _fileManagementClient.UploadAsync(
+        var uploadedFile = await fileManagementClient.UploadAsync(
             entryStream,
             contentType: "application/xliff+xml",
             fileName: expectedFileName
@@ -509,7 +497,7 @@ public class FileActions : LokaliseInvocable
             if (tempStream.Length == 0)
                 continue; 
 
-            var uploadedFile = await _fileManagementClient.UploadAsync(
+            var uploadedFile = await fileManagementClient.UploadAsync(
                 tempStream,
                 contentType: "application/xliff+xml",
                 fileName: entry.Name
@@ -557,7 +545,7 @@ public class FileActions : LokaliseInvocable
             if (tempStream.Length == 0)
                 continue;
 
-            var uploadedFile = await _fileManagementClient.UploadAsync(
+            var uploadedFile = await fileManagementClient.UploadAsync(
                 tempStream,
                 contentType: "application/xliff+xml",
                 fileName: entry.Name
@@ -577,8 +565,6 @@ public class FileActions : LokaliseInvocable
 
         return Client.ExecuteWithHandling(request);
     }
-
-
 
     [Action("Export glossary", Description = "Export project glossary as TBX file")]
     public async Task<FileReference> ExportGlossaryTerms([ActionParameter] ProjectRequest input)
@@ -642,7 +628,7 @@ public class FileActions : LokaliseInvocable
 
         using var tbxStream = glossary.ConvertToTbx();
 
-        var fileReference = await _fileManagementClient.UploadAsync(
+        var fileReference = await fileManagementClient.UploadAsync(
             tbxStream,
             "application/x-tbx+xml",
             $"project_{input.ProjectId}_glossary.tbx"
@@ -651,14 +637,12 @@ public class FileActions : LokaliseInvocable
         return fileReference;
     }
 
-
-
     [Action("Import glossary", Description = "Import glossary terms from a TBX file into the project")]
     public async Task<ImportGlossaryResponse> ImportGlossary(
              [ActionParameter] ProjectRequest input,
              [ActionParameter] FileReference tbxFile)
     {
-        await using var originalStream = await _fileManagementClient.DownloadAsync(tbxFile);
+        await using var originalStream = await fileManagementClient.DownloadAsync(tbxFile);
         var xDoc = XDocument.Load(originalStream);
         var root = xDoc.Root;
         if (root == null || !string.Equals(root.Name.LocalName, "tbx", StringComparison.OrdinalIgnoreCase))
@@ -736,14 +720,8 @@ public class FileActions : LokaliseInvocable
         var response = await Client.ExecuteWithHandling<ImportGlossaryResponse>(request);
         return response;
     }
-    
-    
-
-
 
     #endregion
-
-
 
     private async Task<FileReference> ConvertMqXliffToXliff(Stream stream, string fileName, bool useSkeleton = false)
     {
@@ -755,7 +733,7 @@ public class FileActions : LokaliseInvocable
         xliffStream.Position = 0;
         fileName = ParseFileName(fileName);
         string contentType = MediaTypeNames.Text.Xml;
-        return await _fileManagementClient.UploadAsync(xliffStream, contentType, fileName);
+        return await fileManagementClient.UploadAsync(xliffStream, contentType, fileName);
     } 
     
     private string ParseFileName(string fileName)

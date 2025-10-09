@@ -3,7 +3,6 @@ using Apps.Lokalise.Extensions;
 using Apps.Lokalise.Invocables;
 using Apps.Lokalise.Models.Requests.Translations;
 using Apps.Lokalise.Models.Responses.Keys;
-using Apps.Lokalise.Models.Responses.Segments;
 using Apps.Lokalise.Models.Responses.Translations;
 using Apps.Lokalise.RestSharp;
 using Apps.Lokalise.Utils;
@@ -18,13 +17,9 @@ using RestSharp;
 
 namespace Apps.Lokalise.Actions;
 
-[ActionList]
-public class TranslationActions : LokaliseInvocable
+[ActionList("Translations")]
+public class TranslationActions(InvocationContext invocationContext) : LokaliseInvocable(invocationContext)
 {
-    public TranslationActions(InvocationContext invocationContext) : base(invocationContext)
-    {
-    }
-
     #region Actions
 
     [Action("List translations", Description = "Retrieves a list of project translations")]
