@@ -14,17 +14,22 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Newtonsoft.Json;
 using RestSharp;
+using Task = System.Threading.Tasks.Task;
 
 namespace Apps.Lokalise.Actions;
 
 [ActionList("Languages")]
 public class LanguageActions(InvocationContext invocationContext) : LokaliseInvocable(invocationContext)
 {
-    #region Actions
-
     [Action("Get all project languages", Description = "Get all project languages")]
-    public Task<ListLanguagesResponse> ListProjectLanguages([ActionParameter] ProjectRequest input)
-        => ListLanguages($"/projects/{input.ProjectId}/languages");
+    public async Task<ListLanguagesResponse> ListProjectLanguages([ActionParameter] ProjectRequest input)
+    {
+        var endpoint = $"/projects/{input.ProjectId}/languages";
+        var languages = await Paginator.GetAll<LanguagesWrapper, LanguageDto>(Creds, endpoint);
+        return new(
+            languages,
+            languages.Select(l => l.LangIso));
+    }
 
     [Action("Add language to project", Description = "Add language to project")]
     public Task AddLanguageToProject([ActionParameter] ProjectRequest project,
@@ -62,16 +67,4 @@ public class LanguageActions(InvocationContext invocationContext) : LokaliseInvo
             }))
         };
     }
-
-    #endregion
-
-    #region Utils
-
-    private async Task<ListLanguagesResponse> ListLanguages(string endpoint)
-    {
-        var items = await Paginator.GetAll<LanguagesWrapper, LanguageDto>(Creds, endpoint);
-        return new(items);
-    }
-
-    #endregion
 }
