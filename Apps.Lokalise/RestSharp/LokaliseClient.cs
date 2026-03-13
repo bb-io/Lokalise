@@ -6,7 +6,9 @@ using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Glossaries.Utils.Dtos;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
+using System.Net;
 
 namespace Apps.Lokalise.RestSharp;
 
@@ -41,22 +43,62 @@ public class LokaliseClient : RestClient
             return await ExecuteWithHandling(request);
         }
 
-        throw ConfigureRequestException(response.Content);
+        throw ConfigureRequestException(response);
     }
 
-    private Exception ConfigureRequestException(string content)
+    private Exception ConfigureRequestException(RestResponse response)
     {
-        var error = JsonConvert.DeserializeObject<ErrorResponse>(content);
-        if (error?.Error?.Message == "Not Found" || error?.Error?.Code == 404)
-        {
-            return new PluginApplicationException($"Error: {error.Error.Message}; Nothing was found using your inputs, please check and try again");
-        }
-        if (error?.Error?.Message == "Forbidden" || error?.Error?.Code == 403)
-        {
-            return new PluginApplicationException(error.Error.Message);
-        }
+        var content = response.Content;
 
-        return new PluginApplicationException($"{error.Error.Message}; Code: {error.Error.Code}");
+        if (string.IsNullOrWhiteSpace(content))
+            return new PluginApplicationException(
+                $"Request failed with status code {(int)response.StatusCode} ({response.StatusCode}).");
+
+        try
+        {
+            var json = JObject.Parse(content);
+
+            var errorToken = json["error"];
+            string? message = null;
+            int? code = null;
+
+            if (errorToken?.Type == JTokenType.Object)
+            {
+                message = errorToken["message"]?.ToString();
+                code = errorToken["code"]?.Value<int?>();
+            }
+            else if (errorToken?.Type == JTokenType.String)
+            {
+                message = errorToken.ToString();
+            }
+
+            message ??= json["message"]?.ToString();
+            code ??= json["code"]?.Value<int?>();
+
+            if (string.IsNullOrWhiteSpace(message))
+                message = content;
+
+            if (response.StatusCode == HttpStatusCode.NotFound || code == 404 || message == "Not Found")
+            {
+                return new PluginApplicationException(
+                    $"Error: {message}; Nothing was found using your inputs, please check and try again");
+            }
+
+            if (response.StatusCode == HttpStatusCode.Forbidden || code == 403 || message == "Forbidden")
+            {
+                return new PluginApplicationException(
+                    "Forbidden. You do not have access to this resource or the API token does not have sufficient permissions.");
+            }
+
+            return code.HasValue
+                ? new PluginApplicationException($"{message}; Code: {code}")
+                : new PluginApplicationException(message);
+        }
+        catch
+        {
+            return new PluginApplicationException(
+                $"Request failed with status code {(int)response.StatusCode} ({response.StatusCode}). Response: {content}");
+        }
     }
 
     #endregion
