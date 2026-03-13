@@ -356,3 +356,4 @@ healthchecksdb
 *.env
 /ConsoleApp1
 /Tests.Lokalise/appsettings.json
+/Tests.Lokalise/appsettings.json
