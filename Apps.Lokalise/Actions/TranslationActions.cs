@@ -22,7 +22,7 @@ public class TranslationActions(InvocationContext invocationContext) : LokaliseI
 {
     #region Actions
 
-    [Action("List translations", Description = "Searches project translations using optional filters")]
+    [Action("Search translations", Description = "Searches project translations using optional filters")]
     public async Task<ListTranslationResponse> ListTranslations([ActionParameter] ListTranslationRequest input,
         [ActionParameter] ListTranslationQueryRequest queryInput)
     {

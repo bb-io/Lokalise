@@ -24,11 +24,11 @@ Lokalise is a continuous localization and translation management platform. This 
 
 ### Comments
 
-- **Add comment** Adds a comment to a key.
+- **Create comment** Adds a comment to a key.
 
 ### Files
 
-- **Get project files** Searches files in a project, optionally filtering by file name.
+- **Search project files** Searches files in a project, optionally filtering by file name.
     Advanced settings:
   - **File name filter**: Limits results to files whose names match provided text.
 - **Upload file to project** Uploads a file to a project and waits for processing to finish.
@@ -102,12 +102,12 @@ Lokalise is a continuous localization and translation management platform. This 
 - **Download XLIFF files from task** Downloads all translation files for task.
 - **Download all XLIFF files from project** Downloads all translation files for project.
 - **Delete file** Deletes a file from a project.
-- **Export glossary** Exports project glossary terms to a TBX file.
-- **Import glossary** Imports glossary terms from a TBX file into a project.
+- **Download glossary** Exports project glossary terms to a TBX file.
+- **Upload glossary** Imports glossary terms from a TBX file into a project.
 
 ### Keys
 
-- **Get project keys** Searches keys in a project and outputs source and target translations separately.
+- **Search project keys** Searches keys in a project and outputs source and target translations separately.
     Advanced settings:
   - **Filter key platforms**: Limits results to selected key platforms.
   - **Filter untranslated keys**: Limits results by untranslated status.
@@ -125,7 +125,7 @@ Lokalise is a continuous localization and translation management platform. This 
   - **Unverified language**: Applies unverified filter to selected language.
   - **Creation date from**: Sets earliest key creation date.
   - **Creation date to**: Sets latest key creation date.
-- **List key IDs** Searches key IDs using project and translation filters. Output IDs can be used when creating tasks.
+- **Search key IDs** Searches key IDs using project and translation filters. Output IDs can be used when creating tasks.
 - **Create key** Creates a key in a project.
     Advanced settings:
   - **Description**: Sets key description.
@@ -142,17 +142,17 @@ Lokalise is a continuous localization and translation management platform. This 
 
 ### Languages
 
-- **Get all project languages** Searches languages in a project.
-- **Add language to project** Adds one or more languages to a project.
+- **Search project languages** Searches languages in a project.
+- **Create project language** Adds one or more languages to a project.
 - **Delete language from project** Deletes a language from a project.
-- **Build language** Builds a language with user or group assignees for task creation. Provide at least one assignee input.
+- **Create task-language output** Builds a language with user or group assignees for task creation. Provide at least one assignee input.
     Advanced settings:
   - **Users**: Assigns multiple users to built language.
   - **Groups**: Assigns multiple groups to built language.
 
 ### Projects
 
-- **Get projects** Searches projects using optional filters and project details.
+- **Search projects** Searches projects using optional filters and project details.
     Advanced settings:
   - **Filter team ID**: Limits results to team ID.
   - **Filter names**: Limits results to matching project names.
@@ -170,11 +170,11 @@ Lokalise is a continuous localization and translation management platform. This 
 - **Get project** Gets project details.
 - **Update project** Updates project's name and description.
 - **Delete project** Deletes a project.
-- **Clear project** Deletes all keys and translations from a project.
+- **Delete project content** Deletes all keys and translations from a project.
 
 ### Segments
 
-- **Get all segments** Searches segments for a key and language.
+- **Search segments** Searches segments for a key and language.
     Advanced settings:
   - **Filter is reviewed**: Filters segments by reviewed option.
   - **Filter unverified**: Filters segments by unverified option.
@@ -187,7 +187,7 @@ Lokalise is a continuous localization and translation management platform. This 
 
 ### Tasks
 
-- **Get tasks** Searches tasks in a project, optionally filtering by title or status.
+- **Search tasks** Searches tasks in a project, optionally filtering by title or status.
     Advanced settings:
   - **Filter title**: Limits results to matching task title.
   - **Filter statuses**: Limits results to selected task statuses.
@@ -202,14 +202,14 @@ Lokalise is a continuous localization and translation management platform. This 
   - **Parent task ID**: Links task to parent task.
   - **Closing tags**: Applies multiple tags when task closes.
   - **Do lock translations**: Locks translations when task closes.
-- **Create task from the built languages** Creates a task with languages and assignees produced by Build language action. Use this action when target languages need different users or groups.
+- **Create task from the built languages** Creates a task with languages and assignees produced by Create task-language output action. Use this action when target languages need different users or groups.
 - **Create language task** Creates a task for one target language, with optional translation-state filters.
     Advanced settings:
   - **Translation reviewed**: Includes keys whose translation matches reviewed option for target language.
   - **Translation unverified**: Includes keys whose translation matches unverified option for target language.
   - **Translation missing**: Includes keys missing translation for target language.
 - **Get task** Gets task details and can expand group members when team ID is provided.
-- **Get files from task** Outputs unique original file names assigned to keys in a task.
+- **Search files from task** Outputs unique original file names assigned to keys in a task.
 - **Update task** Updates task details.
     Advanced settings:
   - **Close task**: Closes task as part of update.
@@ -217,7 +217,7 @@ Lokalise is a continuous localization and translation management platform. This 
 
 ### Translations
 
-- **List translations** Searches project translations using optional filters.
+- **Search translations** Searches project translations using optional filters.
     Advanced settings:
   - **Filter active task ID**: Limits results to translations assigned to active task ID.
 - **Update translation** Updates a translation by translation ID.
@@ -233,7 +233,7 @@ Lokalise is a continuous localization and translation management platform. This 
   - **Project ID**: Limits event to one project.
 - **On project exported** Starts when a project is exported.
 - **On project deleted** Starts when a project is deleted.
-- **On project snapshot** Starts when a project snapshot is created.
+- **On project snapshot created** Starts when a project snapshot is created.
 - **On project branch added** Starts when a branch is added to a project.
 - **On project branch deleted** Starts when a branch is deleted from a project.
 - **On project branch merged** Starts when a project branch is merged.
@@ -263,8 +263,8 @@ Lokalise is a continuous localization and translation management platform. This 
     Advanced settings:
   - **Task ID**: Limits event to one task.
 - **On key modified for assignee** Starts when a key assigned to a specific user is added or modified, or when a task is created.
-- **On key added (Multiple projects)** Starts when a key is added to any selected project.
-- **On keys added or modified (Multiple projects)** Starts when one or more keys are added or modified in any selected project.
+- **On key added (multiple projects)** Starts when a key is added to any selected project.
+- **On keys added or modified (multiple projects)** Starts when one or more keys are added or modified in any selected project.
 - **On task created** Starts when a task is created in a project.
     Advanced settings:
   - **Task type**: Limits event to selected task type.

@@ -59,7 +59,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
         return Task.FromResult(HandlePreflightAndMap<BaseEvent, BasePayload>(webhookRequest, input, optionalRequest));
     }
 
-    [Webhook("On project snapshot", typeof(ProjectSnapshotHandler),
+    [Webhook("On project snapshot created", typeof(ProjectSnapshotHandler),
         Description = "Starts when a project snapshot is created")]
     public Task<WebhookResponse<BaseEvent>> ProjectSnapshotHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,

@@ -25,7 +25,7 @@ public class KeyActions(InvocationContext invocationContext) : LokaliseInvocable
 {
     #region Actions
 
-    [Action("Get project keys", Description = "Searches keys in a project and outputs source and target translations separately")]
+    [Action("Search project keys", Description = "Searches keys in a project and outputs source and target translations separately")]
     public async Task<ListProjectKeysResponse> GetProjectKeys([ActionParameter] ProjectRequest project,
         [ActionParameter] ListProjectKeysRequest input,
         [ActionParameter] ListProjectKeysFilters filters)
@@ -77,7 +77,7 @@ public class KeyActions(InvocationContext invocationContext) : LokaliseInvocable
         return new ListProjectKeysResponse { Keys = keys, ProjectId = project.ProjectId, TotalCount = keys.Count()};
     }
 
-    [Action("List key IDs", Description = "Searches key IDs using project and translation filters")]
+    [Action("Search key IDs", Description = "Searches key IDs using project and translation filters")]
     public async Task<ListProjectKeyIdsResponse> ListKeyIds([ActionParameter] ProjectRequest project,
         [ActionParameter] ListProjectKeysBaseRequest input,
         [ActionParameter] ListProjectKeysFilters filters)

@@ -32,7 +32,7 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
 {
     #region Actions
 
-    [Action("Get project files", Description = "Searches files in a project, optionally filtering by file name")]
+    [Action("Search project files", Description = "Searches files in a project, optionally filtering by file name")]
     public async Task<ListAllFilesResponse> ListAllFiles([ActionParameter] ListAllFilesRequest input)
     {
         var endpoint =
@@ -636,7 +636,7 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         return Client.ExecuteWithHandling(request);
     }
 
-    [Action("Export glossary", Description = "Exports project glossary terms to a TBX file")]
+    [Action("Download glossary", Description = "Exports project glossary terms to a TBX file")]
     public async Task<FileReference> ExportGlossaryTerms([ActionParameter] ProjectRequest input)
     {
         var endpoint = $"/projects/{input.ProjectId}/glossary-terms";
@@ -707,7 +707,7 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         return fileReference;
     }
 
-    [Action("Import glossary", Description = "Imports glossary terms from a TBX file into a project")]
+    [Action("Upload glossary", Description = "Imports glossary terms from a TBX file into a project")]
     public async Task<ImportGlossaryResponse> ImportGlossary(
              [ActionParameter] ProjectRequest input,
              [ActionParameter] FileReference tbxFile)

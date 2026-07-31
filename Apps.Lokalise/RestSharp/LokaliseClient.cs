@@ -108,9 +108,17 @@ public class LokaliseClient : RestClient
     {
         var request = new LokaliseRequest($"/projects/{projectId}/processes/{processId}",
             Method.Get, authenticationCredentialsProviders);
+        var deadline = DateTime.UtcNow.AddMinutes(10);
+        string? lastObservedStatus = null;
 
         while (true)
         {
+            if (DateTime.UtcNow >= deadline)
+            {
+                throw new PluginApplicationException(
+                    $"File import process polling timed out after 10 minutes for process ID: {processId}. Last observed status: {lastObservedStatus ?? "not observed"}.");
+            }
+
             var response = await ExecuteWithHandling<QueuedProcessDto>(request);
             if (response?.Process == null)
             {
@@ -119,6 +127,7 @@ public class LokaliseClient : RestClient
             }
 
             var status = response.Process.Status;
+            lastObservedStatus = status;
 
             switch (status)
             {

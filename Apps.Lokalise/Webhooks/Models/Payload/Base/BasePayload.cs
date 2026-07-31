@@ -40,7 +40,7 @@ public class BasePayload
 public class Project
 {
     [JsonProperty("id")]
-    [Display("ID")]
+    [Display("Project ID")]
     public string Id { get; set; }
 
     [JsonProperty("name")]

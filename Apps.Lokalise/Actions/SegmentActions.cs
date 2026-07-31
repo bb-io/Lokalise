@@ -20,7 +20,7 @@ public class SegmentActions(InvocationContext invocationContext) : LokaliseInvoc
 {
     #region Actions
 
-    [Action("Get all segments", Description = "Searches segments for a key and language")]
+    [Action("Search segments", Description = "Searches segments for a key and language")]
     public async Task<ListAllSegmentsResponse> ListAllSegments([ActionParameter] ListAllSegmentsPathRequest pathInput,
         [ActionParameter] ListAllSegmentsQueryRequest queryInput)
     {

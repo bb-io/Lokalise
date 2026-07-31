@@ -171,7 +171,7 @@ public class MultiEventWebhookList(InvocationContext invocationContext) : Webhoo
         };
     }
 
-    [Webhook("On key added (Multiple projects)", typeof(ProjectKeyAddedMultipleProjectsHandler),
+    [Webhook("On key added (multiple projects)", typeof(ProjectKeyAddedMultipleProjectsHandler),
         Description = "Starts when a key is added to any selected project")]
     public async Task<WebhookResponse<GetKeyEvent>> OnKeyAdded(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
@@ -181,7 +181,7 @@ public class MultiEventWebhookList(InvocationContext invocationContext) : Webhoo
         return await MapToEventResponse(response);
     }
 
-    [Webhook("On keys added or modified (Multiple projects)", typeof(ProjectKeysAddedOrModifiedHandler),
+    [Webhook("On keys added or modified (multiple projects)", typeof(ProjectKeysAddedOrModifiedHandler),
         Description = "Starts when one or more keys are added or modified in any selected project")]
     public async Task<WebhookResponse<ProjectKeysUnifiedEvent>> OnKeyAddedOrModified(WebhookRequest webhookRequest,
        [WebhookParameter(true)] WebhookInput input,

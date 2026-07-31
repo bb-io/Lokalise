@@ -18,7 +18,7 @@ public class ProjectActions(InvocationContext invocationContext) : LokaliseInvoc
 {
     #region Actions
 
-    [Action("Get projects", Description = "Searches projects using optional filters and project details")]
+    [Action("Search projects", Description = "Searches projects using optional filters and project details")]
     public async Task<ProjectsResponse> ListAllProjects([ActionParameter] ProjectListParameters parameters, [ActionParameter]ProjectFilterByDateRequest dateParameters)
     {
         var query = parameters.AsLokaliseDictionary().AllIsNotNull();
@@ -77,7 +77,7 @@ public class ProjectActions(InvocationContext invocationContext) : LokaliseInvoc
         return Client.ExecuteWithHandling<ProjectDeleteResponse>(request);
     }
 
-    [Action("Clear project", Description = "Deletes all keys and translations from the project")]
+    [Action("Delete project content", Description = "Deletes all keys and translations from the project")]
     public Task<EmptyResponse> ClearProject([ActionParameter] ProjectRequest input)
     {
         var endpoint = $"/projects/{input.ProjectId}/empty";

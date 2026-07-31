@@ -29,7 +29,7 @@ public class TaskActions(InvocationContext invocationContext) : LokaliseInvocabl
 {
     #region Actions
 
-    [Action("Get tasks", Description = "Searches tasks in a project, optionally filtering by title or status")]
+    [Action("Search tasks", Description = "Searches tasks in a project, optionally filtering by title or status")]
     public async Task<ListTasksResponse> ListAllTasks([ActionParameter] ProjectRequest project,
         [ActionParameter] TaskListParameters parameters)
     {
@@ -64,7 +64,7 @@ public class TaskActions(InvocationContext invocationContext) : LokaliseInvocabl
         return response.Task;
     }
 
-    [Action("Create task from the built languages", Description = "Creates a task with languages and assignees produced by the Build language action")]
+    [Action("Create task from the built languages", Description = "Creates a task with languages and assignees produced by the Create task-language output action")]
     public async Task<TaskResponse> CreateTaskFromBuiltLangs([ActionParameter] ProjectRequest project,
         [ActionParameter] TaskFromBuiltLangsRequest parameters)
     {
@@ -156,7 +156,7 @@ public class TaskActions(InvocationContext invocationContext) : LokaliseInvocabl
         return response.Task;
     }
 
-    [Action("Get files from task", Description = "Outputs unique original file names assigned to keys in a task")]
+    [Action("Search files from task", Description = "Outputs unique original file names assigned to keys in a task")]
     public async Task<GetFilesFromTaskResponse> GetFilesFromTask([ActionParameter] GetTaskRequest taskRequest)
     {
         if (string.IsNullOrWhiteSpace(taskRequest.ProjectId))
