@@ -20,7 +20,7 @@ public class SegmentActions(InvocationContext invocationContext) : LokaliseInvoc
 {
     #region Actions
 
-    [Action("Get all segments", Description = "Get all key segments")]
+    [Action("Search segments", Description = "Searches segments for a key and language")]
     public async Task<ListAllSegmentsResponse> ListAllSegments([ActionParameter] ListAllSegmentsPathRequest pathInput,
         [ActionParameter] ListAllSegmentsQueryRequest queryInput)
     {
@@ -37,7 +37,7 @@ public class SegmentActions(InvocationContext invocationContext) : LokaliseInvoc
         };
     }
 
-    [Action("Get segment", Description = "Get segment by number")]
+    [Action("Get segment", Description = "Gets a segment by number")]
     public Task<SegmentResponse> GetSegment([ActionParameter] GetSegmentRequest input)
     {
         var endpoint =
@@ -50,7 +50,7 @@ public class SegmentActions(InvocationContext invocationContext) : LokaliseInvoc
         return Client.ExecuteWithHandling<SegmentResponse>(request);
     }
 
-    [Action("Update segment", Description = "Update segment by number")]
+    [Action("Update segment", Description = "Updates a segment by number")]
     public Task<SegmentResponse> UpdateSegment([ActionParameter] UpdateSegmentPathRequest pathInput,
         [ActionParameter] UpdateSegmentBodyRequest body)
     {

@@ -29,7 +29,7 @@ public class TaskWebhooks(InvocationContext invocationContext) : WebhookList(inv
     protected LokaliseClient Client { get; } = new();
 
     [Webhook("On task created", typeof(ProjectTaskCreatedHandler),
-        Description = "Triggered when a new task is created in a project")]
+        Description = "Starts when a task is created in a project")]
     public async Task<WebhookResponse<GetTaskEvent>> ProjectTaskCreatedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] TaskWebhookInput input,
         [WebhookParameter, Display("Team ID"), DataSource(typeof(TeamDataHandler))] string? teamId)
@@ -39,7 +39,7 @@ public class TaskWebhooks(InvocationContext invocationContext) : WebhookList(inv
     }
 
     [Webhook("On task closed", typeof(ProjectTaskClosedHandler),
-        Description = "Triggered when a project task is closed")]
+        Description = "Starts when a project task is closed")]
     public async Task<WebhookResponse<GetTaskEvent>> ProjectTaskClosedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] TaskWebhookInput input,
         [WebhookParameter, Display("Team ID"), DataSource(typeof(TeamDataHandler))] string? teamId,
@@ -62,7 +62,7 @@ public class TaskWebhooks(InvocationContext invocationContext) : WebhookList(inv
     }
 
     [Webhook("On task deleted", typeof(ProjectTaskDeletedHandler),
-        Description = "Triggered when a project task is deleted")]
+        Description = "Starts when a project task is deleted")]
     public Task<WebhookResponse<TaskEvent>> ProjectTaskDeletedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] TaskWebhookInput input)
     {
@@ -70,7 +70,7 @@ public class TaskWebhooks(InvocationContext invocationContext) : WebhookList(inv
     }
 
     [Webhook("On task language closed", typeof(ProjectTaskLanguageClosedHandler),
-        Description = "Triggered when a specific language task closes")]
+        Description = "Starts when a language in a project task is closed")]
     public async Task<WebhookResponse<GetTaskLanguageEvent>> ProjectTaskLanguageClosedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] TaskWebhookInput input,
         [WebhookParameter, Display("Team ID"), DataSource(typeof(TeamDataHandler))] string? teamId,

@@ -22,7 +22,7 @@ public class TranslationActions(InvocationContext invocationContext) : LokaliseI
 {
     #region Actions
 
-    [Action("List translations", Description = "Retrieves a list of project translations")]
+    [Action("Search translations", Description = "Searches project translations using optional filters")]
     public async Task<ListTranslationResponse> ListTranslations([ActionParameter] ListTranslationRequest input,
         [ActionParameter] ListTranslationQueryRequest queryInput)
     {
@@ -39,7 +39,7 @@ public class TranslationActions(InvocationContext invocationContext) : LokaliseI
         };
     }
 
-    [Action("Update translation", Description = "Update specific translation")]
+    [Action("Update translation", Description = "Updates a translation by translation ID")]
     public async Task<Translation> UpdateTranslation([ActionParameter] TranslationRequest pathData,
         [ActionParameter] UpdateTranslationRequest bodyParams)
     {
@@ -51,7 +51,7 @@ public class TranslationActions(InvocationContext invocationContext) : LokaliseI
         return response.Translation;
     }
 
-    [Action("Update key translation", Description = "Update specific translation using key ID and locale")]
+    [Action("Update key translation", Description = "Updates a translation by key ID and language code")]
     public async Task<Translation> UpdateKeyTranslation([ActionParameter] KeyTranslationRequest input,
         [ActionParameter] UpdateTranslationRequest bodyParams)
     {

@@ -16,4 +16,7 @@ public class ProcessObj
 
     [JsonProperty("status")]
     public string Status { get; set; }
+
+    [JsonProperty("message")]
+    internal string? Message { get; set; }
 }

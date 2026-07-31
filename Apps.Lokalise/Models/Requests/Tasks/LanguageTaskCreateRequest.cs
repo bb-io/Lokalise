@@ -23,7 +23,7 @@ namespace Apps.Lokalise.Models.Requests.Tasks
 
         [Display("Description")] public string? Description { get; set; }
 
-        [Display("Due Date")] public DateTime? DueDate { get; set; }
+        [Display("Due date")] public DateTime? DueDate { get; set; }
 
         [DataSource(typeof(LanguageDataHandler))]
         [Display("Source language")] public string? SourceLanguageIso { get; set; }

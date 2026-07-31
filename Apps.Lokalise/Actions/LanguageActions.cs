@@ -21,7 +21,7 @@ namespace Apps.Lokalise.Actions;
 [ActionList("Languages")]
 public class LanguageActions(InvocationContext invocationContext) : LokaliseInvocable(invocationContext)
 {
-    [Action("Get all project languages", Description = "Get all project languages")]
+    [Action("Search project languages", Description = "Searches languages in a project")]
     public async Task<ListLanguagesResponse> ListProjectLanguages([ActionParameter] ProjectRequest input)
     {
         var endpoint = $"/projects/{input.ProjectId}/languages";
@@ -31,7 +31,7 @@ public class LanguageActions(InvocationContext invocationContext) : LokaliseInvo
             languages.Select(l => l.LangIso));
     }
 
-    [Action("Add language to project", Description = "Add language to project")]
+    [Action("Create project language", Description = "Adds one or more languages to a project")]
     public Task AddLanguageToProject([ActionParameter] ProjectRequest project,
         [ActionParameter] AddLanguageToProjectInput input)
     {
@@ -42,7 +42,7 @@ public class LanguageActions(InvocationContext invocationContext) : LokaliseInvo
         return Client.ExecuteWithHandling(request);
     }
 
-    [Action("Delete language from project", Description = "Delete language from project")]
+    [Action("Delete language from project", Description = "Deletes a language from a project")]
     public Task DeleteLanguageFromProject([ActionParameter] DeleteLanguageFromProjectRequest input)
     {
         var endpoint = $"/projects/{input.ProjectId}/languages/{input.LanguageId}";
@@ -51,7 +51,7 @@ public class LanguageActions(InvocationContext invocationContext) : LokaliseInvo
         return Client.ExecuteWithHandling(request);
     }
 
-    [Action("Build language", Description = "Build language object")]
+    [Action("Create task-language output", Description = "Builds a language with user or group assignees for task creation")]
     public BuildLanguageResponse BuildLanguage([ActionParameter] BuildLanguageRequest input)
     {
         if (input.Users is null && input.Groups is null)

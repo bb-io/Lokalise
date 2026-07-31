@@ -31,7 +31,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     protected LokaliseClient Client { get; } = new();
 
     [Webhook("On project imported", typeof(ProjectImportedHandler),
-        Description = "Triggered when an object is imported")]
+        Description = "Starts when project content is imported")]
     public Task<WebhookResponse<ProjectImportedEvent>> ProjectImportedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -41,7 +41,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On project exported", typeof(ProjectExportedHandler),
-        Description = "Triggered when a project is exported")]
+        Description = "Starts when a project is exported")]
     public Task<WebhookResponse<ProjectExportedEvent>> ProjectExportedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -51,7 +51,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On project deleted", typeof(ProjectDeletedHandler),
-        Description = "Triggered when a project is deleted")]
+        Description = "Starts when a project is deleted")]
     public Task<WebhookResponse<BaseEvent>> ProjectDeletedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -59,8 +59,8 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
         return Task.FromResult(HandlePreflightAndMap<BaseEvent, BasePayload>(webhookRequest, input, optionalRequest));
     }
 
-    [Webhook("On project snapshot", typeof(ProjectSnapshotHandler),
-        Description = "Triggered when a snapshot of a project is made")]
+    [Webhook("On project snapshot created", typeof(ProjectSnapshotHandler),
+        Description = "Starts when a project snapshot is created")]
     public Task<WebhookResponse<BaseEvent>> ProjectSnapshotHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -69,7 +69,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On project branch added", typeof(ProjectBranchAddedHandler),
-        Description = "Triggered when a new branch is added to a project")]
+        Description = "Starts when a branch is added to a project")]
     public Task<WebhookResponse<BranchEvent>> ProjectBranchAddedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -79,7 +79,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On project branch deleted", typeof(ProjectBranchDeletedHandler),
-        Description = "Triggered when a branch is deleted from a project")]
+        Description = "Starts when a branch is deleted from a project")]
     public Task<WebhookResponse<BranchEvent>> ProjectBranchDeletedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -89,7 +89,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On project branch merged", typeof(ProjectBranchMergedHandler),
-        Description = "Triggered when a branch merge happens")]
+        Description = "Starts when a project branch is merged")]
     public Task<WebhookResponse<BranchMergeEvent>> ProjectBranchMergedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -99,7 +99,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On languages added", typeof(ProjectLanguagesAddedHandler),
-        Description = "Triggered when a new language is added to a project")]
+        Description = "Starts when one or more languages are added to a project")]
     public Task<WebhookResponse<LanguagesEvent>> ProjectLanguagesAddedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -109,7 +109,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On language removed", typeof(ProjectLanguageRemovedHandler),
-        Description = "Triggered when a language is removed from a project")]
+        Description = "Starts when a language is removed from a project")]
     public Task<WebhookResponse<LanguageEvent>> ProjectLanguageRemovedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -119,7 +119,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On language settings changed", typeof(ProjectLanguageSettingsChangedHandler),
-        Description = "Triggered when project language settings change")]
+        Description = "Starts when project language settings change")]
     public Task<WebhookResponse<LanguageEvent>> ProjectLanguageSettings_changedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -129,7 +129,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On key added", typeof(ProjectKeyAddedHandler),
-        Description = "Triggered when a new key is added to a project")]
+        Description = "Starts when a key is added to a project")]
     public async Task<WebhookResponse<GetKeyEvent>> ProjectKeyAddedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -139,7 +139,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On keys added", typeof(ProjectKeysAddedHandler),
-        Description = "Triggered when multiple keys are added to a project")]
+        Description = "Starts when multiple keys are added to a project")]
     public Task<WebhookResponse<KeysEvent>> ProjectKeysAddedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -148,7 +148,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On key modified", typeof(ProjectKeyModifiedHandler),
-        Description = "Triggered when keys are modified")]
+        Description = "Starts when a project key is modified")]
     public async Task<WebhookResponse<GetKeyEvent>> ProjectKeyModifiedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest,
@@ -186,7 +186,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On keys deleted", typeof(ProjectKeysDeletedHandler),
-        Description = "Triggered when keys are removed from a project")]
+        Description = "Starts when one or more keys are deleted from a project")]
     public Task<WebhookResponse<KeysDeletedEvent>> ProjectKeysDeletedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest,
@@ -204,7 +204,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On key comment added", typeof(ProjectKeyCommentAddedHandler),
-        Description = "Triggers when a new comment is added to a key")]
+        Description = "Starts when a comment is added to a project key")]
     public Task<WebhookResponse<KeyCommentEvent>> ProjectKeyCommentAddedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] CommentAddedWebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest,
@@ -230,7 +230,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On translation updated", typeof(ProjectTranslationUpdatedHandler),
-        Description = "Triggered when a project translation is updated")]
+        Description = "Starts when a project translation is updated")]
     public async Task<WebhookResponse<TranslationEvent>> ProjectTranslationUpdatedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest,
@@ -254,7 +254,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On translations updated", typeof(ProjectTranslationsUpdatedHandler),
-        Description = "Triggered when multiple project translations have been updated")]
+        Description = "Starts when multiple project translations are updated")]
     public Task<WebhookResponse<TranslationsEvent>> ProjectTranslationsUpdatedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest,
@@ -273,7 +273,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On translation proofread", typeof(ProjectTranslationProofreadHandler),
-        Description = "Triggers when a proofreading has taken place")]
+        Description = "Starts when a project translation is proofread")]
     public Task<WebhookResponse<ProofreadEvent>> ProjectTranslationProofreadHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest,
@@ -292,7 +292,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On contributor added", typeof(ProjectContributorAddedHandler),
-        Description = "Triggered when a contributor is added to a project")]
+        Description = "Starts when a contributor is added to a project")]
     public Task<WebhookResponse<ContributerEvent>> ProjectContributorAddedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -302,7 +302,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On contributor deleted", typeof(ProjectContributorDeletedHandler),
-        Description = "Triggered when a contributor was deleted from a project")]
+        Description = "Starts when a contributor is deleted from a project")]
     public Task<WebhookResponse<ContributerEvent>> ProjectContributorDeletedHandler(
         WebhookRequest webhookRequest, [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -312,7 +312,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On order created", typeof(TeamOrderCreatedHandler),
-        Description = "Triggered when a new team order is created")]
+        Description = "Starts when a team order is created")]
     public Task<WebhookResponse<OrderEvent>> TeamOrderCreatedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -322,7 +322,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On order deleted", typeof(TeamOrderDeletedHandler),
-        Description = "Triggered when a new team order is deleted")]
+        Description = "Starts when a team order is deleted")]
     public Task<WebhookResponse<BaseEvent>> TeamOrderDeletedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -332,7 +332,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
     }
 
     [Webhook("On order completed", typeof(TeamOrderCompletedHandler),
-        Description = "Triggered when a new team order is completed")]
+        Description = "Starts when a team order is completed")]
     public Task<WebhookResponse<OrderEvent>> TeamOrderCompletedHandler(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest,
@@ -352,7 +352,7 @@ public class SingleEventWebhookList(InvocationContext invocationContext) : Webho
 
     [Webhook("On task initial TM leverage calculated",
         typeof(ProjectTaskInitialTmLeverageCalculatedHandler),
-        Description = "Triggered when TM calculation finishes")]
+        Description = "Starts when initial TM leverage calculation for a task finishes")]
     public Task<WebhookResponse<TaskLeverageEvent>> ProjectTaskInitial_tm_leverageCalculatedHandler(
         WebhookRequest webhookRequest, 
         [WebhookParameter(true)] WebhookInput input,

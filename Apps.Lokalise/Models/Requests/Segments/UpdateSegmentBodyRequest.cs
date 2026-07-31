@@ -16,6 +16,6 @@ public class UpdateSegmentBodyRequest
     public bool? IsReviewed { get; set; }
 
     [JsonProperty("custom_translation_status_ids")]
-    [Display("Custom translation status ids")]
+    [Display("Custom translation status IDs")]
     public IEnumerable<string>? CustomTranslationStatusIds { get; set; }
 }

@@ -14,6 +14,7 @@ using Apps.Lokalise.Utils.Converters;
 using Blackbird.Applications.Sdk.Common.Files;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
+using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Xliff.Utils.Extensions;
 using Blackbird.Applications.Sdk.Common.Exceptions;
@@ -21,6 +22,8 @@ using Apps.Lokalise.Models.Responses.Glossary;
 using Blackbird.Applications.Sdk.Glossaries.Utils.Dtos;
 using Blackbird.Applications.Sdk.Glossaries.Utils.Converters;
 using System.Xml.Linq;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Actions;
 
@@ -29,7 +32,7 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
 {
     #region Actions
 
-    [Action("Get project files", Description = "Get all project files")]
+    [Action("Search project files", Description = "Searches files in a project, optionally filtering by file name")]
     public async Task<ListAllFilesResponse> ListAllFiles([ActionParameter] ListAllFilesRequest input)
     {
         var endpoint =
@@ -40,7 +43,7 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         return new(items);
     }
 
-    [Action("Upload file to project", Description = "Upload file to project")]
+    [Action("Upload file to project", Description = "Uploads a file to a project and waits for processing to finish")]
     public async Task<QueuedProcessDto> UploadFile([ActionParameter] ProjectRequest project,
         [ActionParameter] UploadFileInput input)
     {
@@ -53,8 +56,76 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         return await Client
             .PollFileImportOperation(project.ProjectId, uploadResult.Process.ProcessId, Creds);
     }
+
+    [Action("Upload file to marketing project", Description = "Uploads a UTF-8 HTML file to a marketing project and waits for processing to finish")]
+    public async Task<QueuedProcessDto> UploadFileToMarketingProject(
+        [ActionParameter] ProjectRequest project,
+        [ActionParameter] UploadMarketingFileInput input)
+    {
+        if (string.IsNullOrWhiteSpace(project.ProjectId))
+            throw new PluginMisconfigurationException("Project ID cannot be empty. Please select a marketing project.");
+
+        if (input.File == null || string.IsNullOrWhiteSpace(input.File.Name))
+            throw new PluginMisconfigurationException("HTML file cannot be empty. Please select an HTML file.");
+
+        var extension = Path.GetExtension(input.File.Name);
+        if (!extension.Equals(".html", StringComparison.OrdinalIgnoreCase) &&
+            !extension.Equals(".htm", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new PluginMisconfigurationException(
+                "HTML file must have an .html or .htm extension. Please select a supported HTML file.");
+        }
+
+        if (string.IsNullOrWhiteSpace(input.LanguageCode))
+            throw new PluginMisconfigurationException("Language code cannot be empty. Please select a language.");
+
+        var title = string.IsNullOrWhiteSpace(input.Title) ? input.File.Name : input.Title;
+        if (title.Length > 256)
+            throw new PluginMisconfigurationException("Title cannot exceed 256 characters. Please enter a shorter title.");
+
+        string htmlContents;
+        try
+        {
+            await using var stream = await fileManagementClient.DownloadAsync(input.File);
+            var fileBytes = await stream.GetByteData();
+            var utf8Preamble = Encoding.UTF8.GetPreamble();
+            var contentOffset = fileBytes.AsSpan().StartsWith(utf8Preamble) ? utf8Preamble.Length : 0;
+            htmlContents = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true)
+                .GetString(fileBytes, contentOffset, fileBytes.Length - contentOffset);
+        }
+        catch (DecoderFallbackException)
+        {
+            throw new PluginMisconfigurationException(
+                "HTML file contains invalid UTF-8. Please save the file as UTF-8 and try again.");
+        }
+
+        var marketingFile = JsonConvert.SerializeObject(new
+        {
+            html_contents = htmlContents
+        });
+        var data = Convert.ToBase64String(Encoding.UTF8.GetBytes(marketingFile));
+        var body = new
+        {
+            replace_modified = true,
+            lang_iso = input.LanguageCode,
+            filename = $"{input.File.Name}.json",
+            format = "json",
+            title,
+            data
+        };
+
+        var endpoint = $"/projects/{project.ProjectId}/files/upload";
+        var request = new LokaliseRequest(endpoint, Method.Post, Creds).WithJsonBody(body);
+        var uploadResult = await Client.ExecuteWithHandling<QueuedProcessDto>(request);
+        var processId = uploadResult?.Process?.ProcessId;
+
+        if (string.IsNullOrWhiteSpace(processId))
+            throw new PluginApplicationException("Process ID is missing from file upload response.");
+
+        return await Client.PollFileImportOperation(project.ProjectId, processId, Creds);
+    }
     
-    [Action("Upload file to project as XLIFF", Description = "Upload file to project as XLIFF")]
+    [Action("Upload file to project as XLIFF", Description = "Uploads an XLIFF file to a project, converting memoQ XLIFF files when needed")]
     public async Task<QueuedProcessDto> UploadFileAsXliff([ActionParameter] ProjectRequest project,
         [ActionParameter] UploadXliffInput input)
     {
@@ -90,7 +161,7 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         return await UploadFile(project, input);
     }
 
-    [Action("Download all project files as ZIP", Description = "Download all project files as ZIP archive")]
+    [Action("Download all project files as ZIP", Description = "Downloads all project files using the selected export settings")]
     public async Task<DownloadProjectFilesAsZipResponse> DownloadProjectFilesAsZip(
         [ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadFileRequest input)
@@ -184,7 +255,7 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         return new DownloadProjectFilesAsZipResponse { File = zipFileReference };
     }
 
-    [Action("Download project source files", Description = "Download all project source files")]
+    [Action("Download project source files", Description = "Downloads source files for all project languages")]
     public async Task<DownloadFilesResponse> DownloadProjectSourceFiles(
         [ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadSourceFilesRequest input)
@@ -283,7 +354,7 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         return new DownloadFilesResponse(result.ToArray());
     }
 
-    [Action("Download translated project file", Description = "Download translated project file by name")]
+    [Action("Download translated project file", Description = "Downloads one translated project file by file name and language")]
     public async Task<DownloadProjectFilesAsZipResponse> DownloadTranslatedFile(
         [ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadTranslatedFileRequest input)
@@ -420,7 +491,7 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         };
     }
 
-    [Action("Download XLIFF file", Description = "Download XLIFF file")]
+    [Action("Download XLIFF file", Description = "Downloads one task file for the selected language")]
     public async Task<DownloadProjectFilesAsZipResponse> DownloadXLIFF([ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadXLIFFFileRequest input)
     {
@@ -461,7 +532,7 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         };
     }
 
-    [Action("Download XLIFF files from task", Description = "Download XLIFF files from task")]
+    [Action("Download XLIFF files from task", Description = "Downloads all translation files for a task")]
     public async Task<DownloadFilesResponse> DownloadXLIFFFromTask([ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadTaskXLIFFFileRequest input)
     {
@@ -510,7 +581,7 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         return new DownloadFilesResponse(result.ToArray());
     }
 
-    [Action("Download all XLIFF files from project", Description = "Download all XLIFF files from project")]
+    [Action("Download all XLIFF files from project", Description = "Downloads all translation files for a project")]
     public async Task<DownloadFilesResponse> DownloadXLIFFAll([ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadAllXLIFFFilesRequest input)
     {
@@ -557,7 +628,7 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         return new DownloadFilesResponse(result.ToArray());
     }
 
-    [Action("Delete file", Description = "Delete file from project")]
+    [Action("Delete file", Description = "Deletes a file from a project")]
     public Task DeleteFile([ActionParameter] DeleteFileRequest input)
     {
         var endpoint = $"/projects/{input.ProjectId}/files/{input.FileId}";
@@ -566,7 +637,7 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         return Client.ExecuteWithHandling(request);
     }
 
-    [Action("Export glossary", Description = "Export project glossary as TBX file")]
+    [Action("Download glossary", Description = "Exports project glossary terms to a TBX file")]
     public async Task<FileReference> ExportGlossaryTerms([ActionParameter] ProjectRequest input)
     {
         var endpoint = $"/projects/{input.ProjectId}/glossary-terms";
@@ -637,7 +708,7 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         return fileReference;
     }
 
-    [Action("Import glossary", Description = "Import glossary terms from a TBX file into the project")]
+    [Action("Upload glossary", Description = "Imports glossary terms from a TBX file into a project")]
     public async Task<ImportGlossaryResponse> ImportGlossary(
              [ActionParameter] ProjectRequest input,
              [ActionParameter] FileReference tbxFile)

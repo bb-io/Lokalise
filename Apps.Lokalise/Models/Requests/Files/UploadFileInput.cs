@@ -19,7 +19,7 @@ public class UploadFileInput
     [Display("Convert placeholders")]
     public bool? ConvertPlaceHolders { get; set; }
         
-    [Display("Detect icu plurals")]
+    [Display("Detect ICU plurals")]
     public bool? DetectIcuPlurals { get; set; }
         
     public IEnumerable<string>? Tags { get; set; }
@@ -33,7 +33,7 @@ public class UploadFileInput
     [Display("Tag skipped keys")]
     public bool? TagSkippedKeys { get; set; }
         
-    [Display("Replace modified?")]
+    [Display("Replace modified")]
     public bool? ReplaceModified { get; set; }
         
     [Display("Slashn to linebreak")]

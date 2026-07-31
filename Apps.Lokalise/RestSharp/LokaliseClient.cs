@@ -108,15 +108,49 @@ public class LokaliseClient : RestClient
     {
         var request = new LokaliseRequest($"/projects/{projectId}/processes/{processId}",
             Method.Get, authenticationCredentialsProviders);
+        var deadline = DateTime.UtcNow.AddMinutes(10);
+        string? lastObservedStatus = null;
 
-        var response = await ExecuteWithHandling<QueuedProcessDto>(request);
-        while (response?.Process.Status != "finished")
+        while (true)
         {
-            await Task.Delay(2000);
-            response = await ExecuteWithHandling<QueuedProcessDto>(request);
-        }
+            if (DateTime.UtcNow >= deadline)
+            {
+                throw new PluginApplicationException(
+                    $"File import process polling timed out after 10 minutes for process ID: {processId}. Last observed status: {lastObservedStatus ?? "not observed"}.");
+            }
 
-        return response;
+            var response = await ExecuteWithHandling<QueuedProcessDto>(request);
+            if (response?.Process == null)
+            {
+                throw new PluginApplicationException(
+                    $"File import process data is missing for process ID: {processId}.");
+            }
+
+            var status = response.Process.Status;
+            lastObservedStatus = status;
+
+            switch (status)
+            {
+                case "finished":
+                    return response;
+                case "queued":
+                case "pre_processing":
+                case "running":
+                case "post_processing":
+                    await Task.Delay(2000);
+                    break;
+                case "failed":
+                case "cancelled":
+                    throw new PluginApplicationException(
+                        $"File import process {status}. {response.Process.Message ?? "No message was provided by Lokalise."}");
+                case null:
+                    throw new PluginApplicationException(
+                        $"File import process status is missing for process ID: {processId}.");
+                default:
+                    throw new PluginApplicationException(
+                        $"File import process returned unknown status '{status}' for process ID: {processId}.");
+            }
+        }
     }
 
     public async Task<List<TV>> ExecutePaginated<T, TV>(RestRequest request, int limit = 100) where T : PaginationResponse<TV>

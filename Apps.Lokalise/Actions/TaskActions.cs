@@ -29,7 +29,7 @@ public class TaskActions(InvocationContext invocationContext) : LokaliseInvocabl
 {
     #region Actions
 
-    [Action("Get tasks", Description = "Get all tasks of a certain project")]
+    [Action("Search tasks", Description = "Searches tasks in a project, optionally filtering by title or status")]
     public async Task<ListTasksResponse> ListAllTasks([ActionParameter] ProjectRequest project,
         [ActionParameter] TaskListParameters parameters)
     {
@@ -44,7 +44,7 @@ public class TaskActions(InvocationContext invocationContext) : LokaliseInvocabl
         return new(items);
     }
 
-    [Action("Create task", Description = "Create a new task")]
+    [Action("Create task", Description = "Creates a task and assigns selected users or groups to every target language")]
     public async Task<TaskResponse> CreateTask([ActionParameter] ProjectRequest project,
         [ActionParameter] TaskCreateRequest parameters,
         [ActionParameter] TaskAssigneesRequest assigneesRequest)
@@ -64,7 +64,7 @@ public class TaskActions(InvocationContext invocationContext) : LokaliseInvocabl
         return response.Task;
     }
 
-    [Action("Create task from the built languages", Description = "Create a new task from the built languages")]
+    [Action("Create task from the built languages", Description = "Creates a task with languages and assignees produced by the Create task-language output action")]
     public async Task<TaskResponse> CreateTaskFromBuiltLangs([ActionParameter] ProjectRequest project,
         [ActionParameter] TaskFromBuiltLangsRequest parameters)
     {
@@ -80,7 +80,7 @@ public class TaskActions(InvocationContext invocationContext) : LokaliseInvocabl
         return response.Task;
     }
 
-    [Action("Create language task", Description = "Create a new task with a single language for filtering keys and users")]
+    [Action("Create language task", Description = "Creates a task for one target language, with optional translation-state filters")]
     public async Task<TaskResponse> CreateLanguageTask([ActionParameter] ProjectRequest project,
     [ActionParameter] LanguageTaskCreateRequest parameters,
     [ActionParameter] TaskAssigneesRequest assigneesRequest,
@@ -122,7 +122,7 @@ public class TaskActions(InvocationContext invocationContext) : LokaliseInvocabl
         return response.Task;
     }
 
-    [Action("Get task", Description = "Get information about a specific task")]
+    [Action("Get task", Description = "Gets task details and can expand group members when a team ID is provided")]
     public async Task<TaskResponse> RetrieveTask([ActionParameter] GetTaskRequest taskRequest, 
         [ActionParameter, Display("Team ID"), DataSource(typeof(TeamDataHandler))] string? teamId)
     {
@@ -156,7 +156,63 @@ public class TaskActions(InvocationContext invocationContext) : LokaliseInvocabl
         return response.Task;
     }
 
-    [Action("Update task", Description = "Update information on a specific task")]
+    [Action("Search files from task", Description = "Outputs unique original file names assigned to keys in a task")]
+    public async Task<GetFilesFromTaskResponse> GetFilesFromTask([ActionParameter] GetTaskRequest taskRequest)
+    {
+        if (string.IsNullOrWhiteSpace(taskRequest.ProjectId))
+            throw new PluginMisconfigurationException(
+                "Project ID cannot be empty. Please select a project and try again.");
+
+        if (string.IsNullOrWhiteSpace(taskRequest.TaskId))
+            throw new PluginMisconfigurationException(
+                "Task ID cannot be empty. Please select a task and try again.");
+
+        var taskEndpoint = $"/projects/{taskRequest.ProjectId}/tasks/{taskRequest.TaskId}";
+        var taskResponse = await Client.ExecuteWithHandling<TaskRetriveResponse>(
+            new LokaliseRequest(taskEndpoint, Method.Get, Creds));
+
+        if (taskResponse.Task == null)
+            throw new PluginMisconfigurationException(
+                $"Task with ID {taskRequest.TaskId} for project {taskRequest.ProjectId} returned no data. Please check both IDs and try again.");
+
+        var keyIds = taskResponse.Task.Languages?
+            .SelectMany(language => language.Keys ?? new List<string>())
+            .Where(keyId => !string.IsNullOrWhiteSpace(keyId))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray() ?? Array.Empty<string>();
+
+        if (keyIds.Length == 0)
+            return new GetFilesFromTaskResponse();
+
+        var keys = new List<KeyDto>();
+        foreach (var keyIdBatch in keyIds.Chunk(100))
+        {
+            var keysRequest = new LokaliseRequest($"/projects/{taskRequest.ProjectId}/keys", Method.Get, Creds);
+            keysRequest.AddParameter("filter_key_ids", string.Join(",", keyIdBatch));
+
+            var keysResponse = await Client.ExecuteWithHandling<KeysWrapper>(keysRequest);
+            if (keysResponse.Items != null)
+                keys.AddRange(keysResponse.Items);
+        }
+
+        var fileNames = keys
+            .SelectMany(key => new[]
+            {
+                key.Filenames?.Ios,
+                key.Filenames?.Android,
+                key.Filenames?.Web,
+                key.Filenames?.Other
+            })
+            .Where(fileName => !string.IsNullOrWhiteSpace(fileName))
+            .Select(fileName => fileName!)
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(fileName => fileName, StringComparer.Ordinal)
+            .ToList();
+
+        return new GetFilesFromTaskResponse { FileNames = fileNames };
+    }
+
+    [Action("Update task", Description = "Updates task details")]
     public async Task<TaskResponse> UpdateTask([ActionParameter] ProjectRequest project,
         [ActionParameter] [Display("Task ID")] string taskId,
         [ActionParameter] TaskUpdateInput input)
@@ -171,7 +227,7 @@ public class TaskActions(InvocationContext invocationContext) : LokaliseInvocabl
         return response.Task;
     }
 
-    [Action("Delete task", Description = "Delete a specific task")]
+    [Action("Delete task", Description = "Deletes a task")]
     public Task<TaskDeleteResponse> DeleteTask([ActionParameter] ProjectRequest input,
         [ActionParameter] [Display("Task ID")] string taskId)
     {

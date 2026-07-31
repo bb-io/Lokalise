@@ -120,7 +120,7 @@ public class TaskResponse
     public string CompletedByEmail { get; set; }
 
     [JsonProperty("custom_translation_status_ids")]
-    [Display("Custom translation status ids")]
+    [Display("Custom translation status IDs")]
     public IEnumerable<string> CustomTranslationStatusIds { get; set; }
 
 

@@ -31,7 +31,7 @@ namespace Apps.Lokalise.Models.Requests.Translations
         public string? FilterQaIssues { get; set; }
 
         [JsonProperty("filter_active_task_id")]
-        [Display("Filter Active Task ID")]
+        [Display("Filter active task ID")]
         public string? FilterActiveTaskID { get; set; }
 
     }
