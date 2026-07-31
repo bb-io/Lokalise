@@ -26,12 +26,20 @@ namespace Tests.Lokalise
                 new ProjectRequest { ProjectId = "672287966a561cd6cec3b8.03914475" },
                 new UploadMarketingFileInput
                 {
-                    File = new FileReference { Name = "marketing-upload.html", ContentType = "text/html" },
-                    LanguageCode = "en"
+                    File = new FileReference { Name = "sample.html", ContentType = "text/html" },
+                    LanguageCode = "en",
+                    Title = "Overwritten title"
                 });
 
             Assert.IsFalse(string.IsNullOrWhiteSpace(result.Process.ProcessId));
             Assert.AreEqual("finished", result.Process.Status);
+
+            var files = await action.ListAllFiles(new ListAllFilesRequest
+            {
+                ProjectId = "672287966a561cd6cec3b8.03914475",
+                FilterFileName = "sample.html.json"
+            });
+            Assert.IsTrue(files.Files.Any(x => x.FileName == "sample.html.json"));
         }
 
         [TestMethod]

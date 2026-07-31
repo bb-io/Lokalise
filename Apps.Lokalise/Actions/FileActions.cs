@@ -107,8 +107,10 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         var data = Convert.ToBase64String(Encoding.UTF8.GetBytes(marketingFile));
         var body = new
         {
-            filename = input.File.Name,
+            replace_modified = true,
             lang_iso = input.LanguageCode,
+            filename = $"{input.File.Name}.json",
+            format = "json",
             title,
             data
         };
