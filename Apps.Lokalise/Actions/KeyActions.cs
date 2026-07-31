@@ -25,7 +25,7 @@ public class KeyActions(InvocationContext invocationContext) : LokaliseInvocable
 {
     #region Actions
 
-    [Action("Get project keys", Description = "Get all project keys")]
+    [Action("Get project keys", Description = "Searches keys in a project and outputs source and target translations separately")]
     public async Task<ListProjectKeysResponse> GetProjectKeys([ActionParameter] ProjectRequest project,
         [ActionParameter] ListProjectKeysRequest input,
         [ActionParameter] ListProjectKeysFilters filters)
@@ -77,7 +77,7 @@ public class KeyActions(InvocationContext invocationContext) : LokaliseInvocable
         return new ListProjectKeysResponse { Keys = keys, ProjectId = project.ProjectId, TotalCount = keys.Count()};
     }
 
-    [Action("List key IDs", Description = "List key IDs based on the provided filters")]
+    [Action("List key IDs", Description = "Searches key IDs using project and translation filters")]
     public async Task<ListProjectKeyIdsResponse> ListKeyIds([ActionParameter] ProjectRequest project,
         [ActionParameter] ListProjectKeysBaseRequest input,
         [ActionParameter] ListProjectKeysFilters filters)
@@ -114,7 +114,7 @@ public class KeyActions(InvocationContext invocationContext) : LokaliseInvocable
         };
     }
 
-    [Action("Create key", Description = "Create key in project")]
+    [Action("Create key", Description = "Creates a key in a project")]
     public async Task<KeyDto> CreateKey([ActionParameter] ProjectRequest project,
         [ActionParameter] CreateKeyInput input)
     {
@@ -129,7 +129,7 @@ public class KeyActions(InvocationContext invocationContext) : LokaliseInvocable
         return response.Keys.FirstOrDefault() ?? throw new("Unknown error occured during key creation");
     }
 
-    [Action("Get key", Description = "Get key by ID")]
+    [Action("Get key", Description = "Gets a key by ID and outputs source and target translations separately")]
     public async Task<KeyDto> RetrieveKey([ActionParameter] RetrieveKeyRequest input)
     {
 
@@ -158,7 +158,7 @@ public class KeyActions(InvocationContext invocationContext) : LokaliseInvocable
         return _key;
     }
 
-    [Action("Delete key", Description = "Delete key by ID")]
+    [Action("Delete key", Description = "Deletes a key by ID")]
     public Task DeleteKey([ActionParameter] DeleteKeyRequest input)
     {
         var endpoint = $"/projects/{input.ProjectId}/keys/{input.KeyId}";

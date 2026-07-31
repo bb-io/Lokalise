@@ -18,7 +18,7 @@ public class ProjectActions(InvocationContext invocationContext) : LokaliseInvoc
 {
     #region Actions
 
-    [Action("Get projects", Description = "Get a list of all projects")]
+    [Action("Get projects", Description = "Searches projects using optional filters and project details")]
     public async Task<ProjectsResponse> ListAllProjects([ActionParameter] ProjectListParameters parameters, [ActionParameter]ProjectFilterByDateRequest dateParameters)
     {
         var query = parameters.AsLokaliseDictionary().AllIsNotNull();
@@ -39,7 +39,7 @@ public class ProjectActions(InvocationContext invocationContext) : LokaliseInvoc
         return response;
     }
 
-    [Action("Create project", Description = "Create a new project")]
+    [Action("Create project", Description = "Creates a project")]
     public Task<ProjectResponse> CreateProject([ActionParameter] ProjectCreateInput parameters)
     {
         var request = new LokaliseRequest("/projects", Method.Post, Creds)
@@ -48,7 +48,7 @@ public class ProjectActions(InvocationContext invocationContext) : LokaliseInvoc
         return Client.ExecuteWithHandling<ProjectResponse>(request);
     }
 
-    [Action("Get project", Description = "Get the details of a project")]
+    [Action("Get project", Description = "Gets project details")]
     public Task<ProjectResponse> RetrieveProject([ActionParameter] ProjectRequest input)
     {
         var endpoint = $"/projects/{input.ProjectId}";
@@ -57,7 +57,7 @@ public class ProjectActions(InvocationContext invocationContext) : LokaliseInvoc
         return Client.ExecuteWithHandling<ProjectResponse>(request);
     }
 
-    [Action("Update project", Description = "Update a project with new information")]
+    [Action("Update project", Description = "Updates a project's name and description")]
     public Task<ProjectResponse> UpdateProject([ActionParameter] ProjectRequest input,
         [ActionParameter] ProjectUpdateRequest parameters)
     {
@@ -68,7 +68,7 @@ public class ProjectActions(InvocationContext invocationContext) : LokaliseInvoc
         return Client.ExecuteWithHandling<ProjectResponse>(request);
     }
 
-    [Action("Delete project", Description = "Delete a project")]
+    [Action("Delete project", Description = "Deletes a project")]
     public Task<ProjectDeleteResponse> DeleteProject([ActionParameter] ProjectRequest input)
     {
         var endpoint = $"/projects/{input.ProjectId}";

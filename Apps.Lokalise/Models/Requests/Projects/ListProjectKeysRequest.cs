@@ -23,7 +23,7 @@ public class ListProjectKeysRequest : ListProjectKeysBaseRequest
     public bool? IncludeTranslations { get; set; }
 
     [JsonProperty("filter_key_ids")]
-    [Display("Filter Key IDs")]
+    [Display("Filter key IDs")]
     public string? FilterKeyIds { get; set; }
 
     public ListProjectKeysRequest()

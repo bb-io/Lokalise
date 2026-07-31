@@ -16,7 +16,7 @@ public class CommentActions(InvocationContext invocationContext) : LokaliseInvoc
 {
     #region Actions
 
-    [Action("Add comment", Description = "Add a comment to a key")]
+    [Action("Add comment", Description = "Adds a comment to a key")]
     public Task<CommentsResponse> AddComment([ActionParameter] KeyRequest pathData,
         [ActionParameter] [Display("Comment")] string comment)
     {

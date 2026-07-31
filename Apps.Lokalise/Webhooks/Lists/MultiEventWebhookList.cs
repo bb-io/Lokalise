@@ -32,7 +32,7 @@ public class MultiEventWebhookList(InvocationContext invocationContext) : Webhoo
 
 
     [Webhook("On key modified for assignee", typeof(AssigneeKeyModifiedEventHandler),
-        Description = "Triggered when a key is modified for a specific assignee")]
+        Description = "Starts when a key assigned to a specific user is added or modified, or when a task is created")]
     public async Task<WebhookResponse<AssigneeKeyModifiedEvent>> OnKeyModifiedForAssignee(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookUserInput input,
         [WebhookParameter] KeyOptionalRequest keyOptionalRequest)
@@ -171,7 +171,8 @@ public class MultiEventWebhookList(InvocationContext invocationContext) : Webhoo
         };
     }
 
-    [Webhook("On key added (Multiple projects)", typeof(ProjectKeyAddedMultipleProjectsHandler))]
+    [Webhook("On key added (Multiple projects)", typeof(ProjectKeyAddedMultipleProjectsHandler),
+        Description = "Starts when a key is added to any selected project")]
     public async Task<WebhookResponse<GetKeyEvent>> OnKeyAdded(WebhookRequest webhookRequest,
         [WebhookParameter(true)] WebhookInput input,
         [WebhookParameter] ProjectOptionalRequest optionalRequest)
@@ -180,7 +181,8 @@ public class MultiEventWebhookList(InvocationContext invocationContext) : Webhoo
         return await MapToEventResponse(response);
     }
 
-    [Webhook("On keys added or modified (Multiple projects)", typeof(ProjectKeysAddedOrModifiedHandler))]
+    [Webhook("On keys added or modified (Multiple projects)", typeof(ProjectKeysAddedOrModifiedHandler),
+        Description = "Starts when one or more keys are added or modified in any selected project")]
     public async Task<WebhookResponse<ProjectKeysUnifiedEvent>> OnKeyAddedOrModified(WebhookRequest webhookRequest,
        [WebhookParameter(true)] WebhookInput input,
        [WebhookParameter] ProjectOptionalRequest optionalRequest)

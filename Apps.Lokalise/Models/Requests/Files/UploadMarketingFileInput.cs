@@ -14,6 +14,6 @@ public class UploadMarketingFileInput
     [DataSource(typeof(LanguageDataHandler))]
     public string LanguageCode { get; set; } = string.Empty;
 
-    [Display("Title", Description = "Title displayed in Lokalise. Defaults to the file name and must not exceed 256 characters.")]
+    [Display("Title", Description = "Title displayed for marketing content. Defaults to the file name and must not exceed 256 characters.")]
     public string? Title { get; set; }
 }

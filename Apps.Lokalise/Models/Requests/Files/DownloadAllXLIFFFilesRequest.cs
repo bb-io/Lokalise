@@ -52,7 +52,7 @@ namespace Apps.Lokalise.Models.Requests.Files
         public string? ExportEmptyAs { get; set; }
 
         [JsonProperty("export_null_as")]
-        [Display("Export null as", Description = "(Ruby on Rails YAML export only) Select how you would like null (void) translations to be exported. Allowed values are null to keep null, empty to replace with empty string.")]
+        [Display("Export null as", Description = "For Ruby on Rails YAML exports, select how null translations are exported. Allowed values are null to keep null or empty to replace with an empty value.")]
         [StaticDataSource(typeof(ExportNullAsDataHandler))]
         public string? ExportNullAs { get; set; }
 
@@ -65,7 +65,7 @@ namespace Apps.Lokalise.Models.Requests.Files
         public bool? IncludeDescription { get; set; }
 
         [JsonProperty("include_pids")]
-        [Display("Include Project IDs", Description = "Other projects ID's, which keys should be included with this export.")]
+        [Display("Include project IDs", Description = "IDs of other projects whose keys should be included with this export.")]
         public IEnumerable<string>? IncludePids { get; set; }
 
         [JsonProperty("triggers")] public IEnumerable<string>? Triggers { get; set; }
@@ -79,7 +79,7 @@ namespace Apps.Lokalise.Models.Requests.Files
         public bool? ReplaceBreaks { get; set; }
 
         [JsonProperty("disable_references")]
-        [Display("Disable References", Description = "Enable to skip automatic replace of key reference placeholders (e.g. [%key:hello_world%]) with their corresponding translations.")]
+        [Display("Disable references", Description = "Enable to skip automatic replacement of key reference placeholders (e.g. [%key:hello_world%]) with their corresponding translations.")]
         public bool? DisableReferences { get; set; }
 
         [JsonProperty("plural_format")]
