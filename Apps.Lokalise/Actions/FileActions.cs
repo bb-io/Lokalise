@@ -101,7 +101,6 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
 
         var marketingFile = JsonConvert.SerializeObject(new
         {
-            title,
             html_contents = htmlContents
         });
         var data = Convert.ToBase64String(Encoding.UTF8.GetBytes(marketingFile));
