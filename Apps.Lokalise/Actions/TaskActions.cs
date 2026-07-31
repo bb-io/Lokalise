@@ -156,6 +156,62 @@ public class TaskActions(InvocationContext invocationContext) : LokaliseInvocabl
         return response.Task;
     }
 
+    [Action("Get files from task", Description = "Get original filenames assigned to keys in a task")]
+    public async Task<GetFilesFromTaskResponse> GetFilesFromTask([ActionParameter] GetTaskRequest taskRequest)
+    {
+        if (string.IsNullOrWhiteSpace(taskRequest.ProjectId))
+            throw new PluginMisconfigurationException(
+                "Project ID cannot be empty. Please select a project and try again.");
+
+        if (string.IsNullOrWhiteSpace(taskRequest.TaskId))
+            throw new PluginMisconfigurationException(
+                "Task ID cannot be empty. Please select a task and try again.");
+
+        var taskEndpoint = $"/projects/{taskRequest.ProjectId}/tasks/{taskRequest.TaskId}";
+        var taskResponse = await Client.ExecuteWithHandling<TaskRetriveResponse>(
+            new LokaliseRequest(taskEndpoint, Method.Get, Creds));
+
+        if (taskResponse.Task == null)
+            throw new PluginMisconfigurationException(
+                $"Task with ID {taskRequest.TaskId} for project {taskRequest.ProjectId} returned no data. Please check both IDs and try again.");
+
+        var keyIds = taskResponse.Task.Languages?
+            .SelectMany(language => language.Keys ?? new List<string>())
+            .Where(keyId => !string.IsNullOrWhiteSpace(keyId))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray() ?? Array.Empty<string>();
+
+        if (keyIds.Length == 0)
+            return new GetFilesFromTaskResponse();
+
+        var keys = new List<KeyDto>();
+        foreach (var keyIdBatch in keyIds.Chunk(100))
+        {
+            var keysRequest = new LokaliseRequest($"/projects/{taskRequest.ProjectId}/keys", Method.Get, Creds);
+            keysRequest.AddParameter("filter_key_ids", string.Join(",", keyIdBatch));
+
+            var keysResponse = await Client.ExecuteWithHandling<KeysWrapper>(keysRequest);
+            if (keysResponse.Items != null)
+                keys.AddRange(keysResponse.Items);
+        }
+
+        var fileNames = keys
+            .SelectMany(key => new[]
+            {
+                key.Filenames?.Ios,
+                key.Filenames?.Android,
+                key.Filenames?.Web,
+                key.Filenames?.Other
+            })
+            .Where(fileName => !string.IsNullOrWhiteSpace(fileName))
+            .Select(fileName => fileName!)
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(fileName => fileName, StringComparer.Ordinal)
+            .ToList();
+
+        return new GetFilesFromTaskResponse { FileNames = fileNames };
+    }
+
     [Action("Update task", Description = "Update information on a specific task")]
     public async Task<TaskResponse> UpdateTask([ActionParameter] ProjectRequest project,
         [ActionParameter] [Display("Task ID")] string taskId,

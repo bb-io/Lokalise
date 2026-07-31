@@ -65,6 +65,7 @@ Lokalise is a continuous localization and translation management platform. This 
 
 - **Create task from the built languages** creates a new task with languages from `Build language` action results. Note: ordinary `Create` task action assigns all specified users/groups to all of the languages. If you need languages to have unique users/groups, please use this action.
 - **Create language task** creates a task for one target language. Because there is only one target language, you can immediatly assign users and groups, and filter keys by translation reviewed/unverified/untranslated.
+- **Get files from task** returns unique original filenames assigned to keys in a task.
 - **List/Create/Get/Update/Delete task(s)**
 
 ### Translations
