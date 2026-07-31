@@ -5,15 +5,15 @@
     <Nullable>enable</Nullable>
     <Product>Lokalise</Product>
     <Description>The localization platform built for growth</Description>
-    <Version>1.5.24</Version>
+    <Version>1.5.25</Version>
     <AssemblyName>Apps.Lokalise</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-	<PackageReference Include="Blackbird.Applications.Sdk.Blueprints" Version="1.0.0-rc.10308" />
-    <PackageReference Include="Blackbird.Applications.SDK.Extensions.FileManagement" Version="1.0.1" />
+	<PackageReference Include="Blackbird.Applications.Sdk.Blueprints" Version="1.0.2" />
+    <PackageReference Include="Blackbird.Applications.SDK.Extensions.FileManagement" Version="1.1.0" />
     <PackageReference Include="Blackbird.Applications.Sdk.Glossaries.Utils" Version="1.0.1" />
-    <PackageReference Include="Blackbird.Applications.Sdk.Utils" Version="1.0.22" />
-    <PackageReference Include="Blackbird.Xliff.Utils" Version="1.1.4" />
+    <PackageReference Include="Blackbird.Applications.Sdk.Utils" Version="1.0.26" />
+    <PackageReference Include="Blackbird.Xliff.Utils" Version="1.1.14" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource CopyToOutputDirectory="Always" Include="image\icon.png" />

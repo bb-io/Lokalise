@@ -109,14 +109,39 @@ public class LokaliseClient : RestClient
         var request = new LokaliseRequest($"/projects/{projectId}/processes/{processId}",
             Method.Get, authenticationCredentialsProviders);
 
-        var response = await ExecuteWithHandling<QueuedProcessDto>(request);
-        while (response?.Process.Status != "finished")
+        while (true)
         {
-            await Task.Delay(2000);
-            response = await ExecuteWithHandling<QueuedProcessDto>(request);
-        }
+            var response = await ExecuteWithHandling<QueuedProcessDto>(request);
+            if (response?.Process == null)
+            {
+                throw new PluginApplicationException(
+                    $"File import process data is missing for process ID: {processId}.");
+            }
 
-        return response;
+            var status = response.Process.Status;
+
+            switch (status)
+            {
+                case "finished":
+                    return response;
+                case "queued":
+                case "pre_processing":
+                case "running":
+                case "post_processing":
+                    await Task.Delay(2000);
+                    break;
+                case "failed":
+                case "cancelled":
+                    throw new PluginApplicationException(
+                        $"File import process {status}. {response.Process.Message ?? "No message was provided by Lokalise."}");
+                case null:
+                    throw new PluginApplicationException(
+                        $"File import process status is missing for process ID: {processId}.");
+                default:
+                    throw new PluginApplicationException(
+                        $"File import process returned unknown status '{status}' for process ID: {processId}.");
+            }
+        }
     }
 
     public async Task<List<TV>> ExecutePaginated<T, TV>(RestRequest request, int limit = 100) where T : PaginationResponse<TV>

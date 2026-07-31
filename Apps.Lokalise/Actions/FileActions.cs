@@ -14,6 +14,7 @@ using Apps.Lokalise.Utils.Converters;
 using Blackbird.Applications.Sdk.Common.Files;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
+using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Xliff.Utils.Extensions;
 using Blackbird.Applications.Sdk.Common.Exceptions;
@@ -21,6 +22,8 @@ using Apps.Lokalise.Models.Responses.Glossary;
 using Blackbird.Applications.Sdk.Glossaries.Utils.Dtos;
 using Blackbird.Applications.Sdk.Glossaries.Utils.Converters;
 using System.Xml.Linq;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace Apps.Lokalise.Actions;
 
@@ -52,6 +55,73 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
 
         return await Client
             .PollFileImportOperation(project.ProjectId, uploadResult.Process.ProcessId, Creds);
+    }
+
+    [Action("Upload file to marketing project", Description = "Upload an HTML file to a marketing project")]
+    public async Task<QueuedProcessDto> UploadFileToMarketingProject(
+        [ActionParameter] ProjectRequest project,
+        [ActionParameter] UploadMarketingFileInput input)
+    {
+        if (string.IsNullOrWhiteSpace(project.ProjectId))
+            throw new PluginMisconfigurationException("Project ID cannot be empty. Please select a marketing project.");
+
+        if (input.File == null || string.IsNullOrWhiteSpace(input.File.Name))
+            throw new PluginMisconfigurationException("HTML file cannot be empty. Please select an HTML file.");
+
+        var extension = Path.GetExtension(input.File.Name);
+        if (!extension.Equals(".html", StringComparison.OrdinalIgnoreCase) &&
+            !extension.Equals(".htm", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new PluginMisconfigurationException(
+                "HTML file must have an .html or .htm extension. Please select a supported HTML file.");
+        }
+
+        if (string.IsNullOrWhiteSpace(input.LanguageCode))
+            throw new PluginMisconfigurationException("Language code cannot be empty. Please select a language.");
+
+        var title = string.IsNullOrWhiteSpace(input.Title) ? input.File.Name : input.Title;
+        if (title.Length > 256)
+            throw new PluginMisconfigurationException("Title cannot exceed 256 characters. Please enter a shorter title.");
+
+        string htmlContents;
+        try
+        {
+            await using var stream = await fileManagementClient.DownloadAsync(input.File);
+            var fileBytes = await stream.GetByteData();
+            var utf8Preamble = Encoding.UTF8.GetPreamble();
+            var contentOffset = fileBytes.AsSpan().StartsWith(utf8Preamble) ? utf8Preamble.Length : 0;
+            htmlContents = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true)
+                .GetString(fileBytes, contentOffset, fileBytes.Length - contentOffset);
+        }
+        catch (DecoderFallbackException)
+        {
+            throw new PluginMisconfigurationException(
+                "HTML file contains invalid UTF-8. Please save the file as UTF-8 and try again.");
+        }
+
+        var marketingFile = JsonConvert.SerializeObject(new
+        {
+            title,
+            html_contents = htmlContents
+        });
+        var data = Convert.ToBase64String(Encoding.UTF8.GetBytes(marketingFile));
+        var body = new
+        {
+            filename = input.File.Name,
+            lang_iso = input.LanguageCode,
+            title,
+            data
+        };
+
+        var endpoint = $"/projects/{project.ProjectId}/files/upload";
+        var request = new LokaliseRequest(endpoint, Method.Post, Creds).WithJsonBody(body);
+        var uploadResult = await Client.ExecuteWithHandling<QueuedProcessDto>(request);
+        var processId = uploadResult?.Process?.ProcessId;
+
+        if (string.IsNullOrWhiteSpace(processId))
+            throw new PluginApplicationException("Process ID is missing from file upload response.");
+
+        return await Client.PollFileImportOperation(project.ProjectId, processId, Creds);
     }
     
     [Action("Upload file to project as XLIFF", Description = "Upload file to project as XLIFF")]
