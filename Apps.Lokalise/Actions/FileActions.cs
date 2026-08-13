@@ -491,6 +491,88 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         };
     }
 
+    [Action("Download content from marketing project", Description = "Downloads translated HTML content from a marketing project")]
+    public async Task<DownloadProjectFilesAsZipResponse> DownloadMarketingContent(
+        [ActionParameter] ProjectRequest project,
+        [ActionParameter] DownloadMarketingContentRequest input)
+    {
+        var projectData = await new ProjectActions(InvocationContext).RetrieveProject(project);
+        if (projectData.ProjectType is not ("content_integration" or "marketing" or "marketing_integrations"))
+        {
+            throw new PluginMisconfigurationException(
+                "Selected project is not a marketing project. Please select a marketing project.");
+        }
+
+        if (string.IsNullOrWhiteSpace(input.FileName))
+            throw new PluginMisconfigurationException("File name cannot be empty. Please enter an HTML file name.");
+
+        if (string.IsNullOrWhiteSpace(input.LanguageCode))
+            throw new PluginMisconfigurationException("Language code cannot be empty. Please select a language.");
+
+        var extension = Path.GetExtension(input.FileName);
+        if (!string.Equals(extension, ".html", StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(extension, ".htm", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new PluginMisconfigurationException(
+                "File name must have an .html or .htm extension. Please enter an HTML file name.");
+        }
+
+        var endpoint = $"/projects/{project.ProjectId}/files/download";
+        var request = new LokaliseRequest(endpoint, Method.Post, Creds)
+            .WithJsonBody(new DownloadFileRequest
+            {
+                Format = "json",
+                OriginalFilenames = true,
+                DirectoryPrefix = "%LANG_ISO%",
+                AllPlatforms = true,
+                FilterLangs = new[] { input.LanguageCode }
+            });
+
+        var export = await Client.ExecuteWithHandling<ExportFilesDto>(request);
+        var zipResponse = await Client.ExecuteWithHandling(new RestRequest(new Uri(export.BundleUrl)));
+        var rawBytes = zipResponse.RawBytes
+            ?? throw new PluginApplicationException("Downloaded marketing content is null.");
+
+        using var zipStream = new MemoryStream(rawBytes);
+        using var sourceArchive = new ZipArchive(zipStream, ZipArchiveMode.Read);
+        var archiveFileName = $"{input.FileName}.json";
+        var languageDirectory = input.LanguageCode.Replace("-", "_");
+        var matchingEntry = sourceArchive.Entries.FirstOrDefault(entry =>
+            !entry.FullName.EndsWith('/') &&
+            entry.FullName.Split('/').First() == languageDirectory &&
+            entry.Name == archiveFileName);
+
+        if (matchingEntry == null)
+        {
+            throw new PluginApplicationException(
+                $"File '{input.FileName}' for language '{input.LanguageCode}' was not found in the marketing project export.");
+        }
+
+        using var entryStream = matchingEntry.Open();
+        using var reader = new StreamReader(entryStream, Encoding.UTF8);
+        var marketingFile = JsonConvert.DeserializeObject<Dictionary<string, string>>(
+            await reader.ReadToEndAsync());
+
+        if (marketingFile == null ||
+            !marketingFile.TryGetValue("html_contents", out var htmlContents) ||
+            string.IsNullOrWhiteSpace(htmlContents))
+        {
+            throw new PluginApplicationException(
+                $"File '{archiveFileName}' does not contain translated HTML content.");
+        }
+
+        using var htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(htmlContents));
+        var htmlFile = await fileManagementClient.UploadAsync(
+            htmlStream,
+            MediaTypeNames.Text.Html,
+            input.FileName);
+
+        return new DownloadProjectFilesAsZipResponse
+        {
+            File = htmlFile
+        };
+    }
+
     [Action("Download XLIFF file", Description = "Downloads one task file for the selected language")]
     public async Task<DownloadProjectFilesAsZipResponse> DownloadXLIFF([ActionParameter] ProjectRequest project,
         [ActionParameter] DownloadXLIFFFileRequest input)

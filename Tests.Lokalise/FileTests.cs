@@ -123,6 +123,23 @@ namespace Tests.Lokalise
         }
 
         [TestMethod]
+        public async Task DownloadMarketingContent_IsSuccess()
+        {
+            var action = new FileActions(InvocationContext, FileManager);
+            var result = await action.DownloadMarketingContent(
+                new ProjectRequest { ProjectId = "672287966a561cd6cec3b8.03914475" },
+                new DownloadMarketingContentRequest
+                {
+                    LanguageCode = "fr",
+                    FileName = "36.html"
+                });
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("36.html", result.File.Name);
+            Assert.AreEqual("text/html", result.File.ContentType);
+        }
+
+        [TestMethod]
         public async Task DownloadXLIFFFile_IsSuccess()
         {
             var action = new FileActions(InvocationContext, FileManager);
