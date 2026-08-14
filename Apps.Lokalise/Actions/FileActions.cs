@@ -498,26 +498,19 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
     {
         var projectData = await new ProjectActions(InvocationContext).RetrieveProject(project);
         if (projectData.ProjectType is not ("content_integration" or "marketing" or "marketing_integrations"))
-        {
-            throw new PluginMisconfigurationException(
-                "Selected project is not a marketing project. Please select a marketing project.");
-        }
-
-        if (string.IsNullOrWhiteSpace(input.FileName))
-            throw new PluginMisconfigurationException("File name cannot be empty. Please enter an HTML file name.");
+            throw new PluginMisconfigurationException("Selected project is not a marketing project. Please select a marketing project.");
 
         if (string.IsNullOrWhiteSpace(input.LanguageCode))
             throw new PluginMisconfigurationException("Language code cannot be empty. Please select a language.");
 
-        var extension = Path.GetExtension(input.FileName);
-        if (!string.Equals(extension, ".html", StringComparison.OrdinalIgnoreCase) &&
-            !string.Equals(extension, ".htm", StringComparison.OrdinalIgnoreCase))
-        {
-            throw new PluginMisconfigurationException(
-                "File name must have an .html or .htm extension. Please enter an HTML file name.");
-        }
+        if (string.IsNullOrWhiteSpace(input.FileName))
+            throw new PluginMisconfigurationException("File name cannot be empty. Please enter an HTML file name.");
 
-        var endpoint = $"/projects/{project.ProjectId}/files/download";
+        if (Path.GetExtension(input.FileName).ToLowerInvariant() is not ".html" and not ".htm")
+            throw new PluginMisconfigurationException("File name must have an .html or .htm extension. Please enter an HTML file name.");
+
+        var archiveFileName = $"{input.FileName}.json";
+        var endpoint = $"/projects/{project.ProjectId}/files/async-download";
         var request = new LokaliseRequest(endpoint, Method.Post, Creds)
             .WithJsonBody(new DownloadFileRequest
             {
@@ -525,27 +518,57 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
                 OriginalFilenames = true,
                 DirectoryPrefix = "%LANG_ISO%",
                 AllPlatforms = true,
-                FilterLangs = new[] { input.LanguageCode }
+                FilterLangs = [input.LanguageCode],
+                FilterFilenames = [archiveFileName]
             });
 
-        var export = await Client.ExecuteWithHandling<ExportFilesDto>(request);
-        var zipResponse = await Client.ExecuteWithHandling(new RestRequest(new Uri(export.BundleUrl)));
+        var asyncProcessResult = await Client.ExecuteWithHandling<AsyncProcessInitResponse>(request);
+        var processId = asyncProcessResult.ProcessId
+            ?? throw new PluginApplicationException("Process ID is null in async download response.");
+
+        var processEndpoint = $"/projects/{project.ProjectId}/processes/{processId}";
+        var processRequest = new LokaliseRequest(processEndpoint, Method.Get, Creds);
+        AsyncProcessDto process;
+        do
+        {
+            var processStatus = await Client.ExecuteWithHandling<AsyncProcessResponse>(processRequest);
+            if (processStatus?.Process is not { Status: not null } currentProcess)
+            {
+                throw new PluginApplicationException(
+                    $"Process status is null in API response for process_id: {processId}");
+            }
+
+            if (currentProcess.Type is not "async-export")
+            {
+                throw new PluginApplicationException(
+                    $"Expected 'async-export' process, but got '{currentProcess.Type}' for process_id: {processId}");
+            }
+
+            process = currentProcess;
+        }
+        while (process.Status is "queued" or "pre_processing" or "running" or "post_processing");
+
+        if (process.Status is not "finished")
+            throw new PluginApplicationException($"Marketing content export process failed with status: {process.Status}, message: {process.Message ?? "No message provided"} for process_id: {processId}");
+
+        if (process.Details?.DownloadUrl is not { Length: > 0 } downloadUrl)
+            throw new PluginApplicationException($"Download URL is null or empty in finished process response for process_id: {processId}");
+
+        var zipResponse = await Client.ExecuteWithHandling(new RestRequest(new Uri(downloadUrl)));
         var rawBytes = zipResponse.RawBytes
             ?? throw new PluginApplicationException("Downloaded marketing content is null.");
 
-        using var zipStream = new MemoryStream(rawBytes);
+        using var zipStream = new MemoryStream(rawBytes, writable: false);
         using var sourceArchive = new ZipArchive(zipStream, ZipArchiveMode.Read);
-        var archiveFileName = $"{input.FileName}.json";
-        var languageDirectory = input.LanguageCode.Replace("-", "_");
+        var languageDirectoryPrefix = $"{input.LanguageCode.Replace('-', '_')}/";
         var matchingEntry = sourceArchive.Entries.FirstOrDefault(entry =>
             !entry.FullName.EndsWith('/') &&
-            entry.FullName.Split('/').First() == languageDirectory &&
-            entry.Name == archiveFileName);
+            entry.FullName.StartsWith(languageDirectoryPrefix, StringComparison.Ordinal) &&
+            entry.Name.Equals(archiveFileName, StringComparison.Ordinal));
 
         if (matchingEntry == null)
         {
-            throw new PluginApplicationException(
-                $"File '{input.FileName}' for language '{input.LanguageCode}' was not found in the marketing project export.");
+            throw new PluginApplicationException($"File '{input.FileName}' for language '{input.LanguageCode}' was not found in the marketing project export.");
         }
 
         using var entryStream = matchingEntry.Open();
@@ -553,13 +576,14 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
         var marketingFile = JsonConvert.DeserializeObject<Dictionary<string, string>>(
             await reader.ReadToEndAsync());
 
-        if (marketingFile == null ||
-            !marketingFile.TryGetValue("html_contents", out var htmlContents) ||
-            string.IsNullOrWhiteSpace(htmlContents))
-        {
-            throw new PluginApplicationException(
-                $"File '{archiveFileName}' does not contain translated HTML content.");
-        }
+        var htmlContents = marketingFile?.GetValueOrDefault("html_contents");
+        if (string.IsNullOrWhiteSpace(htmlContents))
+            throw new PluginApplicationException($"File '{archiveFileName}' does not contain translated HTML content.");
+
+        htmlContents = htmlContents
+            .Replace("\\r\\n", "\r\n")
+            .Replace("\\n", "\n")
+            .Replace("\\r", "\r");
 
         using var htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(htmlContents));
         var htmlFile = await fileManagementClient.UploadAsync(
@@ -567,7 +591,7 @@ public class FileActions(InvocationContext invocationContext, IFileManagementCli
             MediaTypeNames.Text.Html,
             input.FileName);
 
-        return new DownloadProjectFilesAsZipResponse
+        return new()
         {
             File = htmlFile
         };
