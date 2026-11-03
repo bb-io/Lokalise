@@ -19,14 +19,14 @@ namespace Apps.Lokalise.Actions;
 public class ScreenshotActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient)
     : LokaliseInvocable(invocationContext)
 {
-    [Action("Add screenshot", Description = "Adds a screenshot to a project")]
+    [Action("Add screenshot", Description = "Adds a JPG or PNG screenshot to a project and outputs its ID and URL")]
     public async Task<ScreenshotResponse> AddScreenshot([ActionParameter] ScreenshotInput input)
     {
         var screenshots = await UploadScreenshot(new[] { input.Screenshot }, input);
         return screenshots.Single();
     }
 
-    [Action("Add multiple screenshots", Description = "Adds screenshots to a project in batches of up to 10")]
+    [Action("Add multiple screenshots", Description = "Adds JPG or PNG screenshots to a project in batches of up to 10 and outputs their IDs and URLs")]
     public async Task<ScreenshotsResponse> AddMultipleScreenshots([ActionParameter] ScreenshotsInput input)
         => new() { Screenshots = await UploadScreenshot(input.Screenshots, input) };
 
