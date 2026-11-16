@@ -12,7 +12,7 @@ namespace Apps.Lokalise.DataSourceHandlers;
 
 public class UserDataHandler : LokaliseInvocable, IAsyncDataSourceHandler
 {
-    private string TeamId { get; }
+    private string? TeamId { get; }
 
     public UserDataHandler(InvocationContext invocationContext, [ActionParameter] TaskAssigneesRequest input)
         : base(invocationContext)

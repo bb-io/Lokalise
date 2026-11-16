@@ -127,17 +127,22 @@ public class TaskResponse
     [Display("Language codes")] 
     public List<string> LanguageCodes { get; set; }
 
+    [JsonProperty("skipped_languages")]
+    [Display("Skipped languages")]
+    public List<SkippedTaskLanguage> SkippedLanguages { get; set; } = new();
+
     public void FillLanguageCodesArray()
     {
-        LanguageCodes = Languages.Select(l => l.LanguageIso).ToList();
+        var languages = Languages?.ToList() ?? new List<Language>();
+        LanguageCodes = languages.Select(l => l.LanguageIso).ToList();
 
         if (Users == null)
         {
-            Users = Languages.SelectMany(x => x.Users).Distinct().ToList();
+            Users = languages.SelectMany(x => x.Users ?? new List<User>()).Distinct().ToList();
         }
         else
         {
-            Users.AddRange(Languages.SelectMany(x => x.Users).Distinct());
+            Users.AddRange(languages.SelectMany(x => x.Users ?? new List<User>()).Distinct());
         }
     }
 }

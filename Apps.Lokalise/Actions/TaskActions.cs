@@ -1,4 +1,4 @@
-﻿using Apps.Lokalise.Constants;
+using Apps.Lokalise.Constants;
 using Apps.Lokalise.DataSourceHandlers;
 using Apps.Lokalise.Dtos;
 using Apps.Lokalise.Extensions;
@@ -44,50 +44,45 @@ public class TaskActions(InvocationContext invocationContext) : LokaliseInvocabl
         return new(items);
     }
 
-    [Action("Create task", Description = "Creates a task and assigns selected users or groups to every target language")]
+    [Action("Create task", Description = "Creates a Translation, Review, Automatic translation, or LQA by AI task. AI tasks require no user or group assignees")]
     public async Task<TaskResponse> CreateTask([ActionParameter] ProjectRequest project,
         [ActionParameter] TaskCreateRequest parameters,
         [ActionParameter] TaskAssigneesRequest assigneesRequest)
     {
-        if (assigneesRequest.Users is null && assigneesRequest.Groups is null)
-            throw new PluginMisconfigurationException("One of the inputs must be specified: Users or Groups");
-
         var endpoint = $"/projects/{project.ProjectId}/tasks";
 
         var payload = new TaskCreateWithMultLangsRequest(parameters, assigneesRequest);
+        payload.Validate(requireAssignees: true);
         var request = new LokaliseRequest(endpoint, Method.Post, Creds)
             .WithJsonBody(payload, JsonConfig.SerializeSettings);
 
         var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
-        response.Task.FillLanguageCodesArray();
-
-        return response.Task;
+        return response.GetCreatedTask();
     }
 
-    [Action("Create task from the built languages", Description = "Creates a task with languages and assignees produced by the Create task-language output action")]
+    [Action("Create task from the built languages", Description = "Creates a task from built languages. Use language-only outputs for Automatic translation and LQA by AI")]
     public async Task<TaskResponse> CreateTaskFromBuiltLangs([ActionParameter] ProjectRequest project,
         [ActionParameter] TaskFromBuiltLangsRequest parameters)
     {
         var endpoint = $"/projects/{project.ProjectId}/tasks";
 
         var payload = new TaskCreateWithMultLangsRequest(parameters);
+        payload.Validate();
         var request = new LokaliseRequest(endpoint, Method.Post, Creds)
             .WithJsonBody(payload, JsonConfig.SerializeSettings);
 
         var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
-        response.Task.FillLanguageCodesArray();
-
-        return response.Task;
+        return response.GetCreatedTask();
     }
 
-    [Action("Create language task", Description = "Creates a task for one target language, with optional translation-state filters")]
+    [Action("Create language task", Description = "Creates a task for one target language, including Automatic translation and LQA by AI, with optional translation-state filters")]
     public async Task<TaskResponse> CreateLanguageTask([ActionParameter] ProjectRequest project,
     [ActionParameter] LanguageTaskCreateRequest parameters,
     [ActionParameter] TaskAssigneesRequest assigneesRequest,
     [ActionParameter] FilterRequest filters)
     {
-        if (assigneesRequest.Users is null && assigneesRequest.Groups is null)
-            throw new PluginMisconfigurationException("One of the inputs must be specified: Users or Groups");
+        var payload = new TaskCreateWithMultLangsRequest(parameters, assigneesRequest, Array.Empty<string>());
+        payload.Validate(requireAssignees: true);
 
         // Getting project languages
         var languages = await Client.ExecutePaginated<LanguagesWrapper, LanguageDto>(new LokaliseRequest($"/projects/{project.ProjectId}/languages", Method.Get, Creds));
@@ -112,14 +107,12 @@ public class TaskActions(InvocationContext invocationContext) : LokaliseInvocabl
         }        
 
         // Create task
-        var payload = new TaskCreateWithMultLangsRequest(parameters, assigneesRequest, keys);
+        if (parameters.ParentTaskId == null) payload.Keys = keys;
         var request = new LokaliseRequest($"/projects/{project.ProjectId}/tasks", Method.Post, Creds)
             .WithJsonBody(payload, JsonConfig.SerializeSettings);
 
         var response = await Client.ExecuteWithHandling<TaskRetriveResponse>(request);
-        response.Task.FillLanguageCodesArray();
-
-        return response.Task;
+        return response.GetCreatedTask();
     }
 
     [Action("Get task", Description = "Gets task details and can expand group members when a team ID is provided")]

@@ -7,7 +7,9 @@ public class TaskTypeDataHandler : IStaticDataSourceHandler
     private static Dictionary<string, string> EnumValues => new()
     {
         { "translation", "Translation" },
-        { "review", "Review" }
+        { "review", "Review" },
+        { "automatic_translation", "Automatic translation" },
+        { "lqa_by_ai", "LQA by AI" }
     };
 
     public Dictionary<string, string> GetData()
