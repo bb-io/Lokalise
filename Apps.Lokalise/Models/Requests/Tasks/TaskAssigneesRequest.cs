@@ -6,9 +6,9 @@ namespace Apps.Lokalise.Models.Requests.Tasks;
 
 public class TaskAssigneesRequest
 {
-    [Display("Team")]
+    [Display("Team", Description = "Required to browse users or groups. Not needed for AI tasks.")]
     [DataSource(typeof(TeamDataHandler))]
-    public string TeamId { get; set; }
+    public string? TeamId { get; set; }
 
     [Display("Users")]
     [DataSource(typeof(UserDataHandler))]

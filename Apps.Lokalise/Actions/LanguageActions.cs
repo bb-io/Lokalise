@@ -51,12 +51,9 @@ public class LanguageActions(InvocationContext invocationContext) : LokaliseInvo
         return Client.ExecuteWithHandling(request);
     }
 
-    [Action("Create task-language output", Description = "Builds a language with user or group assignees for task creation")]
+    [Action("Create task-language output", Description = "Builds a language for task creation, with optional user or group assignees. Leave assignees empty for AI tasks")]
     public BuildLanguageResponse BuildLanguage([ActionParameter] BuildLanguageRequest input)
     {
-        if (input.Users is null && input.Groups is null)
-            throw new PluginMisconfigurationException("Either Users or Groups must be specified");
-
         return new()
         {
             Language = HttpUtility.HtmlEncode(JsonConvert.SerializeObject(new TaskLanguage()
